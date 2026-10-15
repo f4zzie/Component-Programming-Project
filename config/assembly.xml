@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Deployment descriptor of the SCO310 QR component suite.
+  It selects one implementation per role and sets design-time property values.
+  Edit this file - do not recompile - to re-deploy the same components as a
+  desktop tool, a print shop tool or a web service.
+-->
+<qr-assembly name="default">
+  <!-- provided/required interface pairs are declared in the component catalogue -->
+  <component role="encoder"    id="encoder.pure-java.v1"/>
+  <component role="renderer"   id="renderer.png.v1"/>
+  <component role="repository" id="repository.file-system.v1"/>
+  <component role="history"    id="history.bounded-memory.v1"/>
+  <component role="listener"   id="listener.audit-log.v1"/>
+  <component role="facade"     id="facade.qr-studio.v1"/>
+
+  <!-- encoder component properties -->
+  <property role="encoder" name="defaultErrorCorrection" value="M"/>
+  <property role="encoder" name="boostErrorCorrection" value="false"/>
+  <property role="encoder" name="minimumVersion" value="1"/>
+  <property role="encoder" name="maximumVersion" value="40"/>
+
+  <!-- renderer component properties (PNG) -->
+  <property role="renderer" name="moduleSize" value="10"/>
+  <property role="renderer" name="quietZone" value="4"/>
+  <property role="renderer" name="foregroundColor" value="#101820"/>
+  <property role="renderer" name="backgroundColor" value="#FFFFFF"/>
+
+  <!-- repository component properties -->
+  <property role="repository" name="rootDirectory" value="out/generated"/>
+  <property role="repository" name="historyFileName" value="history.ser"/>
+
+  <!-- history component properties -->
+  <property role="history" name="maxEntries" value="50"/>
+
+  <!-- audit listener component properties -->
+  <property role="listener" name="echoToConsole" value="true"/>
+  <property role="listener" name="verbose" value="false"/>
+
+  <!-- facade component properties -->
+  <property role="facade" name="defaultErrorCorrection" value="M"/>
+  <property role="facade" name="autoSaveArtifacts" value="true"/>
+  <property role="facade" name="autoSaveHistory" value="true"/>
+  <property role="facade" name="fileBaseName" value="qr-code"/>
+</qr-assembly>

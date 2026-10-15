@@ -1,0 +1,37 @@
+Manifest-Version: 1.0
+Implementation-Title: SCO310 QR Code Generator Component Suite
+Implementation-Version: 1.0.0
+Implementation-Vendor: Kenyatta University - SCO310 Component Programming
+Specification-Title: JavaBeans component model (JavaBeans 1.01)
+Specification-Version: 1.01
+Specification-Vendor: Oracle / Sun Microsystems
+Created-By: javac (JDK 21, --release 11)
+Class-Path: lib/core-3.5.3.jar lib/javase-3.5.3.jar
+Main-Class: ke.ku.sco310.qr.cli.QrCliAssembly
+
+Name: ke/ku/sco310/qr/components/PureJavaQrEncoderBean.class
+Java-Bean: True
+
+Name: ke/ku/sco310/qr/components/ZxingQrEncoderAdapterBean.class
+Java-Bean: True
+
+Name: ke/ku/sco310/qr/render/PngRendererBean.class
+Java-Bean: True
+
+Name: ke/ku/sco310/qr/render/SvgRendererBean.class
+Java-Bean: True
+
+Name: ke/ku/sco310/qr/render/AsciiRendererBean.class
+Java-Bean: True
+
+Name: ke/ku/sco310/qr/store/FileSystemRepositoryBean.class
+Java-Bean: True
+
+Name: ke/ku/sco310/qr/store/QrHistoryBean.class
+Java-Bean: True
+
+Name: ke/ku/sco310/qr/log/AuditLogListenerBean.class
+Java-Bean: True
+
+Name: ke/ku/sco310/qr/facade/QrStudioFacadeBean.class
+Java-Bean: True

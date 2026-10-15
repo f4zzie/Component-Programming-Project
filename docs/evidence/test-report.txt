@@ -1,0 +1,162 @@
+SCO310 QR component suite - automated verification transcript
+generated: Thu Oct 15 20:46:22 EAT 2026
+java: 21.0.12.1 (Arch Linux)
+host: Linux amd64
+
+
+[engine]
+  PASS ISO 18004 tables match ZXing for 40 versions x 4 ... 0 mismatching combinations 
+  PASS payloads survive the ZXing decode round trip (15 ... 60 decoded, 0 failed
+  PASS numeric payload selects numeric mode                 expected=Numeric actual=Numeric
+  PASS upper-case payload selects alphanumeric mode         expected=Alphanumeric actual=Alphanumeric
+  PASS mixed case payload selects byte mode                 expected=Byte actual=Byte
+  PASS compact mode lowers the symbol version               numeric v1 vs alphanumeric v1
+  PASS full capacity round trip for all 40 versions x 4 ... 160 decoded, 0 failed 
+  PASS encoding is deterministic for equal input            expected=QrCode{version=2, size=25, ec=Q, mode=Byte, mask=0, chars=17, dataCodewords=22, eccCodewords=22, producer='encoder.pure-java.v1'} actual=QrCode{version=2, size=25, ec=Q, mode=Byte, mask=0, chars=17, dataCodewords=22, eccCodewords=22, producer='encoder.pure-java.v1'}
+  PASS every forced mask pattern still decodes (0..7)       8/8 masks decoded, masks used [0, 1, 2, 3, 4, 5, 6, 7]
+  PASS forced mask is reported in the symbol                expected=5 actual=5
+  PASS encoder publishes its capability metadata            SCO310 in-house QR engine 1.0.0 [versions 1-40, modes [Numeric, Alphanumeric, Byte], in-house]
+  PASS maximum byte capacity reported for level L           expected=2953 actual=2953
+  PASS empty payload is rejected                            rejected as expected: QrEncodingException: The payload is empty; a QR Code must carry at least one byte
+  PASS null payload is rejected                             rejected as expected: QrEncodingException: The payload is empty; a QR Code must carry at least one byte
+  PASS over-capacity payload is rejected with a clear error rejected as expected: QrEncodingException: Payload of 200 characters does not fit version 1 at level H (needs 1113 bits, capacity 72 bits). Shorten the payload or lower the error-correction level.
+  PASS unknown error-correction label is rejected           rejected as expected: IllegalArgumentException: Unknown error-correction level 'Z'. Expected one of L, M, Q, H
+  PASS invalid forced mask is rejected                      rejected as expected: IllegalArgumentException: forcedMaskPattern must be -1 or 0..7
+  PASS constrained minimumVersion vetoes an inconsistent... rejected as expected: PropertyVetoException: minimumVersion 9 would exceed maximumVersion 5
+
+[renderer.png]
+  PASS artifact size follows moduleSize and quietZone       expected=246 actual=246
+  PASS mime type is published for the HTTP service          expected=image/png actual=image/png
+  PASS PNG artifact decodes back to the payload             expected=https://www.ku.ac.ke/sco310 - renderer check actual=https://www.ku.ac.ke/sco310 - renderer check
+  PASS quiet zone is painted with the background colour     expected=java.awt.Color[r=255,g=255,b=255] actual=java.awt.Color[r=255,g=255,b=255]
+  PASS every module is painted at the right position and... 0 of 1089 modules mismatched
+  PASS bound moduleSize property resizes the artifact       before=246px after=451px
+
+[renderer.svg]
+  PASS document declares absolute millimetre dimensions     first 60 chars: <?xml version="1.0" encoding="UTF-8"?> <svg xmlns="http://ww
+  PASS declares the vector namespace                        svg root present
+  PASS horizontal run merging reduces the element count     merged=297 single=577
+  PASS parsing the SVG back reproduces the module matrix    0 module mismatches
+  PASS switching the optimisation off restores one rect ... rects=577 darkModules=577
+
+[renderer.ascii]
+  PASS parsing the text art reproduces the module matrix    0 module mismatches
+  PASS artifact is flagged as textual                       expected=true actual=true
+
+[renderer]
+  PASS three renderer components fill the same role with... PNG, SVG, ASCII
+  PASS artifacts carry the identifier of the component t... renderer.png.v1 / renderer.svg.v1 (297 rects) / renderer.ascii.v1
+  PASS custom property editor parses #RRGGBB                expected=#1B5E20 actual=#1B5E20
+  PASS invalid colour text is rejected                      rejected as expected: IllegalArgumentException: '#12GG45' is not a hexadecimal colour
+  PASS invalid module size is rejected                      rejected as expected: IllegalArgumentException: moduleSize must be 1..64
+  PASS negative control: a corrupted PNG no longer decodes  decoder rejected the damaged artifact as expected
+
+[beans]
+  PASS PureJavaQrEncoderBean: public class with a no-arg... public=true noArgConstructor=true
+  PASS PureJavaQrEncoderBean: exposes writable propertie... 5 writable properties of 8 discovered
+  PASS PureJavaQrEncoderBean: implements Serializable an... serializable=true boundPropertySource=true
+  PASS ZxingQrEncoderAdapterBean: public class with a no... public=true noArgConstructor=true
+  PASS ZxingQrEncoderAdapterBean: exposes writable prope... 3 writable properties of 6 discovered
+  PASS ZxingQrEncoderAdapterBean: implements Serializabl... serializable=true boundPropertySource=true
+  PASS PngRendererBean: public class with a no-argument ... public=true noArgConstructor=true
+  PASS PngRendererBean: exposes writable properties thro... 4 writable properties of 4 discovered
+  PASS PngRendererBean: implements Serializable and Boun... serializable=true boundPropertySource=true
+  PASS SvgRendererBean: public class with a no-argument ... public=true noArgConstructor=true
+  PASS SvgRendererBean: exposes writable properties thro... 6 writable properties of 11 discovered
+  PASS SvgRendererBean: implements Serializable and Boun... serializable=true boundPropertySource=true
+  PASS AsciiRendererBean: public class with a no-argumen... public=true noArgConstructor=true
+  PASS AsciiRendererBean: exposes writable properties th... 3 writable properties of 8 discovered
+  PASS AsciiRendererBean: implements Serializable and Bo... serializable=true boundPropertySource=true
+  PASS FileSystemRepositoryBean: public class with a no-... public=true noArgConstructor=true
+  PASS FileSystemRepositoryBean: exposes writable proper... 2 writable properties of 7 discovered
+  PASS FileSystemRepositoryBean: implements Serializable... serializable=true boundPropertySource=true
+  PASS QrHistoryBean: public class with a no-argument co... public=true noArgConstructor=true
+  PASS QrHistoryBean: exposes writable properties throug... 2 writable properties of 2 discovered
+  PASS QrHistoryBean: implements Serializable and BoundP... serializable=true boundPropertySource=true
+  PASS AuditLogListenerBean: public class with a no-argu... public=true noArgConstructor=true
+  PASS AuditLogListenerBean: exposes writable properties... 3 writable properties of 7 discovered
+  PASS AuditLogListenerBean: implements Serializable and... serializable=true boundPropertySource=true
+  PASS QrStudioFacadeBean: public class with a no-argume... public=true noArgConstructor=true
+  PASS QrStudioFacadeBean: exposes writable properties t... 8 writable properties of 12 discovered
+  PASS QrStudioFacadeBean: implements Serializable and B... serializable=true boundPropertySource=true
+  PASS encoder event set is visible without a BeanInfo      expected=propertyChange actual=propertyChange
+
+[beans.bound]
+  PASS changing moduleSize fires a PropertyChangeEvent      moduleSize 8 -> 12
+
+[beans.constrained]
+  PASS a listener can veto a capacity reduction             rejected as expected: PropertyVetoException: capacity may not be reduced
+  PASS the vetoed value was not applied                     expected=5 actual=5
+  PASS removing the listener allows the change again        expected=7 actual=7
+
+[beans.indexed]
+  PASS addEntry fires an IndexedPropertyChangeEvent         4 events observed
+  PASS indexed accessor returns the stored element          expected=1 actual=1
+  PASS capacity policy discards the oldest entry            count=3 discarded=1
+  PASS overflow flag is exposed as a read-only property     expected=true actual=true
+
+[beans.introspection]
+  PASS BeanInfo attaches the custom colour editor           expected=HexColorPropertyEditor actual=HexColorPropertyEditor
+  PASS BeanInfo marks quietZone as an expert feature        expected=expert actual=expert
+  PASS BeanInfo publishes a display name for builder tools  expected=PNG Renderer Bean actual=PNG Renderer Bean
+
+[beans.events]
+  PASS the facade notifies every connected listener         listeners notified=1 audit events=1
+  PASS the event object carries the symbol and the artifact symbol=QrCode{version=2, size=25, ec=M, mode=Byte, mask=6, chars=17, dataCodewords=28, eccCodewords=16, producer='encoder.pure-java.v1'} artifact=RenderedArtifact{format=PNG, 264x264, bytes=5865, by=renderer.png.v1}
+
+[beans.persistence]
+  PASS the assembled bean graph survives an XML round trip  facade[encoder=encoder.pure-java.v1, renderer=renderer.png.v1, repository=repository.file-system.v1, history=history.bounded-memory.v1, listeners=1]
+  PASS design-time property values survive the round trip   moduleSize=8 xmlBytes=1244
+  PASS the restored assembly can generate without recomp... artifact written by the restored graph
+  PASS the assembly profile survives an XML round trip      Assembly profile 'round-trip':   encoder     -> encoder.pure-java.v1   renderer    -> renderer.svg.v1                  moduleSize = 9   repository  -> repository.file-system.v1   history     -> history.bounded-memory.v1   listener    -> listener.audit-log.v1   facade      -> facade.qr-studio.v1 
+
+[beans.optional]
+  PASS the assembly detects the optional third-party com... com.google.zxing.core present=true
+  PASS the adapter reports itself as a third-party compo... ZXing ("Zebra Crossing") core 3.5.3 [versions 1-40, modes [Numeric, Alphanumeric, Byte], third-party, optional library required]
+
+[assembly.catalogue]
+  PASS every role has at least one implementation           encoders=2 renderers=3 repositories=2
+  PASS the optional component declares its context depen... adapter declared with an explicit required interface
+
+[assembly.wiring]
+  PASS every declared dependency of the assembly is sati... encoder       -> facade.setEncoder     : OK | renderer      -> facade.setRenderer    : OK | repository    -> facade.setRepository  : OK | history       -> facade.setHistory     : OK | listener      -> facade event source   : OK | encoder       -> optional ZXing library : PRESENT
+  PASS profile properties reached the component instances   moduleSize=7
+
+[assembly.end-to-end]
+  PASS generation stores an artifact and returns the path   docs/evidence/work/assembly-test-1792086382318/qr-code-v5-q-20261015-204622.png
+  PASS the stored PNG decodes back to the payload           expected=https://www.ku.ac.ke/sco310/component-programming actual=https://www.ku.ac.ke/sco310/component-programming
+  PASS history and audit counters were updated              history=1 audit=1 facade=1
+  PASS the repository persisted the history record          expected=1 actual=1
+
+[assembly.replace]
+  PASS the assembly runs with a different renderer compo... expected=SVG actual=SVG
+  PASS the choice is recorded in the profile                renderer.svg.v1
+  PASS a third renderer drops in without recompiling        expected=ASCII actual=ASCII
+  PASS all three renderers produced the same symbol         version 5, mask 7 for PNG, SVG and ASCII
+  PASS the third-party encoder satisfies the same contract  expected=https://www.ku.ac.ke/sco310/component-programming actual=https://www.ku.ac.ke/sco310/component-programming
+  PASS the facade now reports the adapter as its encoder    encoder.zxing-adapter.v1
+
+[assembly.negative]
+  PASS generating without an encoder fails loudly           rejected as expected: QrEncodingException: No encoder component is connected: call setEncoder(...) before generating
+  PASS an unknown component id is rejected at assembly time rejected as expected: IllegalArgumentException: Unknown renderer component id: renderer.does-not-exist.v1
+  PASS a profile property the selected component does no... [not applicable to component renderer.ascii.v1 (property not declared): component renderer.ascii.v1.moduleSize]
+
+[assembly.repository]
+  PASS clearHistory empties the persisted history           expected=0 actual=0
+  PASS a new record is persisted immediately                expected=1 actual=1
+  PASS reinstantiating the repository component reads th... history file /home/lacoste/component-programming/qr-component-studio/docs/evidence/work/assembly-test-1792086382318/history.ser
+
+[assembly.history]
+  PASS the in-memory history honours its capacity policy    entries=2 discarded=5
+
+[gallery]
+  PASS the third-party adapter component produces decoda... v3 mask 4 by encoder.zxing-adapter.v1
+  PASS the assembled application writes gallery artifacts   docs/evidence/gallery/evidence-v5-h-20261015-204622.png
+  PASS gallery contains PNG, SVG and ASCII artifacts        /home/lacoste/component-programming/qr-component-studio/docs/evidence/gallery
+
+note: assembly storage directory: /home/lacoste/component-programming/qr-component-studio/docs/evidence/work/assembly-test-1792086382318
+
+TOTAL 108 checks, 108 passed, 0 failed
+
+
+ISO/IEC 18004 parameter table cross-check: 160 version/level combinations compared with the ZXing tables, 0 mismatches.

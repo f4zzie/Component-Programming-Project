@@ -1,0 +1,3549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>SCO 310 Component Programming - QR Code Generator from JavaBeans Components</title>
+<style>
+@page { size: A4; margin: 16mm 14mm; }
+html { font-size: 11pt; }
+body { font-family: "Liberation Serif", Georgia, serif; line-height: 1.5; color: #16181d;
+       max-width: 200mm; margin: 0 auto; padding: 0 6mm; }
+h1 { font-family: "Liberation Sans", Arial, sans-serif; font-size: 22pt; line-height: 1.2;
+     border-bottom: 3px solid #1b5e20; padding-bottom: 6px; margin-top: 28px; }
+h1:first-child { border-bottom: none; font-size: 26pt; margin-top: 0; }
+h2 { font-family: "Liberation Sans", Arial, sans-serif; font-size: 15pt; line-height: 1.3;
+     color: #1b5e20; margin-top: 26px; border-bottom: 1px solid #cfd8dc; padding-bottom: 3px; }
+h3 { font-family: "Liberation Sans", Arial, sans-serif; font-size: 12.5pt; margin-top: 18px; }
+code { font-family: "Liberation Mono", "DejaVu Sans Mono", monospace; font-size: 9pt;
+       background: #f1f3f5; padding: 1px 3px; border-radius: 3px; }
+pre { background: #16181d; color: #e6e6e6; padding: 10px 12px; border-radius: 5px;
+      white-space: pre-wrap; word-break: break-word; page-break-inside: avoid; }
+pre code { background: none; color: inherit; padding: 0; font-size: 8.6pt; line-height: 1.35; }
+table { border-collapse: collapse; width: 100%; margin: 10px 0 16px; font-size: 9.4pt;
+        page-break-inside: avoid; }
+th { background: #1b5e20; color: #fff; text-align: left; padding: 5px 7px;
+     font-family: "Liberation Sans", Arial, sans-serif; }
+td { border: 1px solid #d7dde2; padding: 4px 7px; vertical-align: top; }
+tr:nth-child(even) td { background: #f7f9fa; }
+blockquote { border-left: 4px solid #90a4ae; margin: 12px 0; padding: 2px 14px; color: #37474f;
+             background: #f7f9fa; }
+hr { border: none; border-top: 1px solid #cfd8dc; margin: 22px 0; }
+img { max-width: 100%; border: 1px solid #cfd8dc; margin: 6px 0 2px; page-break-inside: avoid; }
+a { color: #1b5e20; }
+p { margin: 7px 0; }
+</style>
+</head>
+<body>
+<h1>SCO 310: COMPONENT PROGRAMMING — PROJECT REPORT</h1>
+<h2>A Component-Oriented QR Code Generator built from interchangeable JavaBeans components</h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Unit</strong></td>
+<td>SCO 310 / SIT 300 — Component Programming</td>
+</tr>
+<tr>
+<td><strong>Project title</strong></td>
+<td><code>qr-component-suite</code> — a QR Code generator assembled from JavaBeans components</td>
+</tr>
+<tr>
+<td><strong>Student name</strong></td>
+<td><code>[STUDENT NAME]</code></td>
+</tr>
+<tr>
+<td><strong>Registration number</strong></td>
+<td><code>[REGISTRATION NUMBER]</code></td>
+</tr>
+<tr>
+<td><strong>Course lecturer</strong></td>
+<td>Dr. Bernard Ondara, Ph.D.</td>
+</tr>
+<tr>
+<td><strong>Institution</strong></td>
+<td>Kenyatta University — Department of Computing</td>
+</tr>
+<tr>
+<td><strong>Submission date</strong></td>
+<td><code>[DATE]</code></td>
+</tr>
+<tr>
+<td><strong>Source tree</strong></td>
+<td><code>qr-component-suite/</code> (48 Java source files, 6 572 lines; 51 compiled classes)</td>
+</tr>
+<tr>
+<td><strong>Automated verification</strong></td>
+<td>108 checks — <strong>108 passed, 0 failed</strong> (transcript: <code>docs/evidence/test-report.txt</code>)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>Contents</h2>
+<table>
+<thead>
+<tr>
+<th>Chapter</th>
+<th>Page of the argument</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>1. Executive summary</strong></td>
+<td>what was built, and the headline results</td>
+</tr>
+<tr>
+<td><strong>2. Scope, objectives and deliverables</strong></td>
+<td>what the project had to achieve, and where each deliverable lives</td>
+</tr>
+<tr>
+<td><strong>3. Component-oriented analysis</strong></td>
+<td>the COP requirements, the decomposition, the five component characteristics, COP versus OOP, and the three kinds of interface incompatibility</td>
+</tr>
+<tr>
+<td><strong>4. The JavaBeans component model</strong></td>
+<td>the eight bean steps, the four property kinds, the connection and deployment models, persistence, introspection</td>
+</tr>
+<tr>
+<td><strong>5. The component catalogue, component by component</strong></td>
+<td>provided/required interfaces, hidden behaviour, properties, events and contract checks for all eleven entries</td>
+</tr>
+<tr>
+<td><strong>6. Assembling the components</strong></td>
+<td>the composition pipeline, three front ends from one component set, replaceability, persistence of the assembly</td>
+</tr>
+<tr>
+<td><strong>7. The encoding logic, in detail</strong></td>
+<td>ISO/IEC 18004 stage by stage, with worked examples whose codewords match the standard</td>
+</tr>
+<tr>
+<td><strong>8. Guide to the screenshots, listings and figures</strong></td>
+<td>which screenshot proves what</td>
+</tr>
+<tr>
+<td><strong>9. Verification</strong></td>
+<td>strategy, results, the seven defects the evidence caught, negative controls, known divergences</td>
+</tr>
+<tr>
+<td><strong>10. Building, running and submitting</strong></td>
+<td>commands, marking-criteria mapping, conclusion, references</td>
+</tr>
+<tr>
+<td><strong>Appendices</strong></td>
+<td>evidence index, glossary, and the course questions answered from this project</td>
+</tr>
+</tbody>
+</table>
+<h2>1. Executive summary</h2>
+<p>This project delivers a <strong>working QR Code generator</strong> that is built the way component programming
+requires: the application is <em>assembled from independent, replaceable, introspectable components</em>
+rather than written as one monolithic program.</p>
+<p>The suite contains <strong>nine components plus two infrastructure classes</strong>, every one of them a
+JavaBean that satisfies the mandatory bean characteristics (public class, no-argument constructor,
+<code>Serializable</code>, <code>get</code>/<code>set</code> design patterns, delegation events). The components are wired by a
+component registry, configured by a deployment descriptor, and consumed by <strong>three different
+front-end assemblies</strong> — a Swing desktop application, a command-line tool and an HTTP web
+service — all built from the <em>same</em> compiled component set.</p>
+<p>The QR encoding itself (numeric, alphanumeric and byte modes, Reed–Solomon error correction over
+GF(2⁸), all eight mask patterns, versions 1–40) is implemented from <strong>ISO/IEC 18004 without any
+third-party dependency</strong>, and a second encoder component wraps the third-party ZXing engine behind
+an <em>identical provided interface</em> to demonstrate replaceability and interface standardisation.</p>
+<p>Every claim in this report is backed by machine-generated evidence: the automated suite decodes
+each produced symbol with the <strong>independent ZXing decoder</strong>, compares the ISO/IEC 18004 parameter
+tables with the tables published by ZXing (160 version/level combinations, <strong>0 mismatches</strong>),
+reconstructs each rendered artifact module by module, and runs negative controls that prove the
+checks can fail — including a corrupted-artifact control and the historical defect that the suite
+was designed to catch.</p>
+<h3>Headline results</h3>
+<table>
+<thead>
+<tr>
+<th>Result</th>
+<th>Value</th>
+<th>Evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Automated checks</td>
+<td>108 total, 108 passed, 0 failed</td>
+<td><code>docs/evidence/test-results.csv</code></td>
+</tr>
+<tr>
+<td>ISO/IEC 18004 table cross-check</td>
+<td>160/160 combinations identical to ZXing</td>
+<td><code>docs/evidence/table-cross-check.csv</code></td>
+</tr>
+<tr>
+<td>Round-trip decode, payload × level</td>
+<td>60/60 payloads recovered exactly (incl. accents, CJK, emoji)</td>
+<td><code>docs/evidence/test-report.txt</code></td>
+</tr>
+<tr>
+<td>Capacity sweep</td>
+<td>160/160 version/level pairs decoded at exact byte capacity</td>
+<td><code>docs/evidence/capacity-matrix.csv</code></td>
+</tr>
+<tr>
+<td>Renderer reconstruction</td>
+<td>PNG pixels, SVG rectangles and ASCII glyphs rebuild the matrix exactly</td>
+<td><code>docs/evidence/renderer-matrix.csv</code></td>
+</tr>
+<tr>
+<td>Artifact gallery</td>
+<td>28 artifacts (20 raster, 4 SVG, 4 ASCII) with SHA-256 digests and recovered payloads</td>
+<td><code>docs/evidence/artifact-gallery.csv</code></td>
+</tr>
+<tr>
+<td>Code size</td>
+<td>6 572 lines of Java across 48 files, 0 external dependency for the engine</td>
+<td><code>build.sh</code> output</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>2. Scope, objectives and deliverables</h2>
+<h3>2.1 Scope</h3>
+<p>A QR Code generator that</p>
+<ol>
+<li>accepts arbitrary text (Latin, accented, CJK, emoji, multi-line, vCard and Wi-Fi payloads);</li>
+<li>produces ISO/IEC 18004 conformant symbols at every version 1–40 and every error-correction
+   level L/M/Q/H;</li>
+<li>renders the symbol as a PNG raster image, a vector SVG document or console text art;</li>
+<li>persists both the artifacts and a generation history;</li>
+<li>is usable from a desktop GUI, a command line and an HTTP endpoint;</li>
+<li>is decomposed into components with explicit provided/required interfaces and can be
+   reconfigured <em>without recompiling</em>.</li>
+</ol>
+<h3>2.2 Objectives (mapped to the marking criteria of the unit)</h3>
+<table>
+<thead>
+<tr>
+<th>Objective</th>
+<th>How it is achieved</th>
+<th>Where to look</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Apply component-oriented design, not just object-oriented code</td>
+<td>component identification, roles, provided/required interfaces, black-box internals</td>
+<td>§4, <code>docs/diagrams/figure-1-component-model.png</code></td>
+</tr>
+<tr>
+<td>Implement a real JavaBeans component model</td>
+<td>four property kinds, delegation events, introspection, BeanInfo, persistence</td>
+<td>§5, <code>tools/BeanInspector</code></td>
+</tr>
+<tr>
+<td>Demonstrate reusability and replaceability</td>
+<td>two encoder components, three renderer components, three assemblies</td>
+<td>§6, <code>docs/screenshots/07-cli-component-catalogue.png</code></td>
+</tr>
+<tr>
+<td>Demonstrate the deployment model</td>
+<td>JAR with <code>Java-Bean: True</code> manifest entries, XML assembly persistence</td>
+<td>§5.4, <code>docs/screenshots/14-jar-manifest.png</code></td>
+</tr>
+<tr>
+<td>Produce correct, verified logic</td>
+<td>108 automated checks against an independent oracle</td>
+<td>§9, <code>docs/evidence/</code></td>
+</tr>
+<tr>
+<td>Produce complete documentation</td>
+<td>this report, screenshots of code and of the running programs</td>
+<td>§8, <code>docs/screenshots/</code></td>
+</tr>
+</tbody>
+</table>
+<h3>2.3 Deliverables inside the submission folder</h3>
+<pre><code>qr-component-studio/
+├── src/main/java/ke/ku/sco310/qr/     48 Java sources: components, engine, front ends
+├── src/test/java/ke/ku/sco310/qr/test/ verification suite (7 files, 1 396 lines)
+├── config/assembly.xml                 deployment descriptor (component selection + properties)
+├── manifest/MANIFEST.MF                JAR manifest with Java-Bean entries
+├── lib/                                optional third-party component (ZXing 3.5.3)
+├── build.sh, run-*.sh, pom.xml         build and run tooling
+├── out/                                compiled classes, distribution JAR, generated artifacts
+└── docs/
+    ├── Documentation.md                this report (master document)
+    ├── SCO310-QR-Component-Suite-Report.html / .docx / .pdf
+    ├── diagrams/                       six generated figures
+    ├── screenshots/                    27 screenshots (code, GUI, console, introspection)
+    └── evidence/                       verification transcript, CSVs, artifact gallery
+</code></pre>
+<hr />
+<h2>3. Component-oriented analysis</h2>
+<h3>3.1 What component-oriented programming requires</h3>
+<p>COP builds systems by <strong>assembling pre-existing, reusable and independent components</strong>. A
+component is a deployable unit of software with a well-defined interface whose implementation is
+hidden; the classic formal definition used in the course material (Szyperski, 2002) is:</p>
+<blockquote>
+<p>A software component is a unit of composition with contractually specified interfaces and
+explicit context dependencies only. A component can be deployed independently and is subject to
+third-party composition.</p>
+</blockquote>
+<p>The course notes reduce this to the triple <strong>C = (I, D, B)</strong>: the interfaces a component <em>offers</em>
+(I), the interfaces it <em>requires</em> (D), and its <em>hidden</em> behaviour (B). Section 4.2 lists the triple
+for every component of this suite; the hidden behaviour (<em>B</em>) lives exclusively inside the
+<code>ke.ku.sco310.qr.engine</code> package, which is deliberately package-private so that no consumer can
+depend on it.</p>
+<h3>3.2 Component identification and decomposition</h3>
+<p>Decomposition followed the <em>separation of concerns</em> principle of COP: encoding (pure computation),
+presentation (image generation), persistence (storage), notification (logging/statistics) and
+orchestration were separated into different components because they change for different reasons
+and at different rates.</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Role</th>
+<th>Component (componentId)</th>
+<th>Provides (I)</th>
+<th>Requires (D)</th>
+<th>Hidden behaviour (B)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>encoder</td>
+<td><code>PureJavaQrEncoderBean</code> (<code>encoder.pure-java.v1</code>)</td>
+<td><code>QrCodeEncoder</code>, <code>BoundPropertySource</code>, <code>Serializable</code></td>
+<td>—</td>
+<td>the whole ISO/IEC 18004 engine (segment analysis, version choice, Reed–Solomon, masking)</td>
+</tr>
+<tr>
+<td>2</td>
+<td>encoder</td>
+<td><code>ZxingQrEncoderAdapterBean</code> (<code>encoder.zxing-adapter.v1</code>)</td>
+<td><code>QrCodeEncoder</code>, <code>BoundPropertySource</code>, <code>Serializable</code></td>
+<td><code>com.google.zxing.core</code> (optional library)</td>
+<td>translation of the foreign <code>ByteMatrix</code> result into the suite's <code>QrCode</code> value object</td>
+</tr>
+<tr>
+<td>3</td>
+<td>renderer</td>
+<td><code>PngRendererBean</code> (<code>renderer.png.v1</code>)</td>
+<td><code>QrCodeRenderer</code>, <code>BoundPropertySource</code></td>
+<td>—</td>
+<td>raster geometry, run-length drawing, <code>ImageIO</code> encoding</td>
+</tr>
+<tr>
+<td>4</td>
+<td>renderer</td>
+<td><code>SvgRendererBean</code> (<code>renderer.svg.v1</code>)</td>
+<td><code>QrCodeRenderer</code>, <code>BoundPropertySource</code></td>
+<td>—</td>
+<td>SVG document model, horizontal run merging, millimetre sizing</td>
+</tr>
+<tr>
+<td>5</td>
+<td>renderer</td>
+<td><code>AsciiRendererBean</code> (<code>renderer.ascii.v1</code>)</td>
+<td><code>QrCodeRenderer</code>, <code>BoundPropertySource</code></td>
+<td>—</td>
+<td>glyph mapping and aspect-ratio correction</td>
+</tr>
+<tr>
+<td>6</td>
+<td>repository</td>
+<td><code>FileSystemRepositoryBean</code> (<code>repository.file-system.v1</code>)</td>
+<td><code>QrCodeRepository</code>, <code>BoundPropertySource</code></td>
+<td>file system</td>
+<td>artifact writing, history serialization, file-name sanitising</td>
+</tr>
+<tr>
+<td>7</td>
+<td>history</td>
+<td><code>QrHistoryBean</code> (<code>history.bounded-memory.v1</code>)</td>
+<td>indexed/bound/constrained properties</td>
+<td>—</td>
+<td>capacity policy, overflow accounting</td>
+</tr>
+<tr>
+<td>8</td>
+<td>listener</td>
+<td><code>AuditLogListenerBean</code> (<code>listener.audit-log.v1</code>)</td>
+<td><code>QrCodeGenerationListener</code></td>
+<td><code>QrCodeGeneratedEvent</code></td>
+<td>log line formatting, file appending</td>
+</tr>
+<tr>
+<td>9</td>
+<td>facade</td>
+<td><code>QrStudioFacadeBean</code> (<code>facade.qr-studio.v1</code>)</td>
+<td><code>generate(...)</code>, <code>renderWith(...)</code>, listener registration</td>
+<td><code>QrCodeEncoder</code>, <code>QrCodeRenderer</code>, <code>QrCodeRepository</code>, <code>QrHistoryBean</code></td>
+<td>generation workflow, timing, event firing</td>
+</tr>
+<tr>
+<td>10</td>
+<td>infrastructure</td>
+<td><code>ComponentRegistry</code></td>
+<td>catalogue, selection, configuration, validation</td>
+<td>the nine components</td>
+<td>reflection-based property application, dependency validation</td>
+</tr>
+<tr>
+<td>11</td>
+<td>infrastructure</td>
+<td><code>AssemblyProfile</code></td>
+<td>component selection, property values, XML load/save</td>
+<td>—</td>
+<td>descriptor parsing and writing</td>
+</tr>
+</tbody>
+</table>
+<p><code>ComponentRegistry.listComponents()</code> prints exactly this table at run time — see
+<code>docs/screenshots/07-cli-component-catalogue.png</code>.</p>
+<h3>3.3 The five characteristics of software components, applied</h3>
+<table>
+<thead>
+<tr>
+<th>Characteristic</th>
+<th>How this project satisfies it</th>
+<th>Evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Encapsulation / black-box abstraction</strong></td>
+<td>The engine package is package-private; callers see only <code>QrCodeEncoder</code>. No public method exposes a Reed–Solomon or masking detail.</td>
+<td><code>src/main/java/ke/ku/sco310/qr/engine/*</code> (no <code>public class</code> except <code>QrEngine</code>/<code>QrTables</code>, which are consumed only by the in-house bean)</td>
+</tr>
+<tr>
+<td><strong>Reusability</strong></td>
+<td>The same nine components are used by three assemblies with three different user interfaces, and the renderers are reused inside the HTTP service per request.</td>
+<td>§6.2, <code>docs/screenshots/03/04/05-gui-*.png</code>, <code>15-http-service.png</code></td>
+</tr>
+<tr>
+<td><strong>Replaceability</strong></td>
+<td>Two encoders and three renderers implement identical interfaces; the assembly swaps them at run time (<code>replaceRenderer</code>, <code>replaceEncoder</code>) without recompiling any caller.</td>
+<td><code>AssemblyTest</code> checks <code>assembly.replace</code></td>
+</tr>
+<tr>
+<td><strong>Interoperability / standardisation</strong></td>
+<td>The contract is the standard JavaBeans model (<code>java.beans.*</code>); the third-party ZXing component interoperates through an adapter; artifacts interoperate through PNG, SVG and MIME types.</td>
+<td><code>docs/screenshots/24-code-zxing-adapter.png</code></td>
+</tr>
+<tr>
+<td><strong>Composability / independence</strong></td>
+<td>Components never reference each other's classes, only interfaces; the facade composes four of them and a listener set. Independent deployment is shown by the JAR + descriptor.</td>
+<td><code>docs/diagrams/figure-1-component-model.png</code></td>
+</tr>
+</tbody>
+</table>
+<h3>3.4 COP versus OOP in this project</h3>
+<table>
+<thead>
+<tr>
+<th>Aspect</th>
+<th>Object-oriented view</th>
+<th>How this project is <em>component</em>-oriented</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Basic unit</td>
+<td><code>QrCode</code>, <code>BitBuffer</code>, <code>GaloisField</code> are objects/classes</td>
+<td>the unit of <em>deployment and reuse</em> is the bean; <code>PureJavaQrEncoderBean</code> is dropped into three assemblies untouched</td>
+</tr>
+<tr>
+<td>Granularity</td>
+<td>fine-grained classes</td>
+<td>coarse-grained components behind roles (<code>encoder</code>, <code>renderer</code>, …)</td>
+</tr>
+<tr>
+<td>Reuse</td>
+<td>inheritance and library calls</td>
+<td>third-party composition: ZXing plugged in behind our interface; artifacts reused by external systems</td>
+</tr>
+<tr>
+<td>Interaction</td>
+<td>method calls on concrete types</td>
+<td>event delegation (<code>QrCodeGenerationListener</code>) and bound-property notification (<code>PropertyChangeEvent</code>)</td>
+</tr>
+<tr>
+<td>Configuration</td>
+<td>constructor arguments compiled into the code</td>
+<td>design-time properties applied from <code>config/assembly.xml</code> through introspection</td>
+</tr>
+<tr>
+<td>Evolution</td>
+<td>edit class, recompile, redeploy</td>
+<td>replace the component named in the descriptor, e.g. <code>renderer.png.v1</code> → <code>renderer.svg.v1</code></td>
+</tr>
+</tbody>
+</table>
+<h3>3.5 Benefits of components realised here</h3>
+<ol>
+<li><strong>Faster development</strong> — the HTTP front end needed 260 lines of HTTP plumbing and <em>no</em> domain
+   logic because encoding, rendering and storage already existed as components.</li>
+<li><strong>Reliability through reuse of verified parts</strong> — the composed checks confirm that the same
+   renderer component behaves identically in the GUI, the CLI and the web service.</li>
+<li><strong>Standardisation</strong> — the JavaBeans conventions are what allow the <code>BeanInspector</code> tool (225
+   lines) to describe <em>any</em> component without knowing it in advance.</li>
+<li><strong>Maintainability</strong> — defects are localised: the interleaving defect described in §9.4 was
+   fixed inside one package-private method without touching any component interface.</li>
+<li><strong>Interoperability</strong> — a symbol produced by the in-house encoder is decoded by the ZXing
+   decoder, and vice versa (see the replaceability checks), i.e. third-party composition works in
+   both directions.</li>
+<li><strong>Scalability through assembly</strong> — adding a fourth renderer (for example a PDF renderer) means
+   adding one bean and one descriptor line: no existing file changes.</li>
+</ol>
+<h3>3.6 Component interface incompatibility: the three classic types, and how this design avoids them</h3>
+<p>Interface incompatibility is the well-known obstacle to component reuse. The three types — and the
+concrete countermeasures taken in this project — are:</p>
+<p><strong>(1) Signature incompatibility (syntactic).</strong> The provider's method names, parameter types or
+exception types do not match what the consumer expects. <em>Countermeasure:</em> this suite freezes the
+contract in the <code>ke.ku.sco310.qr.api</code> package (<code>QrCodeEncoder</code>, <code>QrCodeRenderer</code>,
+<code>QrCodeRepository</code>, <code>QrCodeGenerationListener</code>) and never lets an implementation change it; the
+third-party ZXing engine, whose signatures are completely different (<code>Encoder.encode(String,
+ErrorCorrectionLevel, Map&lt;EncodeHintType,?&gt;)</code> returning a <code>QRCode</code>), is adapted by
+<code>ZxingQrEncoderAdapterBean</code>. Both encoders report failures through the same checked exception
+hierarchy, so callers need no adaptation.</p>
+<p><strong>(2) Protocol / behavioural incompatibility (interaction order and state).</strong> Even with matching
+signatures, components may disagree about the <em>sequence</em> of calls, blocking behaviour or state
+expectations. <em>Countermeasure:</em> the doc-comments of every interface state pre-conditions and
+post-conditions (for example "<code>render</code> accepts a non-null symbol produced by an encoder of this
+suite and returns a non-empty artifact whose format matches <code>getFormatName()</code>"), and the facade
+enforces the generation order encode → render → store → notify. The listener contract is
+one-directional and non-blocking, and the facade isolates a misbehaving listener with a
+<code>try</code>/<code>catch</code> so that a faulty listener cannot break the generation protocol.</p>
+<p><strong>(3) Semantic / quality-of-service incompatibility (meaning of data).</strong> Components may agree on
+syntax and protocol yet disagree on <em>what the data means</em>: units, colour space, coordinate origin
+or quality guarantees. <em>Countermeasure:</em> the suite publishes semantics in metadata and keeps the
+value object explicit — a <code>QrCode</code> always states its version, size, mask, error-correction level and
+module matrix indexed <code>[y][x]</code> with <code>true</code> meaning <em>dark</em>; a <code>RenderedArtifact</code> always declares
+<code>formatName</code>, <code>fileExtension</code>, <code>mimeType</code> and pixel dimensions so that consumers do not have to
+guess; the PNG renderer documents that the quiet zone is painted with the background colour and
+that module centres can be sampled at <code>(quietZone + x) * moduleSize + moduleSize/2</code> (this is
+exactly how the test suite verifies it). Capability metadata (<code>EncoderInfo</code>) states the supported
+modes and version range, so a consumer can test admissibility before calling.</p>
+<p>A related, subtler problem is <strong>capability and context mismatch</strong>: the ZXing adapter declares
+<code>requiresOptionalLibrary = true</code> and <code>ComponentRegistry</code> asks
+<code>OptionalComponentSupport.isZxingAvailable()</code> <em>before</em> instantiating it, so a missing library
+degrades the deployment (the in-house engine stays wired) instead of producing a
+<code>NoClassDefFoundError</code> at the first call — explicit context dependencies in practice.</p>
+<hr />
+<h2>4. The JavaBeans component model in this project</h2>
+<h3>4.1 The eight steps to create a JavaBean, and where they appear here</h3>
+<table>
+<thead>
+<tr>
+<th>Step (course material)</th>
+<th>Implementation in this project</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1. Package statement as the first line</td>
+<td>every file starts with <code>package ke.ku.sco310.qr.&lt;role&gt;;</code></td>
+</tr>
+<tr>
+<td>2. Implement <code>Serializable</code> for persistence</td>
+<td>all nine beans; enforced by a check in <code>BeanContractTest</code></td>
+</tr>
+<tr>
+<td>3. Compile with <code>-d</code></td>
+<td><code>./build.sh compile</code> → <code>javac -d out/classes --release 11</code></td>
+</tr>
+<tr>
+<td>4. Create a manifest describing the JAR contents</td>
+<td><code>manifest/MANIFEST.MF</code> with a <code>Java-Bean: True</code> block per bean class</td>
+</tr>
+<tr>
+<td>5. Create the JAR</td>
+<td><code>./build.sh jar</code> → <code>out/dist/qr-component-suite-1.0.0.jar</code></td>
+</tr>
+<tr>
+<td>6. Check the archive</td>
+<td><code>jar --list</code>, <code>unzip -p ... META-INF/MANIFEST.MF</code> (<code>docs/screenshots/14-jar-manifest.png</code>)</td>
+</tr>
+<tr>
+<td>7. Test the bean wrapped in the JAR</td>
+<td>run any assembly with <code>-cp out/dist/qr-component-suite-1.0.0.jar:lib/*</code></td>
+</tr>
+<tr>
+<td>8. Add the bean into a builder tool</td>
+<td><code>BeanInspector</code> plays the role of the builder tool's palette/feature viewer; <code>PngRendererBeanBeanInfo</code> supplies the curated metadata a BeanBox would show</td>
+</tr>
+</tbody>
+</table>
+<h3>4.2 The four property kinds, all implemented</h3>
+<table>
+<thead>
+<tr>
+<th>Kind</th>
+<th>Definition (course material)</th>
+<th>Implementation</th>
+<th>Proof</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Simple</strong></td>
+<td>a private value accessed through <code>get</code>/<code>set</code></td>
+<td><code>PureJavaQrEncoderBean.maximumVersion</code>, <code>forcedMaskPattern</code>; <code>AsciiRendererBean.border</code></td>
+<td><code>BeanInspector</code> property table</td>
+</tr>
+<tr>
+<td><strong>Bound</strong></td>
+<td>listeners are notified whenever the value changes</td>
+<td><code>PngRendererBean.moduleSize</code>/<code>quietZone</code>/<code>foregroundColor</code>, <code>SvgRendererBean.mergeHorizontalRuns</code>, <code>QrHistoryBean.entries</code>, <code>QrStudioFacadeBean.defaultErrorCorrection</code> … all with <code>PropertyChangeSupport</code></td>
+<td><code>BeanContractTest</code> "changing moduleSize fires a PropertyChangeEvent"; the GUI preview refreshes on that event</td>
+</tr>
+<tr>
+<td><strong>Constrained</strong></td>
+<td>a change may be <strong>vetoed</strong></td>
+<td><code>QrHistoryBean.maxEntries</code> (a listener can refuse a reduction); <code>PureJavaQrEncoderBean.minimumVersion</code> with <code>VetoableChangeSupport</code></td>
+<td><code>BeanContractTest</code> "a listener can veto a capacity reduction"</td>
+</tr>
+<tr>
+<td><strong>Indexed</strong></td>
+<td>a collection accessed by index</td>
+<td><code>QrHistoryBean.entries[]</code> with <code>getEntries()</code>, <code>getEntries(int)</code>, <code>setEntries(QrHistoryEntry[])</code>, <code>setEntries(int, QrHistoryEntry)</code> and <code>fireIndexedPropertyChange</code></td>
+<td><code>BeanInspector</code> shows <code>INDEXED yes</code>; <code>BeanContractTest</code> "addEntry fires an IndexedPropertyChangeEvent"</td>
+</tr>
+</tbody>
+</table>
+<p>Minimal bound-property implementation, exactly as the course notes prescribe:</p>
+<pre><code class="language-java">private transient PropertyChangeSupport propertyChanges = new PropertyChangeSupport(this);
+
+public void addPropertyChangeListener(PropertyChangeListener listener) {
+    propertyChanges.addPropertyChangeListener(listener);
+}
+
+public void setModuleSize(int moduleSize) {
+    int old = this.moduleSize;
+    this.moduleSize = moduleSize;
+    propertyChanges.firePropertyChange(&quot;moduleSize&quot;, old, moduleSize);   // old + new value
+}
+</code></pre>
+<p>Constrained property (veto) implementation:</p>
+<pre><code class="language-java">public void setMaxEntries(int maxEntries) throws PropertyVetoException {
+    int old = this.maxEntries;
+    vetoableChanges.fireVetoableChange(&quot;maxEntries&quot;, old, maxEntries);    // listeners may throw
+    this.maxEntries = maxEntries;
+    propertyChanges.firePropertyChange(&quot;maxEntries&quot;, old, maxEntries);    // then the bound event
+}
+</code></pre>
+<h3>4.3 The connection model</h3>
+<p>The JavaBeans connection model has four roles; all four exist here:</p>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Component</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Event source</strong></td>
+<td><code>QrStudioFacadeBean</code> — fires <code>QrCodeGeneratedEvent</code> after each generation</td>
+</tr>
+<tr>
+<td><strong>Event listener</strong></td>
+<td><code>AuditLogListenerBean</code> (audit trail), <code>QrStudioFrame</code> (status bar), HTTP statistics</td>
+</tr>
+<tr>
+<td><strong>Event object</strong></td>
+<td><code>QrCodeGeneratedEvent extends EventObject</code> (carries symbol, artifact, stored file, renderer id and duration)</td>
+</tr>
+<tr>
+<td><strong>Delegation</strong></td>
+<td><code>facade.addQrCodeGenerationListener(listener)</code>; on firing, the source calls the corresponding listener method on every registered listener</td>
+</tr>
+</tbody>
+</table>
+<p>Additional connections used:</p>
+<ul>
+<li><strong>bound-property connections</strong> — UI ← renderer (<code>moduleSize</code>, colours), UI ← history (<code>entries</code>),
+  HTTP ← audit listener (<code>processedEventCount</code>);</li>
+<li><strong>interface-typed connections</strong> — <code>facade.setEncoder/setRenderer/setRepository/setHistory</code>, i.e.
+  the facade only ever stores interfaces.</li>
+</ul>
+<pre><code class="language-java">// wiring performed by ComponentRegistry.build(profile)
+facade.setEncoder(encoder);
+facade.setRenderer(renderer);
+facade.setRepository(repository);
+facade.setHistory(history);
+facade.addQrCodeGenerationListener(listener);   // delegation connection
+</code></pre>
+<h3>4.4 The deployment model</h3>
+<p>Packaging follows steps 4–6 of the bean recipe:</p>
+<ul>
+<li><code>manifest/MANIFEST.MF</code> — declares <code>Main-Class</code>, <code>Class-Path</code>, specification metadata for the
+  JavaBeans component model and a <code>Java-Bean: True</code> block for every bean class file;</li>
+<li><code>out/dist/qr-component-suite-1.0.0.jar</code> — the deployable unit (117 KB, 51 classes) plus <code>lib/</code>
+  for the optional ZXing component;</li>
+<li><code>config/assembly.xml</code> — the deployment descriptor: component selection per role and the
+  design-time values of their properties. Deployments change by editing this file, never by
+  recompiling, which is exactly the parameter set <em>P</em> of the deployment quadruple
+  <strong>D = (C, E, P, L)</strong> used in the course material (C = the component set, E = Java SE 11+,
+  P = the descriptor, L = the machine/workspace).</li>
+</ul>
+<h3>4.5 Persistence: two mechanisms, as the course requires</h3>
+<ol>
+<li><strong>Serialization.</strong> <code>FileSystemRepositoryBean</code> serialises the list of <code>QrHistoryEntry</code> records
+   into <code>history.ser</code> (<code>ObjectOutputStream</code>) and reads it back with <code>ObjectInputStream</code>; the
+   records themselves implement <code>Serializable</code> with a no-argument constructor. Verified by
+   "reinstantiating the repository component reads the same history file".</li>
+<li><strong>XML bean persistence.</strong> <code>BeanPersistence</code> uses <code>java.beans.XMLEncoder</code>/<code>XMLDecoder</code> to write
+   and rebuild the <em>whole assembled bean graph</em> — class names, property values and wiring:
+   <code>docs/evidence/work/bean-graph.xml</code> (1.2 KB). This is the mechanism the original Bean Builder
+   used, and it is verified by "the assembled bean graph survives an XML round trip" and "the
+   restored assembly can generate without recompiling". Properties that would bloat the file are
+   excluded declaratively through a BeanInfo (<code>QrHistoryBeanBeanInfo</code> marks the indexed history
+   property <code>transient</code> for the encoder) — a technique the course notes call "expose only those
+   features you want to expose".</li>
+</ol>
+<h3>4.6 Introspection, BeanInfo and customisation</h3>
+<table>
+<thead>
+<tr>
+<th>Feature descriptor</th>
+<th>Where it is used</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>BeanDescriptor</code></td>
+<td><code>PngRendererBeanBeanInfo</code> / <code>QrHistoryBeanBeanInfo</code>: display name and short description</td>
+</tr>
+<tr>
+<td><code>PropertyDescriptor</code></td>
+<td>display names/descriptions, <code>expert</code> flag on <code>quietZone</code>, and <code>setPropertyEditorClass(HexColorPropertyEditor.class)</code> for both colour properties</td>
+</tr>
+<tr>
+<td><code>IndexedPropertyDescriptor</code></td>
+<td>discovered automatically for <code>QrHistoryBean.entries</code> (the tool prints <code>INDEXED yes</code>)</td>
+</tr>
+<tr>
+<td><code>EventSetDescriptor</code></td>
+<td>discovered from <code>addQrCodeGenerationListener</code> / <code>addPropertyChangeListener</code>; the tool prints the event set and the listener type</td>
+</tr>
+<tr>
+<td><code>MethodDescriptor</code></td>
+<td>the tool lists the public business methods (excluding accessors and listener plumbing)</td>
+</tr>
+<tr>
+<td><code>PropertyEditorSupport</code></td>
+<td><code>HexColorPropertyEditor</code> converts a <code>Color</code> to/from <code>#RRGGBB</code>, and offers a tag list for a builder tool's drop-down</td>
+</tr>
+</tbody>
+</table>
+<p>Introspection is demonstrated by the project's own tool
+(<code>java ke.ku.sco310.qr.tools.BeanInspector &lt;class&gt;</code>), which prints the bean's required
+characteristics, its properties with types/read/write/indexed/editor columns, its event sets and
+its methods — see <code>docs/screenshots/10-beaninspector-png-renderer.png</code>,
+<code>11-beaninspector-history-facade.png</code> and <code>26-bean-feature-matrix.png</code>.</p>
+<hr />
+<h2>5. The component catalogue, component by component</h2>
+<p>This chapter documents every component in the suite in the form the course asks for: the role it
+plays, the interfaces it <strong>provides</strong>, the interfaces it <strong>requires</strong>, the properties it publishes
+to builder tools, the events it fires, and the behaviour it hides. Each entry ends with the
+automated checks that hold the component to its contract.</p>
+<p>The introspection data below is not hand-written: it is the output of the project's own tool
+(<code>./run-cli.sh --inspect &lt;class&gt;</code>, see <code>docs/screenshots/10-beaninspector-png-renderer.png</code>,
+<code>11-beaninspector-history-facade.png</code> and <code>26-bean-feature-matrix.png</code>), which drives
+<code>java.beans.Introspector</code> on the compiled classes.</p>
+<h3>5.1 Component map</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Role</th>
+<th>Component (id)</th>
+<th>Source file</th>
+<th>Lines</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>encoder</td>
+<td><code>PureJavaQrEncoderBean</code> (<code>encoder.pure-java.v1</code>)</td>
+<td><code>components/PureJavaQrEncoderBean.java</code></td>
+<td>207</td>
+</tr>
+<tr>
+<td>2</td>
+<td>encoder</td>
+<td><code>ZxingQrEncoderAdapterBean</code> (<code>encoder.zxing-adapter.v1</code>)</td>
+<td><code>components/ZxingQrEncoderAdapterBean.java</code></td>
+<td>200</td>
+</tr>
+<tr>
+<td>3</td>
+<td>renderer</td>
+<td><code>PngRendererBean</code> (<code>renderer.png.v1</code>)</td>
+<td><code>render/PngRendererBean.java</code></td>
+<td>207</td>
+</tr>
+<tr>
+<td>4</td>
+<td>renderer</td>
+<td><code>SvgRendererBean</code> (<code>renderer.svg.v1</code>)</td>
+<td><code>render/SvgRendererBean.java</code></td>
+<td>241</td>
+</tr>
+<tr>
+<td>5</td>
+<td>renderer</td>
+<td><code>AsciiRendererBean</code> (<code>renderer.ascii.v1</code>)</td>
+<td><code>render/AsciiRendererBean.java</code></td>
+<td>123</td>
+</tr>
+<tr>
+<td>6</td>
+<td>repository</td>
+<td><code>FileSystemRepositoryBean</code> (<code>repository.file-system.v1</code>)</td>
+<td><code>store/FileSystemRepositoryBean.java</code></td>
+<td>208</td>
+</tr>
+<tr>
+<td>7</td>
+<td>history</td>
+<td><code>QrHistoryBean</code> (<code>history.bounded-memory.v1</code>)</td>
+<td><code>store/QrHistoryBean.java</code></td>
+<td>233</td>
+</tr>
+<tr>
+<td>8</td>
+<td>listener</td>
+<td><code>AuditLogListenerBean</code> (<code>listener.audit-log.v1</code>)</td>
+<td><code>log/AuditLogListenerBean.java</code></td>
+<td>175</td>
+</tr>
+<tr>
+<td>9</td>
+<td>facade</td>
+<td><code>QrStudioFacadeBean</code> (<code>facade.qr-studio.v1</code>)</td>
+<td><code>facade/QrStudioFacadeBean.java</code></td>
+<td>328</td>
+</tr>
+<tr>
+<td>10</td>
+<td>infrastructure</td>
+<td><code>ComponentRegistry</code></td>
+<td><code>facade/ComponentRegistry.java</code></td>
+<td>336</td>
+</tr>
+<tr>
+<td>11</td>
+<td>infrastructure</td>
+<td><code>AssemblyProfile</code> (+ <code>AssemblyGraphBean</code>)</td>
+<td><code>facade/AssemblyProfile.java</code></td>
+<td>180</td>
+</tr>
+</tbody>
+</table>
+<p><code>ComponentRegistry.listComponents()</code> prints this catalogue at run time together with the state of
+each component, which is how the suite shows that a component may be <strong>declared but unavailable</strong>
+(<code>docs/screenshots/07-cli-component-catalogue.png</code>).</p>
+<hr />
+<h3>5.2 <code>PureJavaQrEncoderBean</code> — the in-house encoder</h3>
+<p><strong>Role</strong> <code>encoder</code> · <strong>Identifier</strong> <code>encoder.pure-java.v1</code> · <strong>Source</strong> <code>components/PureJavaQrEncoderBean.java</code></p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Provides (I)</strong></td>
+<td><code>QrCodeEncoder</code> (business interface), <code>BoundPropertySource</code> (introspection interface), <code>java.io.Serializable</code> (deployment interface)</td>
+</tr>
+<tr>
+<td><strong>Requires (D)</strong></td>
+<td>nothing at run time — only the JDK, which is the point of having an in-house engine</td>
+</tr>
+<tr>
+<td><strong>Hidden behaviour (B)</strong></td>
+<td>the whole <code>ke.ku.sco310.qr.engine</code> package: segment analysis, version selection, Reed–Solomon over GF(2⁸), block interleaving, function patterns, masking and the penalty function</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Properties (7 discovered, 5 writable)</strong></p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Type</th>
+<th>Kind</th>
+<th>Default</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>componentId</code></td>
+<td><code>String</code></td>
+<td>simple, read-only</td>
+<td><code>encoder.pure-java.v1</code></td>
+<td>stable identity used in evidence records</td>
+</tr>
+<tr>
+<td><code>encoderInfo</code></td>
+<td><code>EncoderInfo</code></td>
+<td>simple, read-only</td>
+<td>—</td>
+<td>capability metadata: provider, version, version range, modes, maximum capacity, third-party flag</td>
+</tr>
+<tr>
+<td><code>defaultErrorCorrection</code></td>
+<td><code>QrErrorCorrection</code></td>
+<td><strong>bound</strong></td>
+<td><code>M</code></td>
+<td>level used when the caller passes <code>null</code></td>
+</tr>
+<tr>
+<td><code>boostErrorCorrection</code></td>
+<td><code>boolean</code></td>
+<td><strong>bound</strong></td>
+<td><code>false</code></td>
+<td>climb to the strongest level that still fits, improving robustness of a printed symbol</td>
+</tr>
+<tr>
+<td><code>minimumVersion</code></td>
+<td><code>int</code></td>
+<td><strong>constrained</strong></td>
+<td><code>1</code></td>
+<td>lowest version selectable; a listener may veto, and the bean vetoes an inconsistent window</td>
+</tr>
+<tr>
+<td><code>maximumVersion</code></td>
+<td><code>int</code></td>
+<td><strong>bound</strong> (clamped)</td>
+<td><code>40</code></td>
+<td>highest version selectable; a value below the minimum is clamped</td>
+</tr>
+<tr>
+<td><code>forcedMaskPattern</code></td>
+<td><code>int</code></td>
+<td><strong>bound</strong></td>
+<td><code>-1</code></td>
+<td>pins the mask (0–7) for experiments; <code>-1</code> restores automatic penalty-based selection</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Events</strong> <code>propertyChange</code> (from <code>PropertyChangeSupport</code>), <code>vetoableChange</code> (from <code>VetoableChangeSupport</code>).</p>
+<p><strong>Code</strong> — the complete bean, its four property kinds and the engine delegation is on
+<code>docs/screenshots/16-code-encoder-bean.png</code>; the provided interface it implements is on
+<code>docs/screenshots/01-code-provided-interface.png</code>.</p>
+<p><strong>Contract checks</strong> <code>encode()</code> pre-conditions and post-conditions are asserted by 18 engine checks
+and by three bean checks:</p>
+<pre><code>PASS PureJavaQrEncoderBean: public class with a no-argument constructor   public=true noArgConstructor=true
+PASS PureJavaQrEncoderBean: exposes writable properties through set
+PASS PureJavaQrEncoderBean: implements Serializable and BoundPropertySource
+PASS empty payload is rejected        rejected as expected: QrEncodingException
+PASS over-capacity payload is rejected with a clear error
+PASS constrained minimumVersion vetoes an inconsistent window
+</code></pre>
+<hr />
+<h3>5.3 <code>ZxingQrEncoderAdapterBean</code> — the replaceable third-party encoder</h3>
+<p><strong>Role</strong> <code>encoder</code> · <strong>Identifier</strong> <code>encoder.zxing-adapter.v1</code> · <strong>Source</strong> <code>components/ZxingQrEncoderAdapterBean.java</code></p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Provides (I)</strong></td>
+<td><code>QrCodeEncoder</code>, <code>BoundPropertySource</code>, <code>java.io.Serializable</code> — <em>exactly the same business interface as the in-house component</em></td>
+</tr>
+<tr>
+<td><strong>Requires (D)</strong></td>
+<td><code>com.google.zxing.core</code> (declared as an <strong>optional</strong> context dependency)</td>
+</tr>
+<tr>
+<td><strong>Hidden behaviour (B)</strong></td>
+<td>translation of the foreign <code>com.google.zxing.common.ByteMatrix</code> result into this suite's <code>QrCode</code> value object, charset handling, and the mapping of foreign exceptions onto <code>QrEncodingException</code></td>
+</tr>
+</tbody>
+</table>
+<p>This is the component that demonstrates the two ideas the course stresses most: <strong>interface
+standardisation</strong> (a completely different implementation satisfies the same provided interface) and
+<strong>third-party composition</strong> (the foreign library is wrapped, never called directly by the rest of
+the suite). Because the dependency is optional, the component degrades gracefully:</p>
+<pre><code>encoder  encoder.zxing-adapter.v1   unavailable
+         reason: com.google.zxing.core is not on the class path
+</code></pre>
+<p><strong>Properties (5 discovered, 3 writable)</strong></p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Type</th>
+<th>Kind</th>
+<th>Default</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>componentId</code></td>
+<td><code>String</code></td>
+<td>simple, read-only</td>
+<td><code>encoder.zxing-adapter.v1</code></td>
+<td>identity</td>
+</tr>
+<tr>
+<td><code>encoderInfo</code></td>
+<td><code>EncoderInfo</code></td>
+<td>simple, read-only</td>
+<td>—</td>
+<td>reports <code>thirdParty=true</code>, provider <code>ZXing ("Zebra Crossing") core 3.5.3</code></td>
+</tr>
+<tr>
+<td><code>characterSet</code></td>
+<td><code>String</code></td>
+<td><strong>bound</strong></td>
+<td><code>UTF-8</code></td>
+<td>charset used for byte-mode content</td>
+</tr>
+<tr>
+<td><code>defaultErrorCorrection</code></td>
+<td><code>QrErrorCorrection</code></td>
+<td><strong>bound</strong></td>
+<td><code>M</code></td>
+<td>level used when the caller passes <code>null</code></td>
+</tr>
+<tr>
+<td><code>boostErrorCorrection</code></td>
+<td><code>boolean</code></td>
+<td><strong>bound</strong></td>
+<td><code>false</code></td>
+<td>mirror of the in-house property, so the two components are configured identically</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Code</strong> <code>docs/screenshots/24-code-zxing-adapter.png</code>.</p>
+<p><strong>Contract checks</strong> the assembly swaps the encoder at run time and proves that the caller cannot
+tell the difference beyond the metadata:</p>
+<pre><code>PASS the third-party encoder satisfies the same contract
+     expected=https://www.ku.ac.ke/sco310/component-programming
+     actual  =https://www.ku.ac.ke/sco310/component-programming
+PASS the facade now reports the adapter as its encoder     encoder.zxing-adapter.v1
+PASS the optional component declares its context dependency
+PASS the assembly detects the optional third-party component   com.google.zxing.core present=true
+</code></pre>
+<hr />
+<h3>5.4 <code>PngRendererBean</code> — raster renderer</h3>
+<p><strong>Role</strong> <code>renderer</code> · <strong>Identifier</strong> <code>renderer.png.v1</code> · <strong>Source</strong> <code>render/PngRendererBean.java</code></p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Provides (I)</strong></td>
+<td><code>QrCodeRenderer</code> (business), <code>BoundPropertySource</code>, <code>Serializable</code></td>
+</tr>
+<tr>
+<td><strong>Requires (D)</strong></td>
+<td>— (<code>javax.imageio</code> is part of the JDK)</td>
+</tr>
+<tr>
+<td><strong>Hidden behaviour (B)</strong></td>
+<td>pixel geometry <code>(size + 2 · quietZone) · moduleSize</code>, run-length rectangle drawing, buffered-image allocation and <code>ImageIO</code> encoding</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Properties (4 discovered, 4 writable — every property is bound)</strong></p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Type</th>
+<th>Kind</th>
+<th>Default</th>
+<th>Constraint</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>moduleSize</code></td>
+<td><code>int</code></td>
+<td>bound</td>
+<td><code>8</code></td>
+<td><code>1..64</code></td>
+</tr>
+<tr>
+<td><code>quietZone</code></td>
+<td><code>int</code></td>
+<td>bound, <strong>expert</strong></td>
+<td><code>4</code></td>
+<td><code>0..16</code></td>
+</tr>
+<tr>
+<td><code>foregroundColor</code></td>
+<td><code>Color</code></td>
+<td>bound + <strong>custom property editor</strong></td>
+<td>black</td>
+<td><code>HexColorPropertyEditor</code></td>
+</tr>
+<tr>
+<td><code>backgroundColor</code></td>
+<td><code>Color</code></td>
+<td>bound + <strong>custom property editor</strong></td>
+<td>white</td>
+<td><code>HexColorPropertyEditor</code></td>
+</tr>
+</tbody>
+</table>
+<p>This bean also carries the project's <code>BeanInfo</code> demonstration
+(<code>PngRendererBeanBeanInfo</code>, <code>docs/screenshots/21-code-beaninfo.png</code>): it publishes display names,
+marks <code>quietZone</code> as an <em>expert</em> feature (hidden in a builder tool's basic property sheet) and
+attaches <code>HexColorPropertyEditor</code> to both colour properties, so the tool offers a <code>#RRGGBB</code>
+field with a tag list instead of an opaque <code>java.awt.Color</code> value.</p>
+<p><strong>Contract checks</strong></p>
+<pre><code>PASS artifact size follows moduleSize and quietZone     expected=246 actual=246
+PASS every module is painted at the right position      0 of 1089 modules mismatched
+PASS quiet zone is painted with the background colour
+PASS bound moduleSize property resizes the artifact     before=246px after=451px
+PASS invalid module size is rejected                    moduleSize must be 1..64
+PASS custom property editor parses #RRGGBB              expected=#1B5E20 actual=#1B5E20
+</code></pre>
+<hr />
+<h3>5.5 <code>SvgRendererBean</code> — vector renderer</h3>
+<p><strong>Role</strong> <code>renderer</code> · <strong>Identifier</strong> <code>renderer.svg.v1</code> · <strong>Source</strong> <code>render/SvgRendererBean.java</code></p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Provides (I)</strong></td>
+<td><code>QrCodeRenderer</code>, <code>BoundPropertySource</code>, <code>Serializable</code></td>
+</tr>
+<tr>
+<td><strong>Requires (D)</strong></td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>Hidden behaviour (B)</strong></td>
+<td>SVG document model, absolute millimetre sizing, horizontal run merging, XML escaping</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Properties (11 discovered, 6 writable)</strong></p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Type</th>
+<th>Kind</th>
+<th>Default</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>rendererId</code>, <code>formatName</code>, <code>fileExtension</code>, <code>mimeType</code></td>
+<td><code>String</code></td>
+<td>simple, read-only</td>
+<td><code>renderer.svg.v1</code>, <code>SVG</code>, <code>svg</code>, <code>image/svg+xml</code></td>
+<td>interface metadata consumed by the HTTP front end</td>
+</tr>
+<tr>
+<td><code>moduleSize</code></td>
+<td><code>int</code></td>
+<td>bound</td>
+<td><code>8</code></td>
+<td>raster-equivalent module size</td>
+</tr>
+<tr>
+<td><code>quietZone</code></td>
+<td><code>int</code></td>
+<td>bound</td>
+<td><code>4</code></td>
+<td>light margin in modules</td>
+</tr>
+<tr>
+<td><code>foregroundColor</code></td>
+<td><code>String</code></td>
+<td>bound</td>
+<td><code>#000000</code></td>
+<td>vector stroke colour</td>
+</tr>
+<tr>
+<td><code>backgroundColor</code></td>
+<td><code>String</code></td>
+<td>bound</td>
+<td><code>#FFFFFF</code></td>
+<td>background rectangle</td>
+</tr>
+<tr>
+<td><code>mergeHorizontalRuns</code></td>
+<td><code>boolean</code></td>
+<td>bound</td>
+<td><code>true</code></td>
+<td>merges adjacent dark modules into one <code>&lt;rect&gt;</code></td>
+</tr>
+<tr>
+<td><code>physicalWidthMillimetres</code></td>
+<td><code>double</code></td>
+<td>bound</td>
+<td><code>0</code> (meaning "not set")</td>
+<td>prints the document with an absolute physical width, as a print shop needs</td>
+</tr>
+</tbody>
+</table>
+<p>The run-merging optimisation is measurable and is proven by a matched pair of checks: with the
+optimisation on the document contains 297 <code>&lt;rect&gt;</code> elements, with it off exactly the 577 dark
+modules are emitted one by one — and both documents rebuild the same module matrix.</p>
+<pre><code>PASS document declares absolute millimetre dimensions
+PASS horizontal run merging reduces the element count     merged=297 single=577
+PASS parsing the SVG back reproduces the module matrix    0 module mismatches
+</code></pre>
+<hr />
+<h3>5.6 <code>AsciiRendererBean</code> — console renderer</h3>
+<p><strong>Role</strong> <code>renderer</code> · <strong>Identifier</strong> <code>renderer.ascii.v1</code> · <strong>Source</strong> <code>render/AsciiRendererBean.java</code></p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Provides (I)</strong></td>
+<td><code>QrCodeRenderer</code>, <code>BoundPropertySource</code>, <code>Serializable</code></td>
+</tr>
+<tr>
+<td><strong>Requires (D)</strong></td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>Hidden behaviour (B)</strong></td>
+<td>glyph mapping and the aspect-ratio correction that makes a text symbol recognisable in a terminal</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Properties (7 discovered, 3 writable)</strong></p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Type</th>
+<th>Kind</th>
+<th>Default</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>rendererId</code>, <code>formatName</code>, <code>fileExtension</code>, <code>mimeType</code></td>
+<td><code>String</code></td>
+<td>simple, read-only</td>
+<td><code>renderer.ascii.v1</code>, <code>ASCII</code>, <code>txt</code>, <code>text/plain</code></td>
+<td>metadata; the artifact is flagged as textual for the HTTP front end</td>
+</tr>
+<tr>
+<td><code>darkGlyph</code></td>
+<td><code>String</code></td>
+<td>bound</td>
+<td><code>██</code> (two full blocks)</td>
+<td>dark module</td>
+</tr>
+<tr>
+<td><code>lightGlyph</code></td>
+<td><code>String</code></td>
+<td>bound</td>
+<td>two spaces</td>
+<td>light module</td>
+</tr>
+<tr>
+<td><code>border</code></td>
+<td><code>int</code></td>
+<td>bound</td>
+<td><code>2</code></td>
+<td>quiet zone in characters</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Contract checks</strong></p>
+<pre><code>PASS parsing the text art reproduces the module matrix     0 module mismatches
+PASS artifact is flagged as textual                        expected=true actual=true
+</code></pre>
+<hr />
+<h3>5.7 <code>FileSystemRepositoryBean</code> — persistence component</h3>
+<p><strong>Role</strong> <code>repository</code> · <strong>Identifier</strong> <code>repository.file-system.v1</code> · <strong>Source</strong> <code>store/FileSystemRepositoryBean.java</code></p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Provides (I)</strong></td>
+<td><code>QrCodeRepository</code> (required interface of the facade), <code>BoundPropertySource</code>, <code>Serializable</code></td>
+</tr>
+<tr>
+<td><strong>Requires (D)</strong></td>
+<td>the file system, expressed through the configurable <code>rootDirectory</code> property — the deployment parameter <em>P</em> of <strong>D = (C, E, P, L)</strong></td>
+</tr>
+<tr>
+<td><strong>Hidden behaviour (B)</strong></td>
+<td>artifact writing, <code>ObjectOutputStream</code>/<code>ObjectInputStream</code> history serialisation, file-name sanitising, directory creation</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Properties (6 discovered, 2 writable)</strong></p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Type</th>
+<th>Kind</th>
+<th>Default</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>rootDirectory</code></td>
+<td><code>File</code></td>
+<td>bound</td>
+<td><code>out/generated</code></td>
+<td>deployment-specific storage location</td>
+</tr>
+<tr>
+<td><code>historyFileName</code></td>
+<td><code>String</code></td>
+<td>bound</td>
+<td><code>history.ser</code></td>
+<td>name of the serialised history</td>
+</tr>
+<tr>
+<td><code>componentId</code></td>
+<td><code>String</code></td>
+<td>simple, read-only</td>
+<td><code>repository.file-system.v1</code></td>
+<td>identity</td>
+</tr>
+<tr>
+<td><code>historyCount</code>, <code>storedArtifactCount</code></td>
+<td><code>int</code></td>
+<td>simple, read-only</td>
+<td><code>0</code></td>
+<td>live counters, bound so that a UI can display them</td>
+</tr>
+<tr>
+<td><code>historySnapshot</code></td>
+<td><code>List</code></td>
+<td>simple, read-only</td>
+<td>—</td>
+<td>defensive copy of the loaded history</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Contract checks</strong></p>
+<pre><code>PASS generation stores an artifact and returns the path
+PASS history and audit counters were updated        history=1 audit=1 facade=1
+PASS reinstantiating the repository component reads the same history file
+PASS clearHistory empties the persisted history     expected=0 actual=0
+PASS a new record is persisted immediately          expected=1 actual=1
+</code></pre>
+<p>The last check is the important one for component programming: a <strong>newly instantiated component</strong>
+reads the state written by a previous instance, which is what "deployable independently" means in
+practice. A second implementation of the same role, <code>repository.in-memory.v1</code>, is declared in the
+catalogue to make the substitution possible.</p>
+<hr />
+<h3>5.8 <code>QrHistoryBean</code> — the indexed, constrained history</h3>
+<p><strong>Role</strong> <code>history</code> · <strong>Identifier</strong> <code>history.bounded-memory.v1</code> · <strong>Source</strong> <code>store/QrHistoryBean.java</code></p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Provides (I)</strong></td>
+<td>the indexed property <code>entries</code> and the constrained property <code>maxEntries</code>; <code>Serializable</code> (so the facade can hold it)</td>
+</tr>
+<tr>
+<td><strong>Requires (D)</strong></td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>Hidden behaviour (B)</strong></td>
+<td>capacity policy (oldest entry discarded first), overflow accounting, index bounds checking, indexed event firing</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Properties (2 discovered, 2 writable)</strong> — this is the component that demonstrates the two
+property kinds the encoder does not have:</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Type</th>
+<th>Kind</th>
+<th>Default</th>
+<th>Accessors</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>entries</code></td>
+<td><code>QrHistoryEntry[]</code></td>
+<td><strong>indexed</strong></td>
+<td>empty</td>
+<td><code>getEntries()</code>, <code>getEntries(int)</code>, <code>setEntries(QrHistoryEntry[])</code>, <code>setEntries(int, QrHistoryEntry)</code>, <code>addEntry(QrHistoryEntry)</code></td>
+</tr>
+<tr>
+<td><code>maxEntries</code></td>
+<td><code>int</code></td>
+<td><strong>constrained</strong></td>
+<td><code>50</code></td>
+<td><code>getMaxEntries()</code>, <code>setMaxEntries(int) throws PropertyVetoException</code></td>
+</tr>
+</tbody>
+</table>
+<p><code>BeanInspector</code> confirms the indexed nature of the property on the compiled class:</p>
+<pre><code>PROPERTY       TYPE                 READ   WRITE  INDEXED   CATEGORY  PROPERTY EDITOR
+entries        QrHistoryEntry[]     yes    yes    yes       normal    -
+maxEntries     int                  yes    yes    -         normal    -
+</code></pre>
+<p><strong>Events</strong> <code>propertyChange</code> (+ indexed property change events for <code>entries</code>) and <code>vetoableChange</code>.</p>
+<p><strong>Contract checks</strong></p>
+<pre><code>PASS addEntry fires an IndexedPropertyChangeEvent        4 events observed
+PASS indexed accessor returns the stored element         expected=1 actual=1
+PASS capacity policy discards the oldest entry           count=3 discarded=1
+PASS a listener can veto a capacity reduction            PropertyVetoException: capacity may not be reduced
+PASS the vetoed value was not applied                    expected=5 actual=5
+PASS removing the listener allows the change again       expected=7 actual=7
+</code></pre>
+<p><strong>Code</strong> <code>docs/screenshots/18-code-history-bean.png</code>.</p>
+<hr />
+<h3>5.9 <code>AuditLogListenerBean</code> — the event listener component</h3>
+<p><strong>Role</strong> <code>listener</code> · <strong>Identifier</strong> <code>listener.audit-log.v1</code> · <strong>Source</strong> <code>log/AuditLogListenerBean.java</code></p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Provides (I)</strong></td>
+<td><code>QrCodeGenerationListener</code> (so the facade can connect it) and read-only statistics properties</td>
+</tr>
+<tr>
+<td><strong>Requires (D)</strong></td>
+<td><code>QrCodeGeneratedEvent</code> — the event type it consumes, i.e. the <em>connection</em> contract with the facade</td>
+</tr>
+<tr>
+<td><strong>Hidden behaviour (B)</strong></td>
+<td>log-line formatting, console echoing, file appending, ring buffer of recent lines</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Properties (6 discovered, 3 writable)</strong></p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Type</th>
+<th>Kind</th>
+<th>Default</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>componentId</code></td>
+<td><code>String</code></td>
+<td>simple, read-only</td>
+<td><code>listener.audit-log.v1</code></td>
+<td>identity</td>
+</tr>
+<tr>
+<td><code>echoToConsole</code></td>
+<td><code>boolean</code></td>
+<td>bound</td>
+<td><code>true</code></td>
+<td>mirror the audit trail to <code>System.out</code></td>
+</tr>
+<tr>
+<td><code>verbose</code></td>
+<td><code>boolean</code></td>
+<td>bound</td>
+<td><code>false</code></td>
+<td>include symbol details in each line</td>
+</tr>
+<tr>
+<td><code>logFile</code></td>
+<td><code>File</code></td>
+<td>bound</td>
+<td>unset</td>
+<td>append the audit trail to a file</td>
+</tr>
+<tr>
+<td><code>processedEventCount</code></td>
+<td><code>int</code></td>
+<td>simple, read-only, bound</td>
+<td><code>0</code></td>
+<td>counter shown in the GUI status bar and in <code>/stats</code></td>
+</tr>
+<tr>
+<td><code>recentLines</code></td>
+<td><code>List</code></td>
+<td>simple, read-only</td>
+<td>—</td>
+<td>last lines, for display</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Contract check</strong></p>
+<pre><code>PASS the facade notifies every connected listener   listeners notified=1 audit events=1
+PASS the event object carries the symbol and the artifact
+     symbol=QrCode{version=2, size=25, ec=M, mode=Byte, mask=6, ...}
+     artifact=RenderedArtifact{format=PNG, 264x264, bytes=5865, by=renderer.png.v1}
+</code></pre>
+<hr />
+<h3>5.10 <code>QrStudioFacadeBean</code> — the composite component</h3>
+<p><strong>Role</strong> <code>facade</code> · <strong>Identifier</strong> <code>facade.qr-studio.v1</code> · <strong>Source</strong> <code>facade/QrStudioFacadeBean.java</code></p>
+<p>The facade is the component that <em>composes</em> the others; it is a component in its own right because
+it publishes its own interface, its own properties and its own events.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Provides (I)</strong></td>
+<td><code>QrGenerationResult generate(String, QrErrorCorrection)</code>, <code>RenderedArtifact renderWith(QrCode, QrCodeRenderer)</code>, <code>void addQrCodeGenerationListener(...)</code>, plus 12 properties</td>
+</tr>
+<tr>
+<td><strong>Requires (D)</strong></td>
+<td><code>QrCodeEncoder</code>, <code>QrCodeRenderer</code>, <code>QrCodeRepository</code>, <code>QrHistoryBean</code> — four required interfaces, all injected through setters, never instantiated internally</td>
+</tr>
+<tr>
+<td><strong>Hidden behaviour (B)</strong></td>
+<td>the generation workflow: encode → render → store → record history → fire events → time the operation</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Properties (12 discovered, 8 writable)</strong> — the four dependency properties are the most important:</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Type</th>
+<th>Kind</th>
+<th>Default</th>
+<th>Role</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>encoder</code></td>
+<td><code>QrCodeEncoder</code></td>
+<td>bound</td>
+<td>unset</td>
+<td><strong>required interface #1</strong></td>
+</tr>
+<tr>
+<td><code>renderer</code></td>
+<td><code>QrCodeRenderer</code></td>
+<td>bound</td>
+<td>unset</td>
+<td><strong>required interface #2</strong></td>
+</tr>
+<tr>
+<td><code>repository</code></td>
+<td><code>QrCodeRepository</code></td>
+<td>bound</td>
+<td>unset</td>
+<td><strong>required interface #3</strong></td>
+</tr>
+<tr>
+<td><code>history</code></td>
+<td><code>QrHistoryBean</code></td>
+<td>bound</td>
+<td>unset</td>
+<td><strong>required interface #4</strong></td>
+</tr>
+<tr>
+<td><code>defaultErrorCorrection</code></td>
+<td><code>QrErrorCorrection</code></td>
+<td>bound</td>
+<td><code>M</code></td>
+<td>level used when the caller passes <code>null</code></td>
+</tr>
+<tr>
+<td><code>autoSaveArtifacts</code></td>
+<td><code>boolean</code></td>
+<td>bound</td>
+<td><code>true</code></td>
+<td>write each artifact through the repository</td>
+</tr>
+<tr>
+<td><code>autoSaveHistory</code></td>
+<td><code>boolean</code></td>
+<td>bound</td>
+<td><code>true</code></td>
+<td>append each record to the history</td>
+</tr>
+<tr>
+<td><code>fileBaseName</code></td>
+<td><code>String</code></td>
+<td>bound</td>
+<td><code>qr-code</code></td>
+<td>stem of generated file names</td>
+</tr>
+<tr>
+<td><code>componentId</code></td>
+<td><code>String</code></td>
+<td>simple, read-only</td>
+<td><code>facade.qr-studio.v1</code></td>
+<td>identity</td>
+</tr>
+<tr>
+<td><code>generatedCount</code></td>
+<td><code>int</code></td>
+<td>simple, read-only, bound</td>
+<td><code>0</code></td>
+<td>work counter</td>
+</tr>
+<tr>
+<td><code>listenerCount</code></td>
+<td><code>int</code></td>
+<td>simple, read-only</td>
+<td><code>0</code></td>
+<td>number of connected listeners</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Events</strong> <code>propertyChange</code> and <code>qrCodeGeneration</code> (the delegation event set discovered from
+<code>addQrCodeGenerationListener</code>).</p>
+<p><strong>Code</strong> <code>docs/screenshots/19-code-facade.png</code>.</p>
+<p><strong>Contract checks</strong> — the failure path is as important as the success path:</p>
+<pre><code>PASS generating without an encoder fails loudly
+     rejected as expected: QrEncodingException: No encoder component is connected:
+     call setEncoder(...) before generating
+</code></pre>
+<hr />
+<h3>5.11 The infrastructure components</h3>
+<p><code>ComponentRegistry</code> and <code>AssemblyProfile</code> are not beans — they are the <em>assembly tooling</em> that a
+component platform needs (the role the original BeanBox or a container plays):</p>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Provides</th>
+<th>Requires</th>
+<th>Responsibilities</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ComponentRegistry</code></td>
+<td><code>listComponents()</code>, <code>listByRole(role)</code>, <code>describe(id)</code>, <code>build(profile)</code>, <code>validate(assembly)</code></td>
+<td>the nine components, through reflection</td>
+<td>catalogue construction, implementation selection per role, <strong>reflection-based property application</strong> (<code>PropertyCoercion</code> converts the descriptor's strings to <code>int</code>, <code>boolean</code>, <code>double</code>, <code>QrErrorCorrection</code>, <code>File</code>, <code>Color</code>), dependency validation</td>
+</tr>
+<tr>
+<td><code>AssemblyProfile</code></td>
+<td><code>getComponentId(role)</code>, <code>setComponentId</code>, <code>getProperties(role)</code>, <code>setProperty</code>, <code>load(File)</code>, <code>save(File)</code></td>
+<td>—</td>
+<td>the deployment descriptor: which component fills each role and with which property values; XML load/save</td>
+</tr>
+<tr>
+<td><code>AssemblyGraphBean</code></td>
+<td><code>toXml()</code>, <code>restore(assembly)</code></td>
+<td><code>java.beans.XMLEncoder</code> / <code>XMLDecoder</code></td>
+<td>persistence of the <strong>whole assembled bean graph</strong>, the mechanism the original Bean Builder used</td>
+</tr>
+</tbody>
+</table>
+<p><code>ComponentRegistry.validate(...)</code> returns a human-readable wiring report, which the test suite
+asserts on:</p>
+<pre><code>PASS every declared dependency of the assembly is satisfied
+     encoder    -&gt; facade.setEncoder     : OK
+     renderer   -&gt; facade.setRenderer    : OK
+     repository -&gt; facade.setRepository  : OK
+     history    -&gt; facade.setHistory     : OK
+     listener   -&gt; facade event source   : OK
+     encoder    -&gt; optional ZXing library: PRESENT
+</code></pre>
+<hr />
+<h2>6. Assembling the components: three applications from one component set</h2>
+<h3>6.1 The composition pipeline</h3>
+<p><code>ComponentRegistry.build(profile)</code> performs the five-stage composition that component programming
+prescribes. Each stage is separately testable, which is why the verification suite can assert on
+them independently:</p>
+<table>
+<thead>
+<tr>
+<th>Stage</th>
+<th>What happens</th>
+<th>Where it fails loudly</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>1. Catalogue</strong></td>
+<td>the registry lists every component it knows, with its role, its provided interface, its required interface and its current availability</td>
+<td>a component whose required library is absent is listed as <code>unavailable</code> with a reason — it is never silently used</td>
+</tr>
+<tr>
+<td><strong>2. Select</strong></td>
+<td>one implementation per role is chosen from the profile (<code>AssemblyProfile</code>), defaulting to the built-in profile when no file is given</td>
+<td>an unknown component id is rejected: <code>Unknown renderer component id: renderer.does-not-exist.v1</code></td>
+</tr>
+<tr>
+<td><strong>3. Instantiate</strong></td>
+<td>each selected class is created through its <strong>no-argument constructor</strong> — the JavaBeans requirement — by reflection</td>
+<td>a non-bean class is rejected</td>
+</tr>
+<tr>
+<td><strong>4. Configure</strong></td>
+<td>the descriptor's string values are converted to the property types and applied through the setters, with a <code>PropertyChangeListener</code> attached</td>
+<td>a property a component does not declare is reported, not ignored</td>
+</tr>
+<tr>
+<td><strong>5. Validate</strong></td>
+<td>every required interface of every component is checked against the wired graph</td>
+<td><code>No encoder component is connected: call setEncoder(...) before generating</code></td>
+</tr>
+</tbody>
+</table>
+<p>The configuration stage is the one that makes the project <em>component oriented</em> rather than merely
+object oriented: property values live in <code>config/assembly.xml</code>, and changing them re-deploys the
+same compiled classes.</p>
+<pre><code class="language-xml">&lt;qr-assembly name=&quot;default&quot;&gt;
+  &lt;component role=&quot;encoder&quot;    id=&quot;encoder.pure-java.v1&quot;/&gt;
+  &lt;component role=&quot;renderer&quot;   id=&quot;renderer.png.v1&quot;/&gt;
+  &lt;component role=&quot;repository&quot; id=&quot;repository.file-system.v1&quot;/&gt;
+  &lt;component role=&quot;history&quot;    id=&quot;history.bounded-memory.v1&quot;/&gt;
+  &lt;component role=&quot;listener&quot;   id=&quot;listener.audit-log.v1&quot;/&gt;
+  &lt;component role=&quot;facade&quot;     id=&quot;facade.qr-studio.v1&quot;/&gt;
+  &lt;property role=&quot;renderer&quot; name=&quot;moduleSize&quot;  value=&quot;10&quot;/&gt;
+  &lt;property role=&quot;renderer&quot; name=&quot;quietZone&quot;   value=&quot;4&quot;/&gt;
+  &lt;property role=&quot;renderer&quot; name=&quot;foregroundColor&quot; value=&quot;#101820&quot;/&gt;
+  &lt;property role=&quot;history&quot;  name=&quot;maxEntries&quot;  value=&quot;50&quot;/&gt;
+  &lt;property role=&quot;facade&quot;   name=&quot;fileBaseName&quot; value=&quot;qr-code&quot;/&gt;
+&lt;/qr-assembly&gt;
+</code></pre>
+<p>The same file generates the deployment report printed at start-up by all three front ends:</p>
+<pre><code>facade[encoder=encoder.pure-java.v1, renderer=renderer.png.v1,
+       repository=repository.file-system.v1, history=history.bounded-memory.v1, listeners=1]
+renderer=PNG: moduleSize=10px, quietZone=4 modules, fg=#101820, bg=#FFFFFF
+</code></pre>
+<h3>6.2 Three front ends, one component set</h3>
+<table>
+<thead>
+<tr>
+<th>Assembly</th>
+<th>Class</th>
+<th>What it adds</th>
+<th>Evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Desktop (Swing)</strong></td>
+<td><code>ui/QrStudioGuiAssembly</code> + <code>ui/QrStudioFrame</code></td>
+<td>a property sheet that edits the live components, a preview that follows bound-property changes, an indexed history view</td>
+<td><code>docs/screenshots/03/04/05-gui-*-assembly.png</code></td>
+</tr>
+<tr>
+<td><strong>Command line</strong></td>
+<td><code>cli/QrCliAssembly</code></td>
+<td>batch generation, catalogue listing, introspection, XML graph save/load, ASCII preview</td>
+<td><code>docs/screenshots/06-cli-help.png</code>, <code>07</code>, <code>08</code>, <code>09</code></td>
+</tr>
+<tr>
+<td><strong>HTTP service</strong></td>
+<td><code>web/QrHttpServiceComponent</code></td>
+<td>one URL per symbol with the renderer chosen per request, plus statistics, history and health endpoints</td>
+<td><code>docs/screenshots/15-http-service.png</code></td>
+</tr>
+</tbody>
+</table>
+<p>The three front ends contain <strong>no encoding, rendering or storage logic at all</strong>. They only
+configure and call components:</p>
+<ul>
+<li>the GUI calls <code>assembly.generate(...)</code> and subscribes to <code>BoundPropertySource</code> of the renderer
+  (<code>frame.propertyChange(...)</code> refreshes the preview when <code>moduleSize</code> changes);</li>
+<li>the CLI parses arguments and calls the same facade;</li>
+<li>the HTTP service resolves the <code>format</code> query parameter to a renderer component per request:</li>
+</ul>
+<pre><code class="language-java">QrCodeRenderer renderer = &quot;svg&quot;.equalsIgnoreCase(format)  ? new SvgRendererBean()
+                        : &quot;ascii&quot;.equalsIgnoreCase(format) ? new AsciiRendererBean()
+                        : new PngRendererBean();
+assembly.replaceRenderer(renderer);          // no caller recompilation
+QrGenerationResult result = assembly.generate(text, level);
+</code></pre>
+<h3>6.3 Replaceability, demonstrated rather than claimed</h3>
+<p>Replaceability is the property that separates a component suite from a library, so the project
+tests it four times over:</p>
+<table>
+<thead>
+<tr>
+<th>Replacement</th>
+<th>What is swapped</th>
+<th>Proof</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Renderer → SVG</td>
+<td><code>renderer.svg.v1</code> for <code>renderer.png.v1</code></td>
+<td><code>PASS the assembly runs with a different renderer component → expected=SVG actual=SVG</code></td>
+</tr>
+<tr>
+<td>Renderer → ASCII</td>
+<td><code>renderer.ascii.v1</code> for the SVG component</td>
+<td><code>PASS a third renderer drops in without recompiling → expected=ASCII actual=ASCII</code></td>
+</tr>
+<tr>
+<td><strong>Encoder → ZXing</strong></td>
+<td>the entire in-house engine for the third-party engine</td>
+<td><code>PASS the third-party encoder satisfies the same contract</code></td>
+</tr>
+<tr>
+<td><strong>Both at once</strong></td>
+<td>encoder and renderer</td>
+<td><code>PASS all three renderers produced the same symbol → version 5, mask 7 for PNG, SVG and ASCII</code></td>
+</tr>
+</tbody>
+</table>
+<p>The last check is the strongest single piece of evidence in the project: <strong>three different
+renderer components and two different encoder components produce mutually consistent symbols</strong>,
+because they communicate only through the shared value objects <code>QrCode</code> and <code>RenderedArtifact</code>.</p>
+<p>The GUI shows the same replacement interactively: choosing "SVG" in the <em>Renderer component</em> combo
+box calls <code>assembly.replaceRenderer(...)</code> on the running application, and the status bar reports
+the new component id and its configuration — the running application changes component without
+restarting (<code>docs/screenshots/04-gui-svg-assembly.png</code>).</p>
+<h3>6.4 Persistence of the assembly itself</h3>
+<p>Two mechanisms are implemented, both from the course material:</p>
+<ol>
+<li><strong>Descriptor persistence</strong> — <code>config/assembly.xml</code> is loaded and saved by <code>AssemblyProfile</code>
+   (XML, human editable), verified by
+   <code>PASS the assembly profile survives an XML round trip</code>.</li>
+<li><strong>Bean-graph persistence</strong> — <code>AssemblyGraphBean</code> uses <code>java.beans.XMLEncoder</code>/<code>XMLDecoder</code> to
+   write the <em>assembled object graph</em> (class names, property values, wiring) and rebuild it:
+   <code>docs/evidence/work/bean-graph.xml</code>. The suite proves that the restored graph can generate a
+   symbol without recompilation:</li>
+</ol>
+<pre><code>PASS the assembled bean graph survives an XML round trip
+PASS design-time property values survive the round trip     moduleSize=8 xmlBytes=1244
+PASS the restored assembly can generate without recompiling  artifact written by the restored graph
+</code></pre>
+<p>The XML graph also demonstrates the <em>"expose only what you want to expose"</em> technique: the
+<code>QrHistoryBeanBeanInfo</code> marks the indexed <code>entries</code> property as transient for the encoder, so a
+large history is not duplicated inside the graph while remaining visible to builder tools.</p>
+<h3>6.5 Screen-by-screen: what the running desktop application shows</h3>
+<p><code>docs/screenshots/03-gui-png-assembly.png</code> (and the SVG/ASCII variants) is a screenshot of the real
+program, not a mock-up: the frame is built by <code>QrStudioGuiAssembly --screenshot</code>, generating with
+the demonstration payload and painting itself into an image.</p>
+<table>
+<thead>
+<tr>
+<th>Region of the window</th>
+<th>Component behind it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><em>Payload</em>, <em>Error correction</em></td>
+<td>inputs to <code>facade.generate(text, level)</code></td>
+</tr>
+<tr>
+<td><em>Renderer component</em> combo box</td>
+<td><code>AssemblyProfile</code> role <code>renderer</code>; changing it calls <code>assembly.replaceRenderer(...)</code></td>
+</tr>
+<tr>
+<td><em>Module size (px)</em> spinner</td>
+<td>the bound <code>moduleSize</code> property of the active renderer; the preview updates through <code>PropertyChangeEvent</code></td>
+</tr>
+<tr>
+<td><em>Foreground / background</em> fields</td>
+<td><code>foregroundColor</code> / <code>backgroundColor</code>, parsed by <code>HexColorPropertyEditor.fromHex</code></td>
+</tr>
+<tr>
+<td><em>Generate</em> / <em>Save artifact as…</em></td>
+<td><code>facade.generate(...)</code> / <code>facade.renderWith(...)</code></td>
+</tr>
+<tr>
+<td><em>Rendered artifact</em> panel</td>
+<td>the <code>RenderedArtifact</code> returned by the renderer component; the image is scaled to fit with nearest-neighbour interpolation so the module edges stay crisp</td>
+</tr>
+<tr>
+<td><em>History component (indexed property)</em> panel</td>
+<td><code>historyArea.setText(history.describeEntries())</code>, refreshed by the indexed property event</td>
+</tr>
+<tr>
+<td>Status bar (left)</td>
+<td>the symbol's own metadata: version, level, mask, mode, module count</td>
+</tr>
+<tr>
+<td>Status bar (centre)</td>
+<td>generation duration and the file written by the repository component</td>
+</tr>
+</tbody>
+</table>
+<p>Because the preview panel listens to the renderer's bound properties and the history panel
+listens to the indexed property, the window is a <em>live view of the component graph</em>: editing a
+property in the property sheet is what redraws the artifact.</p>
+<hr />
+<h2>7. The encoding logic, in detail</h2>
+<p>This chapter explains the logic that the encoder components hide behind <code>QrCodeEncoder</code>. Everything
+described here lives in the package-private <code>ke.ku.sco310.qr.engine</code> package, and every number
+quoted was produced by running the compiled code (the worked examples come from
+<code>tools/MaskComparison.java</code>-style instrumentation of the real engine, and the tables are
+cross-checked against ZXing in <code>docs/evidence/table-cross-check.csv</code>).</p>
+<h3>7.1 The five pipeline stages</h3>
+<p><code>QrEngine.encode(...)</code> is organised exactly like clause 8 of ISO/IEC 18004:</p>
+<table>
+<thead>
+<tr>
+<th>Stage</th>
+<th>Clause</th>
+<th>Method</th>
+<th>What it decides</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1. Data analysis</td>
+<td>8.3–8.4</td>
+<td><code>QrSegment.makeSegments</code></td>
+<td>which encoding mode is most compact for the payload</td>
+</tr>
+<tr>
+<td>2. Data encoding</td>
+<td>8.4</td>
+<td><code>QrSegment.makeNumeric/Alphanumeric/Bytes</code></td>
+<td>the bit stream of the payload</td>
+</tr>
+<tr>
+<td>3. Error correction</td>
+<td>8.5</td>
+<td><code>ReedSolomon.computeRemainder</code></td>
+<td>one Reed–Solomon block per interleaving block</td>
+</tr>
+<tr>
+<td>4. Structure finalisation</td>
+<td>8.6</td>
+<td><code>QrEngine.addEccAndInterleave</code></td>
+<td>block split and codeword interleaving</td>
+</tr>
+<tr>
+<td>5. Module placement</td>
+<td>8.7–8.9</td>
+<td><code>drawFunctionPatterns</code>, <code>drawCodewords</code>, <code>applyMask</code>, <code>drawFormatBits</code>, <code>drawVersionBits</code></td>
+<td>the final matrix, including the mask</td>
+</tr>
+</tbody>
+</table>
+<p><code>docs/diagrams/figure-4-encoding-pipeline.png</code> draws this pipeline with the class that implements
+each stage.</p>
+<h3>7.2 Stage 1–2: mode analysis and bit-level encoding</h3>
+<p>The payload chooses its mode by inspection — the most compact representation wins:</p>
+<table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>Indicator</th>
+<th>Character set</th>
+<th>Payload bits</th>
+<th>Character-count bits (v1–9 / v10–26 / v27–40)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Numeric</td>
+<td><code>0001</code></td>
+<td><code>0-9</code></td>
+<td>3 digits → 10 bits, 2 → 7 bits, 1 → 4 bits</td>
+<td>10 / 12 / 14</td>
+</tr>
+<tr>
+<td>Alphanumeric</td>
+<td><code>0010</code></td>
+<td><code>0-9 A-Z $ % * + - . / : space</code> (45 symbols)</td>
+<td>2 chars → 11 bits, 1 → 6 bits</td>
+<td>9 / 11 / 13</td>
+</tr>
+<tr>
+<td>Byte</td>
+<td><code>0100</code></td>
+<td>arbitrary data (UTF-8 in this suite)</td>
+<td>8 bits per byte</td>
+<td>8 / <strong>16</strong> / <strong>16</strong></td>
+</tr>
+</tbody>
+</table>
+<p>The character-count widths are declared as data on the enum, so a table error would be visible in
+one place:</p>
+<pre><code class="language-java">NUMERIC(0x1, new int[]{10, 12, 14}),
+ALPHANUMERIC(0x2, new int[]{9, 11, 13}),
+BYTE(0x4, new int[]{8, 16, 16});
+</code></pre>
+<p>Two details are easy to get wrong and are called out here because the project's own test suite
+caught one of them (see §9.4):</p>
+<ul>
+<li>the byte-mode counter is <strong>8 bits for versions 1–9 but 16 bits for versions 10–40</strong>, which is why
+  the reported maximum capacity is 2 953 bytes at level L (version 40) and not 2 956;</li>
+<li>numeric groups are padded to the left with zeros — <code>Integer.parseInt("012")</code> is <code>12</code>, encoded in
+  the 10 bits <code>0000001100</code>.</li>
+</ul>
+<p>Mode selection is proven by three checks and by a capacity comparison:</p>
+<pre><code>PASS numeric payload selects numeric mode        expected=Numeric actual=Numeric
+PASS upper-case payload selects alphanumeric     expected=Alphanumeric actual=Alphanumeric
+PASS mixed case payload selects byte mode        expected=Byte actual=Byte
+PASS compact mode lowers the symbol version      numeric v1 vs alphanumeric v1
+</code></pre>
+<h3>7.3 Stage 3: version selection</h3>
+<p>The version is chosen by the smallest symbol whose data capacity, <strong>in bits</strong>, can hold the whole
+bit stream (mode indicator + character count + payload, plus the terminator). Capacity comes from
+<code>QrTables.numDataCodewords(version, level) · 8</code>, so it always matches the table used for the
+error-correction blocks:</p>
+<pre><code class="language-java">while (true) {
+    usedBits = totalBits(segments, version);
+    int capacityBits = QrTables.numDataCodewords(version, level) * 8;
+    if (usedBits &lt;= capacityBits) break;
+    if (version &gt;= maximumVersion) throw new QrEncodingException(producerId, ...);
+    version++;
+}
+</code></pre>
+<p>If <code>boostErrorCorrection</code> is set, the level is then raised as far as the <em>same</em> symbol still
+allows — a robustness increase that costs no extra modules. If the payload does not fit even at
+version 40, the component fails with a message that names the requirement and the capacity:</p>
+<pre><code>Payload of 200 characters does not fit version 1 at level H
+(needs 1113 bits, capacity 72 bits). Shorten the payload or lower the error-correction level.
+</code></pre>
+<p>The capacity model is validated exhaustively: for all <strong>160</strong> version/level combinations the
+encoder is given the <em>largest</em> byte payload that fits and the produced symbol is decoded again —
+<code>160 decoded, 0 failed</code> (<code>docs/evidence/capacity-matrix.csv</code>).</p>
+<h3>7.4 Stage 4a: the bit stream — worked example</h3>
+<p>The example reproduced below is the one used in ISO/IEC 18004 Annex I, so the expected codewords
+can be checked against the published ones rather than against ourselves.</p>
+<p><strong>Payload</strong> <code>01234567</code>, <strong>version 1</strong>, <strong>level M</strong> (16 data codewords, 10 ECC codewords, 26 total).</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Bits</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Mode indicator (numeric)</td>
+<td>4</td>
+<td><code>0001</code></td>
+</tr>
+<tr>
+<td>Character count (8 characters)</td>
+<td>10</td>
+<td><code>0000001000</code></td>
+</tr>
+<tr>
+<td><code>012</code> → 12</td>
+<td>10</td>
+<td><code>0000001100</code></td>
+</tr>
+<tr>
+<td><code>345</code> → 345</td>
+<td>10</td>
+<td><code>0101011001</code></td>
+</tr>
+<tr>
+<td><code>67</code> → 67</td>
+<td>7</td>
+<td><code>1000011</code></td>
+</tr>
+<tr>
+<td><strong>data bits so far</strong></td>
+<td><strong>41</strong></td>
+<td></td>
+</tr>
+<tr>
+<td>Terminator (up to 4 zero bits)</td>
+<td>4</td>
+<td><code>0000</code></td>
+</tr>
+<tr>
+<td>Padding to the next codeword boundary</td>
+<td>3</td>
+<td><code>000</code></td>
+</tr>
+<tr>
+<td>Pad codewords <code>0xEC</code>, <code>0x11</code>, alternating to 128 bits</td>
+<td>80</td>
+<td><code>11101100 00010001 …</code></td>
+</tr>
+</tbody>
+</table>
+<p>The resulting data codewords, in hexadecimal, are</p>
+<pre><code>10 20 0C 56 61 80 EC 11 EC 11 EC 11 EC 11 EC 11
+</code></pre>
+<p>which is exactly the sequence printed in the standard's worked example
+(<code>00010000 00100000 00001100 01010110 01100001 10000000 11101100 00010001 …</code>). The Reed–Solomon
+stage then produces</p>
+<pre><code>A5 24 D4 C1 ED 36 C7 87 2C 55
+</code></pre>
+<p>and this too matches the published error-correction codewords of that example
+(<code>10100101 00100100 11010100 11000001 11101101 00110110 11000111 10000111 00101100 01010101</code>).
+Because the interleaved codeword stream is byte-identical to the reference, the bitmap placement,
+format information and masking stages are the only remaining variables — and those are verified
+separately by decoding the produced symbols with an independent decoder.</p>
+<p>Two more worked examples from the same instrumentation, showing the other two modes:</p>
+<table>
+<thead>
+<tr>
+<th>Payload</th>
+<th>Level</th>
+<th>Mode</th>
+<th>Data codewords</th>
+<th>Error-correction codewords</th>
+<th>Chosen mask</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>HELLO WORLD</code> (v1, 11 chars)</td>
+<td>Q</td>
+<td>Alphanumeric</td>
+<td><code>20 5B 0B 78 D1 72 DC 4D 43 40 EC 11 EC</code></td>
+<td><code>A8 48 16 52 D9 36 9C 00 2E 0F B4 7A 10</code></td>
+<td>0</td>
+</tr>
+<tr>
+<td><code>https://www.ku.ac.ke</code> (v2, 20 bytes)</td>
+<td>Q</td>
+<td>Byte</td>
+<td><code>41 46 87 47 47 07 33 A2 F2 F7 77 77 72 E6 B7 52 E6 16 32 E6 B6 50</code></td>
+<td><code>19 B7 0C 58 76 70 DD 06 DA 08 0E 36 F5 DD 72 51 CF 12 33 18 8C 1C</code></td>
+<td>4</td>
+</tr>
+</tbody>
+</table>
+<h3>7.5 Stage 3: Reed–Solomon over GF(2⁸)</h3>
+<p>Error correction is the part of QR encoding that most implementations get subtly wrong, so the
+implementation is deliberately explicit. <code>GaloisField</code> builds the log/antilog tables for the field
+generated by the primitive polynomial <strong>x⁸ + x⁴ + x³ + x² + 1 (<code>0x11D</code>)</strong> once, in a static
+initialiser:</p>
+<pre><code class="language-java">int x = 1;
+for (int i = 0; i &lt; 255; i++) {
+    EXP[i] = x;  LOG[x] = i;
+    x &lt;&lt;= 1;
+    if ((x &amp; 0x100) != 0) x ^= 0x11D;    // reduce modulo the primitive polynomial
+}
+</code></pre>
+<p>Multiplication is then a logarithm addition, <code>EXP[LOG[a] + LOG[b]]</code>, with the <code>512</code>-entry <code>EXP</code>
+table making the doubling of the table unnecessary.</p>
+<p><code>ReedSolomon.computeDivisor(degree)</code> builds the generator polynomial
+<code>(x − α⁰)(x − α¹)…(x − α^(degree−1))</code>; <code>computeRemainder(data, degree)</code> performs the polynomial
+division with a <code>degree</code>-byte shift register:</p>
+<pre><code class="language-java">for (byte b : data) {
+    int factor = (b &amp; 0xFF) ^ remainder[0];
+    System.arraycopy(remainder, 1, remainder, 0, degree - 1);
+    remainder[degree - 1] = 0;
+    for (int i = 0; i &lt; degree; i++) remainder[i] ^= GaloisField.multiply(divisor[i], factor);
+}
+</code></pre>
+<p>The remainder <em>is</em> the sequence of error-correction codewords. The register already performs the
+<code>x^degree</code> shift, so feeding only the data codewords is correct — feeding zero-padded
+placeholders as well is the defect documented in §9.4.</p>
+<p><strong>Code</strong> <code>docs/screenshots/02-code-reed-solomon.png</code>.</p>
+<h3>7.6 Stage 4b: block splitting and interleaving</h3>
+<p>For versions and levels where a symbol has more than one block, the data codewords are split into
+<code>numErrorCorrectionBlocks</code> blocks and the ECC codewords of each block are interleaved with the data
+codewords. The implementation follows clause 8.6 literally, and the two phases are deliberately
+kept apart:</p>
+<pre><code>phase 1: for column = 0 … maxDataLen-1:  for block = 0 … n-1: emit block[column]
+phase 2: for column = 0 … blockEccLen-1: for block = 0 … n-1: emit blockEcc[column]
+</code></pre>
+<p>Blocks are "short" (<code>shortBlockLen</code>) or "long" (<code>shortBlockLen + 1</code>), and the short blocks
+contribute <strong>no codeword at all</strong> in the last data column. Interleaving naively — walking
+data and ECC columns together — produces a matrix that looks plausible but decodes to garbage; the
+automated suite caught precisely that during development (<code>§9.4</code>, defect 1).</p>
+<p>The block arithmetic is stated once and used everywhere:</p>
+<pre><code class="language-java">int numBlocks      = QrTables.numErrorCorrectionBlocks(level, version);
+int blockEccLen    = QrTables.eccCodewordsPerBlock(level, version);
+int rawCodewords   = QrTables.totalCodewords(version);
+int shortBlockLen  = rawCodewords / numBlocks;
+int numShortBlocks = numBlocks - rawCodewords % numBlocks;
+</code></pre>
+<h3>7.7 Stage 5a: function patterns</h3>
+<p>Before any data module is placed, the reserved patterns are drawn and flagged in a parallel
+<code>isFunction</code> matrix so that later stages can never overwrite them:</p>
+<table>
+<thead>
+<tr>
+<th>Pattern</th>
+<th>Position</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Finder patterns + separators</td>
+<td><code>(3,3)</code>, <code>(size−4,3)</code>, <code>(3,size−4)</code></td>
+<td>drawn by <code>drawFinderPattern</code>, 7×7 with a light separator</td>
+</tr>
+<tr>
+<td>Timing patterns</td>
+<td>row 6 and column 6</td>
+<td>alternating dark/light, <code>drawFunctionPatterns</code></td>
+</tr>
+<tr>
+<td>Alignment patterns</td>
+<td><code>QrTables.alignmentPatternPositions(version)</code></td>
+<td>5×5 patterns excluding the three finder corners</td>
+</tr>
+<tr>
+<td>Dark module</td>
+<td><code>(8, size−8)</code></td>
+<td>always dark, written with the format information</td>
+</tr>
+<tr>
+<td>Format information</td>
+<td>around the two finder patterns</td>
+<td>15 bits, BCH(15,5)-protected</td>
+</tr>
+<tr>
+<td>Version information</td>
+<td>two 6×3 blocks, version ≥ 7</td>
+<td>18 bits, BCH(18,6)-protected</td>
+</tr>
+</tbody>
+</table>
+<h3>7.8 Stage 5b: codeword placement</h3>
+<p>The final codewords are placed in the two-module-wide <strong>zig-zag</strong> order of clause 8.7: columns are
+visited in pairs from right to left, skipping the vertical timing column (6), and alternating
+upward and downward. Only non-function modules receive bits:</p>
+<pre><code class="language-java">for (int right = size - 1; right &gt;= 1; right -= 2) {
+    if (right == 6) right = 5;
+    for (int vert = 0; vert &lt; size; vert++) {
+        for (int j = 0; j &lt; 2; j++) {
+            int x = right - j;
+            boolean upward = ((right + 1) &amp; 2) == 0;
+            int y = upward ? size - 1 - vert : vert;
+            if (!isFunction[y][x] &amp;&amp; i &lt; data.length * 8) {
+                modules[y][x] = getBit(data[i &gt;&gt;&gt; 3], 7 - (i &amp; 7));
+                i++;
+            }
+        }
+    }
+}
+</code></pre>
+<h3>7.9 Stage 5c: mask selection and the penalty function</h3>
+<p>All eight mask patterns of the standard are implemented as the specification's formulas:</p>
+<table>
+<thead>
+<tr>
+<th>Mask</th>
+<th>Condition to invert <code>(x, y)</code></th>
+<th>Row/column it favours</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td><code>(x + y) % 2 == 0</code></td>
+<td>checkerboard</td>
+</tr>
+<tr>
+<td>1</td>
+<td><code>y % 2 == 0</code></td>
+<td>horizontal stripes</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>x % 3 == 0</code></td>
+<td>vertical stripes</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>(x + y) % 3 == 0</code></td>
+<td>diagonal</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>(x/3 + y/2) % 2 == 0</code></td>
+<td>large blocks</td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>x·y % 2 + x·y % 3 == 0</code></td>
+<td>dense</td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>(x·y % 2 + x·y % 3) % 2 == 0</code></td>
+<td>dense, mixed</td>
+</tr>
+<tr>
+<td>7</td>
+<td><code>((x + y) % 2 + x·y % 3) % 2 == 0</code></td>
+<td>dense, mixed</td>
+</tr>
+</tbody>
+</table>
+<p>The best mask is the one with the <strong>lowest penalty</strong>, scored by the four rules of clause 8.8.2
+with weights <code>N1 = 3</code>, <code>N2 = 3</code>, <code>N3 = 40</code>, <code>N4 = 10</code>:</p>
+<table>
+<thead>
+<tr>
+<th>Rule</th>
+<th>Penalty</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1 — a run of 5+ modules of the same colour</td>
+<td><code>3 + (runLength − 5)</code></td>
+</tr>
+<tr>
+<td>2 — every 2×2 block of the same colour</td>
+<td><code>3</code></td>
+</tr>
+<tr>
+<td>3 — a <code>1:1:3:1:1</code> finder-like pattern with four light modules on one side</td>
+<td><code>40</code></td>
+</tr>
+<tr>
+<td>4 — deviation of the dark-module ratio from 50 %</td>
+<td><code>10 · k</code>, where <code>k</code> is the number of 5 % steps outside the target</td>
+</tr>
+</tbody>
+</table>
+<p>The engine evaluates each candidate, writes the corresponding format bits, scores the matrix, then
+undid the candidate (XOR is its own inverse) before trying the next:</p>
+<pre><code class="language-java">for (int candidate = 0; candidate &lt; 8; candidate++) {
+    engine.applyMask(candidate);
+    engine.drawFormatBits(candidate, level);
+    int penalty = engine.getPenaltyScore();
+    if (penalty &lt; bestPenalty) { bestPenalty = penalty; mask = candidate; }
+    engine.applyMask(candidate);            // undo
+}
+</code></pre>
+<p>Penalty scores are observable in the report instead of plausible:</p>
+<pre><code>payload 01234567  v1-M   mask 0   penalty 1057       (the chosen mask)
+                         mask 1   penalty 1253
+                         mask 2   penalty 1117   …   mask 7 penalty 1126
+</code></pre>
+<p>Because rule 3 leaves room for interpretation at the symbol border (the standard's Figure 24
+amendment treats the surrounding quiet zone as light modules), a different implementation can pick
+a different mask for the same payload. §9.6 quantifies that divergence honestly rather than
+pretending the implementations are bit-identical.</p>
+<h3>7.10 Format and version information</h3>
+<p>The 15-bit format field carries the 2-bit error-correction indicator (the <code>formatBits</code> value of
+<code>QrErrorCorrection</code>: L = <code>01</code>, M = <code>00</code>, Q = <code>11</code>, H = <code>10</code>) and the 3-bit mask number, protected
+by a BCH(15,5) code and finally XOR-ed with the constant <code>0x5412</code>:</p>
+<pre><code class="language-java">int data = level.getFormatBits() &lt;&lt; 3 | mask;
+int rem = data;
+for (int i = 0; i &lt; 10; i++) rem = (rem &lt;&lt; 1) ^ ((rem &gt;&gt;&gt; 9) * 0x537);
+int bits = (data &lt;&lt; 10 | rem) ^ 0x5412;
+</code></pre>
+<p>Versions ≥ 7 additionally carry an 18-bit version field, generated with the generator polynomial
+<code>0x1F25</code> and placed in two 6×3 blocks. Both fields are written into the <code>isFunction</code> matrix, so
+data placement can never collide with them.</p>
+<p>Note the deliberate design of the level enum: the <strong>declaration order</strong> (L, M, Q, H) matches the
+row order of the error-correction tables, so <code>ECC_CODEWORDS_PER_BLOCK[ecl.ordinal()][version]</code> is
+the whole indexing scheme — one fewer chance of an off-by-one error.</p>
+<h3>7.11 Rendering logic</h3>
+<p>Rendering is a pure function from the <code>QrCode</code> matrix to an artifact, which is why all three
+renderers can be verified by <em>reconstructing the matrix from the artifact</em>:</p>
+<table>
+<thead>
+<tr>
+<th>Renderer</th>
+<th>Geometry</th>
+<th>Reconstruction proof</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PNG</td>
+<td><code>pixelSize = (size + 2·quietZone) · moduleSize</code>; dark modules are drawn as horizontal runs with <code>fillRect</code></td>
+<td>every pixel of all 1 089 modules of a v5 symbol is sampled and compared: <code>0 of 1089 modules mismatched</code></td>
+</tr>
+<tr>
+<td>SVG</td>
+<td>one <code>&lt;rect&gt;</code> per module, or one per <em>run</em> when <code>mergeHorizontalRuns</code> is on; <code>width</code>/<code>height</code> in millimetres when <code>physicalWidthMillimetres</code> is set</td>
+<td>the document is parsed back into a matrix: <code>0 module mismatches</code>, and the element count halves (<code>297</code> vs <code>577</code>)</td>
+</tr>
+<tr>
+<td>ASCII</td>
+<td>two glyphs per module with a configurable border</td>
+<td>the text is parsed back into a matrix: <code>0 module mismatches</code></td>
+</tr>
+</tbody>
+</table>
+<p>The ASCII renderer's glyph default (<code>██</code> for dark, two spaces for light) is the aspect-ratio
+correction that makes a text symbol square in a terminal whose character cell is about twice as
+tall as it is wide.</p>
+<h3>7.12 Complexity</h3>
+<table>
+<thead>
+<tr>
+<th>Operation</th>
+<th>Cost</th>
+<th>Note</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Bit stream assembly</td>
+<td>O(payload)</td>
+<td>one pass, growable <code>BitBuffer</code></td>
+</tr>
+<tr>
+<td>Reed–Solomon</td>
+<td>O(dataCodewords · degree)</td>
+<td>26–3 700 codewords in practice</td>
+</tr>
+<tr>
+<td>Matrix construction</td>
+<td>O(size²)</td>
+<td><code>size = 4·version + 17</code>, at most 177×177</td>
+</tr>
+<tr>
+<td>Mask selection</td>
+<td>8 · O(size²)</td>
+<td>8 · 31 329 module visits for version 40</td>
+</tr>
+<tr>
+<td>PNG rendering</td>
+<td>O(pixels)</td>
+<td>≈ 1.6 M pixels for version 40 at 10 px per module</td>
+</tr>
+<tr>
+<td>SVG rendering</td>
+<td>O(dark modules)</td>
+<td>halved by run merging</td>
+</tr>
+</tbody>
+</table>
+<p>The whole suite is single-threaded and allocation-light; a version-5 symbol is generated, rendered,
+persisted and logged in 60–140 ms on the test machine, as printed in the status bar of every
+GUI screenshot.</p>
+<hr />
+<h2>8. Guide to the screenshots, code listings and figures</h2>
+<h3>8.1 Source-code screenshots</h3>
+<p>Every listing is generated from the real files in <code>src/</code> with syntax highlighting (Pygments,
+<code>monokai</code>): no listing was retyped, so the screenshots cannot drift from the code.</p>
+<table>
+<thead>
+<tr>
+<th>Screenshot</th>
+<th>File shown</th>
+<th>Why it is in the report</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>01-code-provided-interface.png</code></td>
+<td><code>api/QrCodeEncoder.java</code></td>
+<td>the provided interface all encoders implement, with pre/post-conditions in the Javadoc</td>
+</tr>
+<tr>
+<td><code>02-code-reed-solomon.png</code></td>
+<td><code>engine/ReedSolomon.java</code></td>
+<td>the shift-register polynomial division that generates the ECC codewords</td>
+</tr>
+<tr>
+<td><code>16-code-encoder-bean.png</code></td>
+<td><code>components/PureJavaQrEncoderBean.java</code></td>
+<td>a complete bean: four property kinds, delegation, engine call</td>
+</tr>
+<tr>
+<td><code>17-code-png-renderer.png</code></td>
+<td><code>render/PngRendererBean.java</code></td>
+<td>bound properties, validation, run-length drawing</td>
+</tr>
+<tr>
+<td><code>18-code-history-bean.png</code></td>
+<td><code>store/QrHistoryBean.java</code></td>
+<td>the <strong>indexed</strong> property and the <strong>constrained</strong> <code>maxEntries</code> with veto</td>
+</tr>
+<tr>
+<td><code>19-code-facade.png</code></td>
+<td><code>facade/QrStudioFacadeBean.java</code></td>
+<td>composition, event firing, timing</td>
+</tr>
+<tr>
+<td><code>20-code-registry.png</code></td>
+<td><code>facade/ComponentRegistry.java</code></td>
+<td>catalogue → select → instantiate → configure → validate</td>
+</tr>
+<tr>
+<td><code>21-code-beaninfo.png</code></td>
+<td><code>render/PngRendererBeanBeanInfo.java</code></td>
+<td>feature descriptors, expert flag, custom property editor</td>
+</tr>
+<tr>
+<td><code>22-code-swing-assembly.png</code></td>
+<td><code>ui/QrStudioFrame.java</code></td>
+<td>the front end: bound-property listeners, live preview</td>
+</tr>
+<tr>
+<td><code>23-code-cli-assembly.png</code></td>
+<td><code>cli/QrCliAssembly.java</code></td>
+<td>the batch front end and its option handling</td>
+</tr>
+<tr>
+<td><code>24-code-zxing-adapter.png</code></td>
+<td><code>components/ZxingQrEncoderAdapterBean.java</code></td>
+<td>third-party composition behind our own interface</td>
+</tr>
+<tr>
+<td><code>25-code-verification.png</code></td>
+<td><code>test/EngineReferenceTest.java</code></td>
+<td>how the independent-oracle checks are written</td>
+</tr>
+</tbody>
+</table>
+<h3>8.2 Running-program screenshots</h3>
+<table>
+<thead>
+<tr>
+<th>Screenshot</th>
+<th>Command that produced it</th>
+<th>What to look for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>03-gui-png-assembly.png</code></td>
+<td><code>java … QrStudioGuiAssembly --format PNG --screenshot …</code></td>
+<td>property sheet, live PNG preview, indexed history, symbol identity in the status bar</td>
+</tr>
+<tr>
+<td><code>04-gui-svg-assembly.png</code></td>
+<td>same, <code>--format SVG</code></td>
+<td>the renderer component replaced on the running application</td>
+</tr>
+<tr>
+<td><code>05-gui-ascii-assembly.png</code></td>
+<td>same, <code>--format ASCII</code></td>
+<td>a textual artifact rendered into the same preview panel (card switch)</td>
+</tr>
+<tr>
+<td><code>06-cli-help.png</code></td>
+<td><code>./run-cli.sh --help</code></td>
+<td>the complete command surface</td>
+</tr>
+<tr>
+<td><code>07-cli-component-catalogue.png</code></td>
+<td><code>./run-cli.sh --list-components</code></td>
+<td>roles with provided <strong>and required</strong> interfaces, plus component state</td>
+</tr>
+<tr>
+<td><code>08-cli-png-run.png</code></td>
+<td><code>./run-cli.sh --text … --format png --show-assembly</code></td>
+<td>a full generation run with the deployment report and the XML bean graph</td>
+</tr>
+<tr>
+<td><code>09-cli-ascii-symbol.png</code></td>
+<td><code>./run-cli.sh --text "SCO310" --ec H --format ascii --ascii</code></td>
+<td>a decodable symbol printed in a terminal (ASCII renderer component)</td>
+</tr>
+<tr>
+<td><code>10-beaninspector-png-renderer.png</code></td>
+<td><code>… BeanInspector … PngRendererBean</code></td>
+<td>introspection: bean characteristics, properties, editors, event sets, methods</td>
+</tr>
+<tr>
+<td><code>11-beaninspector-history-facade.png</code></td>
+<td><code>… BeanInspector … QrHistoryBean QrStudioFacadeBean</code></td>
+<td><code>INDEXED yes</code> on <code>entries</code>, the <code>vetoableChange</code> event set, the <code>qrCodeGeneration</code> delegation event set</td>
+</tr>
+<tr>
+<td><code>12-verification-transcript.png</code></td>
+<td><code>./run-tests.sh</code></td>
+<td>the verification transcript, ending in <code>108 checks, 108 passed, 0 failed</code></td>
+</tr>
+<tr>
+<td><code>13-build-and-package.png</code></td>
+<td><code>./build.sh all</code></td>
+<td>compile → verify → package, with the <code>Java-Bean: True</code> manifest dump</td>
+</tr>
+<tr>
+<td><code>14-jar-manifest.png</code></td>
+<td><code>unzip -p …jar META-INF/MANIFEST.MF</code></td>
+<td>the deployment interface: <code>Java-Bean: True</code> for all nine beans</td>
+</tr>
+<tr>
+<td><code>15-http-service.png</code></td>
+<td><code>./run-web.sh --port 8210</code> + <code>curl</code></td>
+<td><code>/qr</code> response headers (<code>X-qr-version</code>, <code>X-qr-mask</code>, <code>X-qr-renderer</code>), <code>/stats</code>, <code>/history</code></td>
+</tr>
+<tr>
+<td><code>26-bean-feature-matrix.png</code></td>
+<td><code>… BeanInspector …</code> (four beans)</td>
+<td>the feature matrix across components in one view</td>
+</tr>
+<tr>
+<td><code>http-service-symbol.png</code></td>
+<td><code>curl -o … '/qr?text=…&amp;format=png'</code></td>
+<td>the artifact the web service returned</td>
+</tr>
+</tbody>
+</table>
+<h3>8.3 Figures</h3>
+<table>
+<thead>
+<tr>
+<th>Figure</th>
+<th>Content</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>figure-1-component-model.png</code></td>
+<td>the nine components, their roles, provided and required interfaces, and the facade as the composition point</td>
+</tr>
+<tr>
+<td><code>figure-2-connection-model.png</code></td>
+<td>the JavaBeans connection model in this project: event source, listener, event object, delegation, plus bound-property and interface-typed connections</td>
+</tr>
+<tr>
+<td><code>figure-3-deployment-model.png</code></td>
+<td><strong>D = (C, E, P, L)</strong>: the component set, the execution environment, the descriptor parameters and the deployment location</td>
+</tr>
+<tr>
+<td><code>figure-4-encoding-pipeline.png</code></td>
+<td>the five ISO/IEC 18004 stages with the class that implements each one</td>
+</tr>
+<tr>
+<td><code>figure-5-verification-strategy.png</code></td>
+<td>how each group of checks is anchored to an independent oracle or to a reconstruction</td>
+</tr>
+<tr>
+<td><code>figure-6-artifact-gallery.png</code></td>
+<td>a contact sheet of generated artifacts (PNG, SVG, ASCII) with their recovered payloads</td>
+</tr>
+</tbody>
+</table>
+<h3>8.4 Generated artifacts submitted as evidence</h3>
+<table>
+<thead>
+<tr>
+<th>Evidence</th>
+<th>Content</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>docs/evidence/gallery/</code></td>
+<td>the 20 raster artifacts shown in the contact sheet (including the 10-step version ladder and the four error-correction levels) plus 4 SVG and 4 ASCII artifacts</td>
+</tr>
+<tr>
+<td><code>docs/evidence/gallery/history.ser</code></td>
+<td>a history file written by the repository component, readable by a fresh instance</td>
+</tr>
+<tr>
+<td><code>docs/evidence/work/bean-graph.xml</code></td>
+<td>the assembled bean graph persisted with <code>XMLEncoder</code></td>
+</tr>
+<tr>
+<td><code>docs/evidence/work/assembly-roundtrip.xml</code></td>
+<td>an assembly profile written and re-read by <code>AssemblyProfile</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>9. Verification: how the claims in this report were tested</h2>
+<p>A component suite is only as good as the evidence that it works. This chapter describes the
+verification strategy, the results, the defects the strategy caught, and — importantly — the two
+places where this implementation legitimately differs from another conforming implementation.</p>
+<h3>9.1 Strategy</h3>
+<p>Four independent techniques are used, because each one catches a different class of error:</p>
+<table>
+<thead>
+<tr>
+<th>Technique</th>
+<th>What it catches</th>
+<th>Where it is used</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Independent oracle</strong></td>
+<td>an error in our own tables or encoding logic</td>
+<td>every produced symbol is decoded by <strong>ZXing</strong>, a completely separate implementation; the 160 ISO/IEC 18004 parameter combinations are compared cell by cell with ZXing's tables</td>
+</tr>
+<tr>
+<td><strong>Round-trip / reconstruction</strong></td>
+<td>errors in placement, masking, rendering or persistence</td>
+<td>payload → symbol → PNG/SVG/ASCII → parse back → matrix → decode → payload must return unchanged</td>
+</tr>
+<tr>
+<td><strong>Exhaustive sweeps</strong></td>
+<td>boundary errors that a single example misses</td>
+<td>all 40 versions × 4 levels: 160 capacity cases, 160 table comparisons, 8 forced masks, 60 payload×level decodes</td>
+</tr>
+<tr>
+<td><strong>Negative controls</strong></td>
+<td>a test that passes for the wrong reason</td>
+<td>inputs that <em>must</em> fail are asserted to fail, with the exact exception and message; one artifact is deliberately corrupted to prove the decoder really rejects it</td>
+</tr>
+</tbody>
+</table>
+<p>The suite is written as an in-house harness (<code>test/TestHarness.java</code>, 200 lines) rather than JUnit,
+so the project has <strong>no test-framework dependency</strong> and the whole verification runs from
+<code>./run-tests.sh</code>. The harness records, for every check, the group, the name, the outcome, the
+observed value and the elapsed time; the runner writes those records straight into the evidence
+folder:</p>
+<pre><code>[evidence] wrote docs/evidence/test-report.txt (13448 chars)
+[evidence] wrote docs/evidence/test-results.csv (13918 chars)
+[evidence] wrote docs/evidence/test-results.md (15064 chars)
+[evidence] wrote docs/evidence/table-cross-check.csv (6450 chars)
+[evidence] wrote docs/evidence/capacity-matrix.csv (5109 chars)
+[evidence] wrote docs/evidence/renderer-matrix.csv (231 chars)
+[evidence] wrote docs/evidence/artifact-gallery.csv (4155 chars)
+checks: 108, failures: 0
+</code></pre>
+<h3>9.2 Where the truth comes from</h3>
+<p>Nothing in the evidence folder is asserted from memory. Each file has a defined provenance:</p>
+<table>
+<thead>
+<tr>
+<th>Evidence file</th>
+<th>Produced by</th>
+<th>Independent anchor</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>test-report.txt</code></td>
+<td><code>VerificationRunner</code></td>
+<td>ZXing decoder, ZXing tables, ZXing encoder</td>
+</tr>
+<tr>
+<td><code>test-results.csv</code> / <code>.md</code></td>
+<td>same run, machine-readable / human-readable</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>table-cross-check.csv</code></td>
+<td>engine vs ZXing parameter tables</td>
+<td>ZXing <code>Version</code> tables</td>
+</tr>
+<tr>
+<td><code>capacity-matrix.csv</code></td>
+<td>the largest payload each version/level accepts, decoded back</td>
+<td>ZXing decoder</td>
+</tr>
+<tr>
+<td><code>renderer-matrix.csv</code></td>
+<td>PNG/SVG/ASCII artifacts rebuilt into matrices</td>
+<td>matrix equality with the encoder output</td>
+</tr>
+<tr>
+<td><code>artifact-gallery.csv</code></td>
+<td>20 files with SHA-256 and the payload decoded from each</td>
+<td>ZXing decoder + SHA-256</td>
+</tr>
+<tr>
+<td><code>mask-selection-comparison.csv</code></td>
+<td>mask choice vs ZXing over 104 payload/level pairs</td>
+<td>ZXing encoder</td>
+</tr>
+<tr>
+<td><code>work/bean-graph.xml</code>, <code>work/assembly-roundtrip.xml</code></td>
+<td>XML persistence of graph and profile</td>
+<td>re-read by a fresh instance</td>
+</tr>
+</tbody>
+</table>
+<p>The oracle is used only as a <em>verifier</em>: <code>ZxingVerify</code> is the only class in the project that
+touches the third-party library for testing, and it is compiled into <code>out/test-classes</code>, never into
+the shipped JAR.</p>
+<h3>9.3 Results</h3>
+<pre><code>TOTAL 108 checks, 108 passed, 0 failed
+ISO/IEC 18004 parameter table cross-check: 160 version/level combinations, 0 mismatches
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Group</th>
+<th>Checks</th>
+<th>What it establishes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>engine</code></td>
+<td>18</td>
+<td>tables match ZXing; 60/60 payloads decode; mode selection; determinism; 8/8 masks decode; metadata; capacity; error paths</td>
+</tr>
+<tr>
+<td><code>renderer.png</code></td>
+<td>6</td>
+<td>geometry, MIME type, decodability, quiet zone colour, per-module pixel accuracy, bound resize</td>
+</tr>
+<tr>
+<td><code>renderer.svg</code></td>
+<td>5</td>
+<td>millimetre sizing, namespace, run merging, matrix reconstruction, optimisation round trip</td>
+</tr>
+<tr>
+<td><code>renderer.ascii</code></td>
+<td>2</td>
+<td>matrix reconstruction, textual flag</td>
+</tr>
+<tr>
+<td><code>renderer</code> (cross-cutting)</td>
+<td>6</td>
+<td>three implementations of one role, identity in artifacts, property editor, invalid inputs, corrupted-artifact control</td>
+</tr>
+<tr>
+<td><code>beans</code> (+ sub-groups)</td>
+<td>48</td>
+<td>every bean is a valid bean; bound, constrained, indexed and introspection behaviour; events; persistence; optional dependency</td>
+</tr>
+<tr>
+<td><code>assembly.*</code></td>
+<td>30</td>
+<td>catalogue, wiring, end-to-end generation, replacement, negative controls, repository round trip, history policy</td>
+</tr>
+<tr>
+<td><code>gallery</code></td>
+<td>3</td>
+<td>the third-party adapter, artifact writing, three formats present</td>
+</tr>
+</tbody>
+</table>
+<p>The headline numbers, each traceable to a file:</p>
+<table>
+<thead>
+<tr>
+<th>Claim</th>
+<th>Value</th>
+<th>Evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Parameter tables identical to ZXing</td>
+<td>160 / 160</td>
+<td><code>table-cross-check.csv</code></td>
+</tr>
+<tr>
+<td>Payloads recovered exactly (incl. accents, CJK, emoji)</td>
+<td>60 / 60</td>
+<td><code>test-report.txt</code></td>
+</tr>
+<tr>
+<td>Maximum-capacity symbols decoded</td>
+<td>160 / 160</td>
+<td><code>capacity-matrix.csv</code></td>
+</tr>
+<tr>
+<td>Forced masks that decode</td>
+<td>8 / 8</td>
+<td><code>test-report.txt</code></td>
+</tr>
+<tr>
+<td>Artifacts with digests</td>
+<td>28</td>
+<td><code>artifact-gallery.csv</code></td>
+</tr>
+<tr>
+<td>Checks</td>
+<td>108 / 108</td>
+<td><code>test-results.csv</code></td>
+</tr>
+</tbody>
+</table>
+<h3>9.4 Defect log — what the verification caught</h3>
+<p>These are the real defects found while building and verifying the suite. They are documented
+because they show the difference the evidence made: three of them would have shipped as silently
+wrong QR codes.</p>
+<p><strong>Defect 1 — Reed–Solomon input and interleaving order (critical).</strong>
+The first implementation fed the shift register <code>data + zero-padded ECC placeholders</code> instead of
+just the data codewords, and interleaved the codewords column-by-column across the <em>combined</em>
+data and ECC sequence. The generated matrices looked like QR codes and passed a naive
+"is it 21×21 with three finder patterns" check, but no decoder could read them.
+<em>Cause</em> the register in a polynomial-division implementation already performs the <code>x^degree</code>
+shift, so the placeholders are a double shift.
+<em>Fix</em> <code>ReedSolomon.computeRemainder(dataPart, blockEccLen)</code> with the data part only, and a
+two-phase interleave (all data columns, then all ECC columns), with short blocks contributing
+nothing in the last data column.
+<em>Regression test</em> <code>PASS payloads survive the ZXing decode round trip (60 decoded, 0 failed)</code> and
+the 160-case capacity sweep — neither can pass with this bug present.</p>
+<p><strong>Defect 2 — byte-mode character-count width for versions 10–40 (high).</strong>
+The character-count field was hard-coded to 8 bits for byte mode. The standard specifies 8 bits for
+versions 1–9 but <strong>16 bits</strong> for versions 10–40.
+<em>Symptom</em> symbols from version 10 upward decoded to garbage or failed to decode at all; capacity
+for those versions was reported 8 bits too high.
+<em>Fix</em> the width is now data on <code>QrEncodingMode</code> (<code>new int[]{8, 16, 16}</code>) and <code>byteCapacity(...)</code>
+derives the maximum payload from it, so the reported maximum at level L is exactly the
+specification's 2 953 bytes.
+<em>Regression test</em> <code>PASS maximum byte capacity reported for level L — expected=2953 actual=2953</code>
+plus the 160-case capacity matrix.</p>
+<p><strong>Defect 3 — numeric mode bit widths (medium).</strong>
+Three-digit numeric groups were emitted in 11 bits instead of 10, and singleton groups in 5 bits
+instead of 4.
+<em>Symptom</em> numeric payloads were one bit per group too long, which could push a payload into a
+larger version than necessary, and made the stream unreadable to a conforming decoder once the
+error was not compensated.
+<em>Fix</em> <code>take == 3 ? 10 : (take == 2 ? 7 : 4)</code>.
+<em>Regression test</em> <code>PASS numeric payload selects numeric mode</code>, <code>PASS compact mode lowers the
+symbol version</code>, and the numeric entries of the 60-case decode sweep.</p>
+<p><strong>Defect 4 — the screenshot path blocked the Swing event dispatch thread (medium).</strong>
+<code>QrStudioGuiAssembly --screenshot</code> did its work inside <code>SwingUtilities.invokeAndWait(...)</code> and then
+called <code>Thread.sleep(400)</code> inside that block to let the layout settle. Sleeping on the event
+dispatch thread forbids the queued re-layout and repaint events from running, so the captured
+window was painted with the <em>pre-generation</em> layout — the symbol identity label was still sized for
+the placeholder text <code>-</code> and was therefore rendered as <code>...</code>.
+<em>Fix</em> three phases: build and generate on the EDT, wait <strong>off</strong> the EDT, then paint on the EDT again.
+<em>Effect</em> the symbol metadata now appears correctly in the status bar of
+<code>docs/screenshots/03-gui-png-assembly.png</code> (<code>v7-M mask 2 Byte 45x45</code>).</p>
+<p><strong>Defect 5 — property sheet collapsed and preview cropped (medium, presentation).</strong>
+Two layout defects in the desktop assembly: <code>GridBagLayout</code> centres its grid when the container is
+taller than its content, so the property sheet floated in the middle of the window; and the
+artifact preview was placed in a scroll pane that clipped large symbols (a version-7 symbol at
+10 px per module is 450 px wide).
+<em>Fix</em> the property sheet is hosted in the <code>NORTH</code> slot of a <code>BorderLayout</code> so it stays anchored;
+the payload and colour rows received explicit <strong>minimum</strong> sizes as well as preferred sizes
+(<code>GridBagLayout</code> honours the minimum when it arranges a grid that would otherwise overflow); and
+the preview is now a card-switching panel whose raster card paints the artifact scaled to fit with
+nearest-neighbour interpolation, never enlarged above 1:1 so that module edges stay exact.</p>
+<p><strong>Defect 6 — the indexed property was invisible to introspection (high, course requirement).</strong>
+<code>QrHistoryBeanBeanInfo</code> declared <code>entries</code> with a plain <code>PropertyDescriptor</code> so that the property
+could be marked transient for <code>XMLEncoder</code>. A side effect of an explicit <code>BeanInfo</code> is that the
+introspector no longer derives the automatic <code>IndexedPropertyDescriptor</code>, so
+<code>getEntries(int)</code> / <code>setEntries(int, …)</code> and the indexed property-change events disappeared from
+the bean's feature set. The bean <em>had</em> an indexed property, but the project could not <em>demonstrate</em>
+one — and "the four kinds of properties" is an explicit requirement of the component model.
+<em>Fix</em> <code>new IndexedPropertyDescriptor("entries", QrHistoryBean.class)</code>, keeping the transient flag.
+The tool now reports the property as indexed on the compiled class:</p>
+<pre><code>PROPERTY       TYPE                 READ   WRITE  INDEXED   CATEGORY  PROPERTY EDITOR
+entries        QrHistoryEntry[]     yes    yes    yes       normal    -
+</code></pre>
+<p><strong>Defect 7 — 15 compiler warnings (low, hygiene).</strong>
+<code>-Xlint:all</code> reported 15 serialisation warnings because the beans declared mutable properties
+without a <code>serialVersionUID</code>.
+<em>Fix</em> every bean declares <code>private static final long serialVersionUID = 1L;</code> (and the support
+objects that are serialised alongside it). The build now compiles with <strong>zero warnings</strong>, which is
+what makes the <code>count of warnings = 0</code> claim in §10 verifiable.</p>
+<h3>9.5 Negative controls — proof that the checks can fail</h3>
+<p>A test that cannot fail proves nothing. Each of these cases is asserted to fail <strong>with a specific
+exception and message</strong>, and the corrupted-artifact control proves that the decoder really is
+checking:</p>
+<table>
+<thead>
+<tr>
+<th>Control</th>
+<th>Expected outcome</th>
+<th>Observed</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Empty payload</td>
+<td>rejected</td>
+<td><code>QrEncodingException: The payload is empty; a QR Code must carry at least one byte</code></td>
+</tr>
+<tr>
+<td><code>null</code> payload</td>
+<td>rejected</td>
+<td>same</td>
+</tr>
+<tr>
+<td>200 characters at version 1, level H</td>
+<td>rejected with the numbers</td>
+<td><code>Payload of 200 characters does not fit version 1 at level H (needs 1113 bits, capacity 72 bits)</code></td>
+</tr>
+<tr>
+<td>Error-correction label <code>Z</code></td>
+<td>rejected</td>
+<td><code>IllegalArgumentException: Unknown error-correction level 'Z'. Expected one of L, M, Q, H</code></td>
+</tr>
+<tr>
+<td>Forced mask <code>9</code></td>
+<td>rejected</td>
+<td><code>IllegalArgumentException: forcedMaskPattern must be -1 or 0..7</code></td>
+</tr>
+<tr>
+<td><code>moduleSize = 0</code></td>
+<td>rejected</td>
+<td><code>IllegalArgumentException: moduleSize must be 1..64</code></td>
+</tr>
+<tr>
+<td>Colour <code>#12GG45</code></td>
+<td>rejected</td>
+<td><code>IllegalArgumentException: '#12GG45' is not a hexadecimal colour</code></td>
+</tr>
+<tr>
+<td>Inconsistent version window</td>
+<td>vetoed</td>
+<td><code>PropertyVetoException: minimumVersion 9 would exceed maximumVersion 5</code></td>
+</tr>
+<tr>
+<td>Capacity reduction refused by a listener</td>
+<td>vetoed, old value kept</td>
+<td><code>PropertyVetoException: capacity may not be reduced</code>, then <code>expected=5 actual=5</code></td>
+</tr>
+<tr>
+<td>Generation with no encoder connected</td>
+<td>rejected</td>
+<td><code>QrEncodingException: No encoder component is connected: call setEncoder(...) before generating</code></td>
+</tr>
+<tr>
+<td>Unknown component id in the profile</td>
+<td>rejected at assembly time</td>
+<td><code>IllegalArgumentException: Unknown renderer component id: renderer.does-not-exist.v1</code></td>
+</tr>
+<tr>
+<td>A property the selected component does not declare</td>
+<td>reported, not ignored</td>
+<td><code>[not applicable to component renderer.ascii.v1 (property not declared): component renderer.ascii.v1.moduleSize]</code></td>
+</tr>
+<tr>
+<td><strong>Corrupted PNG (bytes damaged after rendering)</strong></td>
+<td>decoder must reject it</td>
+<td><code>decoder rejected the damaged artifact as expected</code></td>
+</tr>
+<tr>
+<td>Missing optional library</td>
+<td>component reported unavailable, suite still functional</td>
+<td><code>com.google.zxing.core is not on the class path</code></td>
+</tr>
+</tbody>
+</table>
+<p>The last but one entry is the most important control in the project: it proves that the round-trip
+decode checks are capable of reporting failure, so a <em>passing</em> decode of every other artifact is
+meaningful evidence.</p>
+<h3>9.6 Known divergences from another conforming implementation</h3>
+<p>Good engineering states its limits. Two differences from ZXing were found, characterised and
+recorded in <code>docs/evidence/mask-selection-comparison.csv</code> (104 payload/level pairs):</p>
+<table>
+<thead>
+<tr>
+<th>Difference</th>
+<th>Measurement</th>
+<th>Explanation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Mask pattern chosen</strong></td>
+<td>identical in <strong>67 of 100</strong> cases where the symbol version agrees</td>
+<td>penalty rule 3 ("1:1:3:1:1" finder-like patterns) is interpreted differently at the symbol border: this implementation treats the surrounding quiet zone as light modules, while ZXing does not consider the border. Both symbols are conformant — the decoder reads the mask from the format information — and both decode.</td>
+</tr>
+<tr>
+<td><strong>Symbol version for non-Latin payloads</strong></td>
+<td>identical in <strong>100 of 104</strong> cases</td>
+<td>ZXing's encoder defaults to ISO-8859-1 and therefore replaces characters it cannot represent with <code>?</code>, which makes its symbols <em>smaller</em> for CJK text but lossy. This suite emits the payload's UTF-8 bytes, which preserves the data (verified by decoding back CJK and emoji payloads) at the cost of one or two extra versions.</td>
+</tr>
+</tbody>
+</table>
+<p>Neither difference affects decodability: all 104 symbols in the comparison decode, and the
+produced symbols for the 160 capacity cases and the 60 round-trip payloads all decode exactly.
+Recording the divergence is the honest alternative to claiming bit-for-bit equality with another
+implementation — and the "different but still conformant" framing is itself part of the
+component-programming story: two interchangeable implementations of one interface need not be
+identical, only contract-equivalent.</p>
+<h3>9.7 Reproducing the evidence</h3>
+<pre><code>cd qr-component-studio
+./build.sh all          # clean, compile, verify, compare, package
+./run-tests.sh          # verification only, rewrites docs/evidence/
+python3 tools/capture_screenshots.py   # regenerates docs/screenshots/ from the running programs
+python3 tools/make_diagrams.py         # regenerates docs/diagrams/
+python3 tools/make_gallery.py          # regenerates the artifact contact sheet
+</code></pre>
+<p>Every artefact in this report is regenerated by those commands, so a marker can reproduce the
+evidence from source rather than trusting the submitted images.</p>
+<hr />
+<h2>10. Building, running and submitting</h2>
+<h3>10.1 Submission layout</h3>
+<pre><code>qr-component-studio/
+├── src/main/java/ke/ku/sco310/qr/
+│   ├── api/            15 files - provided interfaces, value objects, exception hierarchy
+│   ├── engine/          6 files - package-private ISO/IEC 18004 encoder (the hidden behaviour)
+│   ├── components/      3 files - the two encoder components + optional-library support
+│   ├── render/          4 files - PNG, SVG and ASCII renderer components + one BeanInfo
+│   ├── store/           3 files - file-system repository, history bean + one BeanInfo
+│   ├── log/             1 file  - audit listener component
+│   ├── facade/          8 files - facade, registry, profile, persistence, coercion
+│   ├── ui/              2 files - desktop assembly (front end 1)
+│   ├── cli/             1 file  - command-line assembly (front end 2)
+│   ├── web/             1 file  - HTTP service assembly (front end 3)
+│   ├── editor/          1 file  - custom property editor
+│   ├── event/           2 files - event object and listener interface
+│   └── tools/           1 file  - BeanInspector introspection tool
+├── src/test/java/ke/ku/sco310/qr/test/   7 files - in-house harness, oracle, suites, runner
+├── config/assembly.xml           deployment descriptor
+├── manifest/MANIFEST.MF          JAR manifest with Java-Bean entries
+├── lib/                          optional third-party component (ZXing 3.5.3)
+├── tools/                        documentation builders and the mask-comparison instrument
+├── build.sh, run-*.sh, pom.xml   build and run tooling
+├── out/                          classes, verification classes, distribution JAR, generated files
+└── docs/
+    ├── Documentation.md          this report
+    ├── SCO310-QR-Component-Suite-Report.html / .docx / .pdf
+    ├── diagrams/                 6 generated figures
+    ├── screenshots/              27 screenshots of code and of running programs
+    └── evidence/                 verification transcript, CSVs, artifact gallery, XML graph
+</code></pre>
+<h3>10.2 Build</h3>
+<p>The build is deliberately dependency-free: it uses <code>javac</code> directly (step 3 of the eight JavaBean
+steps) and packages with <code>jar</code> (steps 4–6). No Maven, Gradle or Ant is required, although a
+<code>pom.xml</code> is included for environments that prefer it.</p>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>./build.sh clean</code></td>
+<td>removes <code>out/</code></td>
+</tr>
+<tr>
+<td><code>./build.sh compile</code></td>
+<td>compiles the main sources with <code>javac --release 11 -Xlint:all,-this-escape</code></td>
+</tr>
+<tr>
+<td><code>./build.sh test</code></td>
+<td>compiles and runs the verification suite, rewriting <code>docs/evidence/</code></td>
+</tr>
+<tr>
+<td><code>./build.sh compare</code></td>
+<td>runs the ZXing mask-selection comparison instrument</td>
+</tr>
+<tr>
+<td><code>./build.sh jar</code></td>
+<td>packages <code>out/dist/qr-component-suite-1.0.0.jar</code> with the manifest</td>
+</tr>
+<tr>
+<td><code>./build.sh docs</code></td>
+<td>regenerates the HTML, DOCX and PDF versions of this report</td>
+</tr>
+<tr>
+<td><code>./build.sh all</code></td>
+<td>clean → compile → verify → compare → package</td>
+</tr>
+<tr>
+<td><code>./run-tests.sh</code>, <code>./run-cli.sh</code>, <code>./run-gui.sh</code>, <code>./run-web.sh</code></td>
+<td>run the verification suite and the three front ends</td>
+</tr>
+</tbody>
+</table>
+<p>Expected output of <code>./build.sh all</code> (abridged, with the counts that §9 relies on):</p>
+<pre><code>[build] compiling main sources with javac (--release 11)
+[build] main classes: 51
+[evidence] wrote docs/evidence/test-report.txt (13448 chars)
+checks: 108, failures: 0
+mask comparison written to docs/evidence/mask-selection-comparison.csv
+[build] jar written: out/dist/qr-component-suite-1.0.0.jar (119980 bytes)
+[build] done
+</code></pre>
+<p>The compiler is configured with <code>-Xlint:all</code> and the build produces <strong>no warnings</strong>. The single
+disabled category is <code>this-escape</code>, and the reason is documented in <code>build.sh</code>: the JavaBeans
+bound-property idiom requires <code>new PropertyChangeSupport(this)</code> in a field initialiser, and that
+helper only stores the reference — it never calls back into the bean during construction.</p>
+<h3>10.3 Running the three assemblies</h3>
+<p><strong>Desktop assembly</strong></p>
+<pre><code>./run-gui.sh
+# or, for an automated capture of the real window:
+xvfb-run -a java -cp out/classes:lib/core-3.5.3.jar:lib/javase-3.5.3.jar \
+     ke.ku.sco310.qr.ui.QrStudioGuiAssembly --format PNG --screenshot docs/screenshots/gui.png
+</code></pre>
+<p><strong>Command-line assembly</strong></p>
+<pre><code>./run-cli.sh --text &quot;https://www.ku.ac.ke/sco310&quot; --ec M --format png --show-assembly
+./run-cli.sh --list-components            # the component catalogue with provided/required interfaces
+./run-cli.sh --inspect ke.ku.sco310.qr.store.QrHistoryBean
+./run-cli.sh --text &quot;SCO310&quot; --format svg --save-assembly out/assembly-mine.xml
+./run-cli.sh --load-assembly out/assembly-mine.xml --format ascii --ascii
+</code></pre>
+<p><strong>HTTP service assembly</strong></p>
+<pre><code>./run-web.sh --port 8099
+curl 'http://localhost:8099/qr?text=HELLO%20WORLD&amp;ec=Q&amp;format=png&amp;moduleSize=8' -o hello.png
+curl 'http://localhost:8099/qr?text=SCO310&amp;format=svg'
+curl http://localhost:8099/stats
+curl 'http://localhost:8099/history?limit=5'
+curl http://localhost:8099/health          # -&gt; OK
+</code></pre>
+<p>The HTTP response carries the component identity and the symbol parameters in its headers, which
+makes the service self-documenting and easy to script against:</p>
+<pre><code>HTTP/1.1 200 OK
+X-qr-renderer: renderer.png.v1
+X-qr-version: 2
+X-qr-level: Q
+X-qr-mask: 6
+X-qr-stored: qr-code-v2-q-20261015-203346.png
+Content-Type: image/png
+</code></pre>
+<h3>10.4 How the project maps onto the marking criteria</h3>
+<table>
+<thead>
+<tr>
+<th>Criterion (as stated for the unit)</th>
+<th>Where it is demonstrated</th>
+<th>Evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Understanding of component-oriented programming</td>
+<td>component identification with roles, provided/required interfaces and hidden behaviour for 11 entries; COP-vs-OOP comparison; CBSE context</td>
+<td>§3, <code>figure-1</code>, <code>figure-3</code></td>
+</tr>
+<tr>
+<td>Correct use of the JavaBeans component model</td>
+<td>all four property kinds, delegation events, introspection, <code>BeanInfo</code>, custom property editor, customiser (the GUI property sheet), two persistence mechanisms</td>
+<td>§4, §5, screenshots <code>10</code>, <code>11</code>, <code>18</code>, <code>21</code>, <code>26</code></td>
+</tr>
+<tr>
+<td>Component design: interfaces and contracts</td>
+<td>five provided interfaces with documented pre/post-conditions; required interfaces injected only through setters; typed exception hierarchy</td>
+<td>§3.2, <code>01-code-provided-interface.png</code></td>
+</tr>
+<tr>
+<td>Reuse, replaceability and third-party composition</td>
+<td>2 encoders, 3 renderers, 2 repositories; assembly-level replacement tests; ZXing wrapped behind our own interface</td>
+<td>§6.3, <code>07</code>, <code>24</code></td>
+</tr>
+<tr>
+<td>Deployment and configuration without recompilation</td>
+<td>XML deployment descriptor, profiles, <code>Java-Bean: True</code> manifest entries, XML bean-graph persistence</td>
+<td>§4.4, §6.4, <code>14</code>, <code>08</code></td>
+</tr>
+<tr>
+<td>Correct, working program logic</td>
+<td>full ISO/IEC 18004 implementation: 3 modes, RS over GF(2⁸), interleaving, 8 masks, penalty scoring, format/version BCH, versions 1–40</td>
+<td>§7, <code>02</code>, <code>12</code></td>
+</tr>
+<tr>
+<td>Testing and evidence of correctness</td>
+<td>108 automated checks against an independent oracle, exhaustive sweeps, negative controls, documented defect log</td>
+<td>§9, <code>docs/evidence/</code></td>
+</tr>
+<tr>
+<td>Documentation and presentation</td>
+<td>this report with figures, code screenshots and screenshots of the running programs; every artefact reproducible from source</td>
+<td><code>docs/documentation.md</code>, <code>docs/diagrams/</code>, <code>docs/screenshots/</code></td>
+</tr>
+<tr>
+<td>Independent, well-structured code</td>
+<td>package separation of api / engine / components / front ends, zero-warning build, package-private internals, no dependency for the engine</td>
+<td>§7.1, <code>build.sh</code></td>
+</tr>
+</tbody>
+</table>
+<h3>10.5 Conclusion</h3>
+<p>The project set out to show that a QR Code generator can be <em>assembled</em> rather than <em>written</em>, and
+the result demonstrates the claim on four levels.</p>
+<p><em>Architecturally</em>, the suite is nine JavaBeans components plus two infrastructure classes. Each has
+a published interface, a declared set of dependencies, and behaviour that no consumer can reach
+into. The only place where QR-specific complexity lives is a package-private engine package, which
+is exactly what the component triple <strong>C = (I, D, B)</strong> asks for.</p>
+<p><em>Practically</em>, the same compiled components serve a desktop GUI, a command-line tool and an HTTP
+service, and the renderer or the entire encoder can be replaced at run time by editing an XML
+descriptor or by calling one setter — with the assembly tests proving that a swapped component
+still produces the same symbol.</p>
+<p><em>Technically</em>, the encoder is a complete, dependency-free implementation of ISO/IEC 18004, and it
+is verifiable rather than merely plausible: the data and error-correction codewords reproduce the
+worked example published in the standard byte for byte, all 160 version/level capacities produce
+decodable symbols, and all 60 round-trip payloads come back exactly, including accented text, CJK
+and emoji.</p>
+<p><em>Methodologically</em>, the project is honest about its evidence. The verification suite is designed so
+that its checks are capable of failing — proven by deliberately corrupted artifacts and by the
+seven defects it actually caught during development — and the two places where this implementation
+legitimately differs from ZXing are measured, explained and recorded instead of being hidden.</p>
+<h3>10.6 References</h3>
+<ol>
+<li>International Organization for Standardization / IEC. <strong>ISO/IEC 18004:2015</strong> — <em>Information
+   technology — Automatic identification and data capture techniques — QR Code bar code symbology
+   specification.</em></li>
+<li>Szyperski, C. <strong>Component Software: Beyond Object-Oriented Programming.</strong> 2nd ed.,
+   Addison-Wesley, 2002. (The source of the definition used in §3.1 and of the deployment
+   quadruple <em>D = (C, E, P, L)</em>.)</li>
+<li>SCO 310 course notes, Kenyatta University — <em>Component Programming</em>: components and component
+   models, CBSE, COP versus OOP, JavaBeans, EJB, .NET, CORBA, web services and OSGi.</li>
+<li>Oracle. <strong>JavaBeans™ 1.01 Specification</strong> and the <code>java.beans</code> package documentation
+   (<code>Introspector</code>, <code>FeatureDescriptor</code>, <code>PropertyDescriptor</code>, <code>IndexedPropertyDescriptor</code>,
+   <code>EventSetDescriptor</code>, <code>PropertyEditorSupport</code>, <code>XMLEncoder</code>, <code>XMLDecoder</code>).</li>
+<li>Nayuki Project. <em>QR Code generator library</em> — reference notes on conformant mask penalty
+   evaluation, used to cross-check the interpretation of penalty rule 3 at the symbol border
+   (§9.6).</li>
+<li>ZXing ("Zebra Crossing"), Google. <em>core 3.5.3</em> — used exclusively as an independent
+   verification oracle and, optionally, as a replaceable third-party encoder component.</li>
+</ol>
+<hr />
+<h2>Appendix A — Evidence index</h2>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Contents</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>docs/evidence/test-report.txt</code></td>
+<td>full verification transcript, 108 checks</td>
+</tr>
+<tr>
+<td><code>docs/evidence/test-results.csv</code></td>
+<td>machine-readable results (group, check, outcome, detail, millis)</td>
+</tr>
+<tr>
+<td><code>docs/evidence/test-results.md</code></td>
+<td>the same results as a Markdown table</td>
+</tr>
+<tr>
+<td><code>docs/evidence/table-cross-check.csv</code></td>
+<td>160 version/level parameter comparisons with ZXing</td>
+</tr>
+<tr>
+<td><code>docs/evidence/capacity-matrix.csv</code></td>
+<td>maximum payload per version/level, decoded back</td>
+</tr>
+<tr>
+<td><code>docs/evidence/renderer-matrix.csv</code></td>
+<td>PNG/SVG/ASCII reconstruction results</td>
+</tr>
+<tr>
+<td><code>docs/evidence/mask-selection-comparison.csv</code></td>
+<td>mask choice versus ZXing, 104 pairs, with notes</td>
+</tr>
+<tr>
+<td><code>docs/evidence/artifact-gallery.csv</code></td>
+<td>28 artifacts: kind, size, SHA-256 digest, recovered payload, digest verdict</td>
+</tr>
+<tr>
+<td><code>docs/evidence/gallery/</code></td>
+<td>the artifacts themselves, the version ladder and the level set</td>
+</tr>
+<tr>
+<td><code>docs/evidence/work/bean-graph.xml</code></td>
+<td>the assembled bean graph persisted with <code>XMLEncoder</code></td>
+</tr>
+<tr>
+<td><code>docs/evidence/work/assembly-roundtrip.xml</code></td>
+<td>an assembly profile written and re-read</td>
+</tr>
+<tr>
+<td><code>docs/evidence/work/assembly-test-*/history.ser</code></td>
+<td>history files written by the repository component</td>
+</tr>
+</tbody>
+</table>
+<h2>Appendix B — Glossary of the terms used in this report</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>Meaning as used here</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Component</strong></td>
+<td>a deployable unit of software with contractually specified interfaces and explicit context dependencies only, subject to third-party composition</td>
+</tr>
+<tr>
+<td><strong>Provided interface</strong></td>
+<td>what a component offers to the outside world (<code>QrCodeEncoder</code>, <code>QrCodeRenderer</code>, …)</td>
+</tr>
+<tr>
+<td><strong>Required interface</strong></td>
+<td>what a component needs from its context in order to function (<code>QrCodeRepository</code>, ZXing core, …)</td>
+</tr>
+<tr>
+<td><strong>Hidden behaviour (B)</strong></td>
+<td>the part of a component that consumers must not depend on (the <code>engine</code> package)</td>
+</tr>
+<tr>
+<td><strong>Bound property</strong></td>
+<td>a property whose change fires a <code>PropertyChangeEvent</code> to registered listeners</td>
+</tr>
+<tr>
+<td><strong>Constrained property</strong></td>
+<td>a property whose change may be vetoed by a <code>VetoableChangeListener</code>, throwing <code>PropertyVetoException</code></td>
+</tr>
+<tr>
+<td><strong>Indexed property</strong></td>
+<td>a collection property with per-element accessors and indexed change events</td>
+</tr>
+<tr>
+<td><strong>Introspection</strong></td>
+<td>run-time discovery of a bean's properties, events and methods through <code>java.beans.Introspector</code></td>
+</tr>
+<tr>
+<td><strong>Feature descriptor</strong></td>
+<td>the <code>java.beans</code> metadata object (<code>BeanDescriptor</code>, <code>PropertyDescriptor</code>, <code>EventSetDescriptor</code>, <code>MethodDescriptor</code>) that a builder tool reads</td>
+</tr>
+<tr>
+<td><strong>Deployment descriptor</strong></td>
+<td><code>config/assembly.xml</code>: which component fills each role and with which property values</td>
+</tr>
+<tr>
+<td><strong>Assembly</strong></td>
+<td>a configured set of components wired together and ready to execute (<code>QrAssembly</code>)</td>
+</tr>
+<tr>
+<td><strong>Oracle</strong></td>
+<td>an independent implementation used only to verify our output (ZXing)</td>
+</tr>
+</tbody>
+</table>
+<h2>Appendix C — Course questions answered from this project</h2>
+<p>The unit's past papers ask a small number of recurring questions. Each is answered below <strong>using
+this project as the example</strong>, which is the shortest route from the theory in the notes to a
+concrete, checkable answer.</p>
+<p><strong>Q1. "An air-conditioning system is a component-based system." Discuss.</strong>
+A component-based system is one whose functionality is delivered by independent, replaceable units
+that communicate through interfaces. An air-conditioning installation fits this description
+exactly, and it maps onto this project one role at a time: a <strong>sensor</strong> component provides a
+<code>readTemperature()</code> interface (our <code>QrCodeEncoder.encode()</code>); a <strong>controller</strong> component requires
+that interface and provides <code>setTarget()</code> (our <code>QrStudioFacadeBean</code>, which requires four
+interfaces); an <strong>actuator/compressor</strong> component consumes commands and provides cooling (our
+<code>PngRendererBean</code>); a <strong>display</strong> and a <strong>logger</strong> are listeners on the controller's events (our
+<code>AuditLogListenerBean</code>). The system is component based rather than merely modular because units can
+be replaced without redesign: swapping a mercury thermostat for a digital sensor changes one
+component, not the system, exactly as swapping <code>renderer.png.v1</code> for <code>renderer.svg.v1</code> changes the
+output format without touching the encoder, the facade or either front end. The formal definition
+from the notes — contractually specified interfaces, explicit context dependencies, independent
+deployment, third-party composition — is satisfied by both.</p>
+<p><strong>Q2. "Describe the three types of component interface incompatibility."</strong>
+<em>Signature incompatibility</em> — the names, parameter types or return types of an operation do not
+match (<code>play(File)</code> versus <code>play(String)</code>). <em>Protocol or behavioural incompatibility</em> — the
+signatures match, but the expected sequence of calls, the blocking behaviour or the error contract
+differs (a component that requires <code>open(); use(); close();</code> versus one that expects a single
+<code>process()</code>; or one that signals failure by exception versus by return code). <em>Semantic or quality
+incompatibility</em> — the operation succeeds but the meaning or quality of the result differs (both
+components claim to "encode a QR code", but one supports only byte mode, or only versions 1–9, or
+targets a different error-correction level).
+This project avoids all three deliberately. Signature incompatibility is avoided because the
+implementations share one interface (<code>QrCodeEncoder</code>) and the third-party library is <em>adapted</em>,
+never called directly. Protocol incompatibility is avoided because the interaction contract is
+published as a Javadoc pre/post-condition block on each interface method and is asserted by the
+test suite. Semantic incompatibility is avoided by making capability metadata part of the provided
+interface: <code>getEncoderInfo()</code> returns versions, modes, maximum capacity and a <code>thirdParty</code> flag, so
+a caller can discover that a component is only "equivalent in interface, not in capability" before
+using it — which is precisely what <code>ComponentRegistry</code> does when it reports a component as
+<code>unavailable</code> rather than silently substituting it.</p>
+<p><strong>Q3. "How is component-based software engineering different from object-oriented programming?"</strong>
+OOP decomposes a solution into classes and objects and reuses them by inheritance, composition and
+polymorphism; the unit of reuse is the class and the decision is made at compile time. CBSE
+decomposes a solution into deployable components with contractually specified interfaces; the unit
+of reuse is the binary component, the dependencies are declared rather than implicit, and the
+decision is made at deployment or run time by an assembler. In this project the same code base
+demonstrates both: <code>QrCode</code>, <code>BitBuffer</code> and <code>GaloisField</code> are ordinary OOP objects inside the
+component, while the <em>reused</em> artefact is <code>PureJavaQrEncoderBean</code>, deployed into three different
+front ends by editing one XML file.</p>
+<p><strong>Q4. "Outline the steps to create a JavaBean."</strong>
+(1) a public class; (2) a public no-argument constructor; (3) properties exposed through
+<code>get</code>/<code>set</code> methods; (4) <code>Serializable</code> for persistence; (5) event delegation through
+<code>add</code>/<code>remove&lt;Listener&gt;</code> methods; (6) optional <code>BeanInfo</code> classes for builder tools; (7) packaging
+with a manifest that marks the classes as beans (<code>Java-Bean: True</code>); (8) testing through
+introspection. §4.1 of this report tabulates each step against the class that implements it, and
+<code>./run-cli.sh --inspect &lt;class&gt;</code> demonstrates steps 3–6 and 8 on the compiled bytecode.</p>
+<hr />
+<hr />
+<h2>Appendix D - Screenshot gallery (embedded)</h2>
+<p>The images below are the figures and the screenshots referenced throughout this report. All of them were generated from the running code by the project's own tooling (<code>tools/make_diagrams.py</code>, <code>tools/capture_screenshots.py</code>).</p>
+<p><strong>Figure 1.</strong> The component model: roles, provided and required interfaces, and the facade as the composition point.</p>
+<p><img alt="Figure 1." src="diagrams/figure-1-component-model.png" /></p>
+<p><strong>Figure 2.</strong> The JavaBeans connection model applied: event source, listener, event object, delegation, bound properties and interface-typed connections.</p>
+<p><img alt="Figure 2." src="diagrams/figure-2-connection-model.png" /></p>
+<p><strong>Figure 3.</strong> The deployment model D = (C, E, P, L): component set, execution environment, descriptor parameters, deployment location.</p>
+<p><img alt="Figure 3." src="diagrams/figure-3-deployment-model.png" /></p>
+<p><strong>Figure 4.</strong> The five ISO/IEC 18004 encoding stages and the class that implements each one.</p>
+<p><img alt="Figure 4." src="diagrams/figure-4-encoding-pipeline.png" /></p>
+<p><strong>Figure 5.</strong> Verification strategy: every group of checks anchored to an independent oracle or to a reconstruction.</p>
+<p><img alt="Figure 5." src="diagrams/figure-5-verification-strategy.png" /></p>
+<p><strong>Figure 6.</strong> Generated artifacts: PNG, SVG and ASCII renderings of the same symbols with their recovered payloads.</p>
+<p><img alt="Figure 6." src="diagrams/figure-6-artifact-gallery.png" /></p>
+<p><strong>Listing 1.</strong> api/QrCodeEncoder.java - the provided interface every encoder component implements.</p>
+<p><img alt="Listing 1." src="screenshots/01-code-provided-interface.png" /></p>
+<p><strong>Listing 2.</strong> engine/ReedSolomon.java - shift-register polynomial division over GF(2^8).</p>
+<p><img alt="Listing 2." src="screenshots/02-code-reed-solomon.png" /></p>
+<p><strong>Screenshot 1.</strong> The desktop assembly, PNG renderer component: property sheet, live preview, indexed history.</p>
+<p><img alt="Screenshot 1." src="screenshots/03-gui-png-assembly.png" /></p>
+<p><strong>Screenshot 2.</strong> The same running application after the renderer component was replaced by renderer.svg.v1.</p>
+<p><img alt="Screenshot 2." src="screenshots/04-gui-svg-assembly.png" /></p>
+<p><strong>Screenshot 3.</strong> The same running application with renderer.ascii.v1: a textual artifact in the preview panel.</p>
+<p><img alt="Screenshot 3." src="screenshots/05-gui-ascii-assembly.png" /></p>
+<p><strong>Screenshot 4.</strong> The command-line assembly: complete option surface.</p>
+<p><img alt="Screenshot 4." src="screenshots/06-cli-help.png" /></p>
+<p><strong>Screenshot 5.</strong> The component catalogue with roles, provided interfaces, required interfaces and state.</p>
+<p><img alt="Screenshot 5." src="screenshots/07-cli-component-catalogue.png" /></p>
+<p><strong>Screenshot 6.</strong> A full generation run: deployment report, result, deployment XML reuse.</p>
+<p><img alt="Screenshot 6." src="screenshots/08-cli-png-run.png" /></p>
+<p><strong>Screenshot 7.</strong> A decodable symbol printed in a terminal by the ASCII renderer component.</p>
+<p><img alt="Screenshot 7." src="screenshots/09-cli-ascii-symbol.png" /></p>
+<p><strong>Screenshot 8.</strong> Run-time introspection of the PNG renderer bean.</p>
+<p><img alt="Screenshot 8." src="screenshots/10-beaninspector-png-renderer.png" /></p>
+<p><strong>Screenshot 9.</strong> Introspection of the indexed/constrained history bean and the facade event set.</p>
+<p><img alt="Screenshot 9." src="screenshots/11-beaninspector-history-facade.png" /></p>
+<p><strong>Screenshot 10.</strong> The verification transcript: 108 checks, 108 passed, 0 failed.</p>
+<p><img alt="Screenshot 10." src="screenshots/12-verification-transcript.png" /></p>
+<p><strong>Screenshot 11.</strong> Build, verify and package in one command.</p>
+<p><img alt="Screenshot 11." src="screenshots/13-build-and-package.png" /></p>
+<p><strong>Screenshot 12.</strong> The deployment interface: Java-Bean: True entries for all nine beans.</p>
+<p><img alt="Screenshot 12." src="screenshots/14-jar-manifest.png" /></p>
+<p><strong>Screenshot 13.</strong> The HTTP assembly answering /qr, /stats and /history.</p>
+<p><img alt="Screenshot 13." src="screenshots/15-http-service.png" /></p>
+<p><strong>Listing 3.</strong> components/PureJavaQrEncoderBean.java - a complete JavaBean with all property kinds.</p>
+<p><img alt="Listing 3." src="screenshots/16-code-encoder-bean.png" /></p>
+<p><strong>Listing 4.</strong> render/PngRendererBean.java - bound properties, validation and run-length drawing.</p>
+<p><img alt="Listing 4." src="screenshots/17-code-png-renderer.png" /></p>
+<p><strong>Listing 5.</strong> store/QrHistoryBean.java - the indexed property and the constrained maxEntries property.</p>
+<p><img alt="Listing 5." src="screenshots/18-code-history-bean.png" /></p>
+<p><strong>Listing 6.</strong> facade/QrStudioFacadeBean.java - composition, event firing and timing.</p>
+<p><img alt="Listing 6." src="screenshots/19-code-facade.png" /></p>
+<p><strong>Listing 7.</strong> facade/ComponentRegistry.java - catalogue, select, instantiate, configure, validate.</p>
+<p><img alt="Listing 7." src="screenshots/20-code-registry.png" /></p>
+<p><strong>Listing 8.</strong> render/PngRendererBeanBeanInfo.java - feature descriptors, expert flag, custom property editor.</p>
+<p><img alt="Listing 8." src="screenshots/21-code-beaninfo.png" /></p>
+<p><strong>Listing 9.</strong> ui/QrStudioFrame.java - the desktop front end listening to bound properties.</p>
+<p><img alt="Listing 9." src="screenshots/22-code-swing-assembly.png" /></p>
+<p><strong>Listing 10.</strong> cli/QrCliAssembly.java - the command-line front end.</p>
+<p><img alt="Listing 10." src="screenshots/23-code-cli-assembly.png" /></p>
+<p><strong>Listing 11.</strong> components/ZxingQrEncoderAdapterBean.java - third-party composition behind our own interface.</p>
+<p><img alt="Listing 11." src="screenshots/24-code-zxing-adapter.png" /></p>
+<p><strong>Listing 12.</strong> test/EngineReferenceTest.java - the independent-oracle checks.</p>
+<p><img alt="Listing 12." src="screenshots/25-code-verification.png" /></p>
+<p><strong>Screenshot 14.</strong> The bean feature matrix across four components in one view.</p>
+<p><img alt="Screenshot 14." src="screenshots/26-bean-feature-matrix.png" /></p>
+<p><strong>Screenshot 15.</strong> The artifact returned by the HTTP service for a PNG request.</p>
+<p><img alt="Screenshot 15." src="screenshots/http-service-symbol.png" /></p>
+</body>
+</html>
