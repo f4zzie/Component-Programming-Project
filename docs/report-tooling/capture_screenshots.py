@@ -5,7 +5,7 @@ the introspection tool, the verification transcript and the source code listings
 Everything is captured from the real programs (Xvfb + Swing for the GUI, the actual command line
 output for the terminal shots, Pygments for the source listings); no screenshot is a mock-up.
 
-    python3 tools/capture_screenshots.py
+    python3 docs/report-tooling/capture_screenshots.py
 """
 from __future__ import annotations
 
@@ -19,8 +19,11 @@ MONO_BOLD = "/usr/share/fonts/liberation/LiberationMono-Bold.ttf"
 SANS_BOLD = "/usr/share/fonts/liberation/LiberationSans-Bold.ttf"
 
 SHOTS = "docs/screenshots"
-CP = "out/classes:out/test-classes:lib/core-3.5.3.jar:lib/javase-3.5.3.jar"
-CP_MAIN = "out/classes:lib/core-3.5.3.jar:lib/javase-3.5.3.jar"
+CP = "out/classes:out/test-classes:lib/*"
+CP_MAIN = "out/classes:lib/*"
+CLI = "ke.ku.sco310.qr.cli.QrCliAssembly"
+BUILDER = "ke.ku.sco310.qr.tools.ProjectBuilder"
+JAVA = "java -cp out/classes:lib/*"
 
 TERM_BG = (18, 21, 27)
 TERM_BG_ALT = (24, 28, 35)
@@ -123,28 +126,28 @@ def main():
         print(f"[gui {fmt}] " + " | ".join(line for line in out.splitlines()[-3:]))
 
     # ------------------------------------------------------------------ 2. console assemblies
-    cli_help = sh(f'java -cp "{CP}" ke.ku.sco310.qr.cli.QrCliAssembly --help')
+    cli_help = sh(f'java -cp "{CP}" {CLI} --help')
     terminal_image(cli_help.splitlines(), f"{SHOTS}/06-cli-help.png",
-                   "java ke.ku.sco310.qr.cli.QrCliAssembly --help",
+                   "the command-line assembly: every option is parsed by QrCliAssembly",
                    prompt="student@ku:~/qr-component-studio$ ")
 
-    catalog = sh(f'java -cp "{CP}" ke.ku.sco310.qr.cli.QrCliAssembly --list-components')
+    catalog = sh(f'java -cp "{CP}" {CLI} --list-components')
     terminal_image(catalog.splitlines(), f"{SHOTS}/07-cli-component-catalogue.png",
                    "component catalogue: roles, provided and required interfaces",
-                   prompt="student@ku:~/qr-component-studio$ ./run-cli.sh --list-components")
+                   prompt="student@ku:~/qr-component-studio$ java -cp out/classes:lib/* ke.ku.sco310.qr.cli.QrCliAssembly --list-components")
 
-    run_png = sh(f'java -cp "{CP}" ke.ku.sco310.qr.cli.QrCliAssembly --text '
+    run_png = sh(f'java -cp "{CP}" {CLI} --text '
                  f'"https://www.ku.ac.ke/sco310" --ec M --format png --show-assembly')
     terminal_image(run_png.splitlines(), f"{SHOTS}/08-cli-png-run.png",
                    "PNG generation through the assembled facade component",
-                   prompt='student@ku:~/qr-component-studio$ ./run-cli.sh --text "https://www.ku.ac.ke/sco310" --ec M')
+                   prompt='student@ku:~/qr-component-studio$ java -cp out/classes:lib/* ke.ku.sco310.qr.cli.QrCliAssembly --text "https://www.ku.ac.ke/sco310" --ec M')
 
-    run_ascii = sh(f'java -cp "{CP}" ke.ku.sco310.qr.cli.QrCliAssembly --text "SCO310" --ec H '
+    run_ascii = sh(f'java -cp "{CP}" {CLI} --text "SCO310" --ec H '
                    f'--format ascii --ascii')
     lines = [line for line in run_ascii.splitlines() if "│" not in line]
     terminal_image(lines, f"{SHOTS}/09-cli-ascii-symbol.png",
                    "ASCII renderer component: the symbol printed from the terminal",
-                   prompt='student@ku:~/qr-component-studio$ ./run-cli.sh --text "SCO310" --ec H --format ascii --ascii',
+                   prompt='student@ku:~/qr-component-studio$ java -cp out/classes:lib/* ke.ku.sco310.qr.cli.QrCliAssembly --text "SCO310" --ec H --format ascii --ascii',
                    width_chars=100)
 
     # ------------------------------------------------------------------ 3. introspection tool
@@ -152,7 +155,7 @@ def main():
                     f'ke.ku.sco310.qr.render.PngRendererBean')
     terminal_image(inspection.splitlines(), f"{SHOTS}/10-beaninspector-png-renderer.png",
                    "java.beans.Introspector discovers the bean features at run time",
-                   prompt="student@ku:~/qr-component-studio$ java ke.ku.sco310.qr.tools.BeanInspector "
+                   prompt="student@ku:~/qr-component-studio$ java -cp out/classes:lib/* ke.ku.sco310.qr.tools.BeanInspector "
                           "ke.ku.sco310.qr.render.PngRendererBean",
                    width_chars=126)
 
@@ -160,7 +163,7 @@ def main():
                             f'ke.ku.sco310.qr.store.QrHistoryBean ke.ku.sco310.qr.facade.QrStudioFacadeBean')
     terminal_image(inspection_history.splitlines(), f"{SHOTS}/11-beaninspector-history-facade.png",
                    "indexed / constrained properties and the facade event set",
-                   prompt="student@ku:~/qr-component-studio$ java ke.ku.sco310.qr.tools.BeanInspector "
+                   prompt="student@ku:~/qr-component-studio$ java -cp out/classes:lib/* ke.ku.sco310.qr.tools.BeanInspector "
                           "ke.ku.sco310.qr.store.QrHistoryBean ke.ku.sco310.qr.facade.QrStudioFacadeBean",
                    width_chars=126)
 
@@ -169,12 +172,12 @@ def main():
     head = report[:6] + ["..."] + report[-60:]
     terminal_image(head, f"{SHOTS}/12-verification-transcript.png",
                    "automated verification: independent ZXing oracle, 108 checks",
-                   prompt="student@ku:~/qr-component-studio$ ./run-tests.sh", width_chars=126)
+                   prompt="student@ku:~/qr-component-studio$ java -cp out/classes ke.ku.sco310.qr.tools.ProjectBuilder test", width_chars=126)
 
-    build = sh('./build.sh all')
+    build = sh('java -cp out/classes ke.ku.sco310.qr.tools.ProjectBuilder all')
     terminal_image(build.splitlines()[-22:], f"{SHOTS}/13-build-and-package.png",
-                   "./build.sh all - javac build, verification suite, JAR packaging with manifest",
-                   prompt="student@ku:~/qr-component-studio$ ./build.sh all", width_chars=126)
+                   "the Java build tool in action: compile, verify, package, no external build system",
+                   prompt="student@ku:~/qr-component-studio$ java -cp out/classes ke.ku.sco310.qr.tools.ProjectBuilder all", width_chars=126)
 
     manifest = sh('unzip -p out/dist/qr-component-suite-1.0.0.jar META-INF/MANIFEST.MF')
     jar_list = sh('jar --list --file out/dist/qr-component-suite-1.0.0.jar | head -20')
@@ -201,7 +204,7 @@ def main():
                        + stats.splitlines() + ["", "$ curl -s http://localhost:8210/history?limit=2"]
                        + history.splitlines(), f"{SHOTS}/15-http-service.png",
                        "web service assembly: one URL, renderer component chosen per request",
-                       prompt="student@ku:~/qr-component-studio$ ./run-web.sh --port 8210",
+                       prompt="student@ku:~/qr-component-studio$ java -cp out/classes:lib/* ke.ku.sco310.qr.web.QrHttpServiceComponent --port 8210",
                        width_chars=120)
     finally:
         server.terminate()

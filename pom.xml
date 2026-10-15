@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Optional Maven build. The project does not need Maven (see build.sh, which uses javac
-  directly, as the JavaBeans chapter requires); this file is supplied for teams that prefer
-  a repository-managed build. The third-party ZXing component stays optional at run time.
+  Optional Maven build. The project does not need Maven: it builds with the JDK alone through
+  ke.ku.sco310.qr.tools.ProjectBuilder, which drives the JavaCompiler API and JarOutputStream.
+  This file is supplied for teams that prefer a repository-managed build; the ZXing component
+  stays optional at run time.
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"

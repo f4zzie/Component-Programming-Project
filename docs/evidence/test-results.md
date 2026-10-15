@@ -90,7 +90,7 @@
 | assembly.catalogue | the optional component declares its context dependency | PASS | `adapter declared with an explicit required interface` |
 | assembly.wiring | every declared dependency of the assembly is satisfied | PASS | `encoder       -> facade.setEncoder     : OK \| renderer      -> facade.setRenderer    : OK \| repository    -> facade.setRepository  : OK \| history       -> facade.setHistory     : OK \| listener      -> facade event source   : OK \| encoder       -> optional ZXing library : PRESENT` |
 | assembly.wiring | profile properties reached the component instances | PASS | `moduleSize=7` |
-| assembly.end-to-end | generation stores an artifact and returns the path | PASS | `docs/evidence/work/assembly-test-1792086382318/qr-code-v5-q-20261015-204622.png` |
+| assembly.end-to-end | generation stores an artifact and returns the path | PASS | `docs/evidence/work/assembly-test-1792089341650/qr-code-v5-q-20261015-213541.png` |
 | assembly.end-to-end | the stored PNG decodes back to the payload | PASS | `expected=https://www.ku.ac.ke/sco310/component-programming actual=https://www.ku.ac.ke/sco310/component-programming` |
 | assembly.end-to-end | history and audit counters were updated | PASS | `history=1 audit=1 facade=1` |
 | assembly.end-to-end | the repository persisted the history record | PASS | `expected=1 actual=1` |
@@ -105,10 +105,10 @@
 | assembly.negative | a profile property the selected component does not declare is reported, not fatal | PASS | `[not applicable to component renderer.ascii.v1 (property not declared): component renderer.ascii.v1.moduleSize]` |
 | assembly.repository | clearHistory empties the persisted history | PASS | `expected=0 actual=0` |
 | assembly.repository | a new record is persisted immediately | PASS | `expected=1 actual=1` |
-| assembly.repository | reinstantiating the repository component reads the same history file | PASS | `history file /home/lacoste/component-programming/qr-component-studio/docs/evidence/work/assembly-test-1792086382318/history.ser` |
+| assembly.repository | reinstantiating the repository component reads the same history file | PASS | `history file /home/lacoste/component-programming/qr-component-studio/docs/evidence/work/assembly-test-1792089341650/history.ser` |
 | assembly.history | the in-memory history honours its capacity policy | PASS | `entries=2 discarded=5` |
 | gallery | the third-party adapter component produces decodable artifacts | PASS | `v3 mask 4 by encoder.zxing-adapter.v1` |
-| gallery | the assembled application writes gallery artifacts | PASS | `docs/evidence/gallery/evidence-v5-h-20261015-204622.png` |
+| gallery | the assembled application writes gallery artifacts | PASS | `docs/evidence/gallery/evidence-v5-h-20261015-213541.png` |
 | gallery | gallery contains PNG, SVG and ASCII artifacts | PASS | `/home/lacoste/component-programming/qr-component-studio/docs/evidence/gallery` |
 
 

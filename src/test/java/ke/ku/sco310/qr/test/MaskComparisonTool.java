@@ -7,8 +7,11 @@
  * interpretation of penalty rule 3 at the symbol border, so a like-for-like comparison of the
  * chosen mask pattern is the honest way to characterise that difference.
  *
- * Run with:  ./build.sh compare
+ * Run with:  java -cp out/test-classes:out/classes:lib/core-3.5.3.jar \
+ *                ke.ku.sco310.qr.test.MaskComparisonTool docs/evidence/mask-selection-comparison.csv
  */
+package ke.ku.sco310.qr.test;
+
 import ke.ku.sco310.qr.api.QrCode;
 import ke.ku.sco310.qr.api.QrEncodingException;
 import ke.ku.sco310.qr.api.QrErrorCorrection;
@@ -21,7 +24,7 @@ import com.google.zxing.qrcode.encoder.QRCode;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 
-public final class MaskComparison {
+public final class MaskComparisonTool {
 
     private static final String[] PAYLOADS = {
         "01234567", "8675309", "HELLO WORLD", "https://www.ku.ac.ke/sco310",
@@ -47,7 +50,7 @@ public final class MaskComparison {
         ErrorCorrectionLevel.Q, ErrorCorrectionLevel.H
     };
 
-    private MaskComparison() {
+    private MaskComparisonTool() {
     }
 
     public static void main(String[] args) throws Exception {

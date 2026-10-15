@@ -74,7 +74,7 @@ p { margin: 7px 0; }
 </tr>
 <tr>
 <td><strong>Source tree</strong></td>
-<td><code>qr-component-suite/</code> (48 Java source files, 6 572 lines; 51 compiled classes)</td>
+<td><code>qr-component-suite/</code> (49 Java source files, 6 844 lines; 52 compiled classes)</td>
 </tr>
 <tr>
 <td><strong>Automated verification</strong></td>
@@ -200,8 +200,8 @@ was designed to catch.</p>
 </tr>
 <tr>
 <td>Code size</td>
-<td>6 572 lines of Java across 48 files, 0 external dependency for the engine</td>
-<td><code>build.sh</code> output</td>
+<td>6 844 lines of Java across 49 files, 0 external dependency for the engine</td>
+<td><code>ProjectBuilder</code> output</td>
 </tr>
 </tbody>
 </table>
@@ -237,7 +237,7 @@ was designed to catch.</p>
 <tr>
 <td>Implement a real JavaBeans component model</td>
 <td>four property kinds, delegation events, introspection, BeanInfo, persistence</td>
-<td>§5, <code>tools/BeanInspector</code></td>
+<td>§5, <code>ke.ku.sco310.qr.tools.BeanInspector</code></td>
 </tr>
 <tr>
 <td>Demonstrate reusability and replaceability</td>
@@ -263,19 +263,20 @@ was designed to catch.</p>
 </table>
 <h3>2.3 Deliverables inside the submission folder</h3>
 <pre><code>qr-component-studio/
-├── src/main/java/ke/ku/sco310/qr/     48 Java sources: components, engine, front ends
-├── src/test/java/ke/ku/sco310/qr/test/ verification suite (7 files, 1 396 lines)
+├── src/main/java/ke/ku/sco310/qr/     49 Java sources: components, engine, front ends, build tool
+├── src/test/java/ke/ku/sco310/qr/test/ verification suite (8 files)
 ├── config/assembly.xml                 deployment descriptor (component selection + properties)
 ├── manifest/MANIFEST.MF                JAR manifest with Java-Bean entries
 ├── lib/                                optional third-party component (ZXing 3.5.3)
-├── build.sh, run-*.sh, pom.xml         build and run tooling
+├── pom.xml, README.md                  optional Maven build, project readme
 ├── out/                                compiled classes, distribution JAR, generated artifacts
 └── docs/
     ├── Documentation.md                this report (master document)
     ├── SCO310-QR-Component-Suite-Report.html / .docx / .pdf
     ├── diagrams/                       six generated figures
     ├── screenshots/                    27 screenshots (code, GUI, console, introspection)
-    └── evidence/                       verification transcript, CSVs, artifact gallery
+    ├── evidence/                       verification transcript, CSVs, artifact gallery
+    └── report-tooling/                 helpers that produced the figures and screenshots
 </code></pre>
 <hr />
 <h2>3. Component-oriented analysis</h2>
@@ -552,7 +553,7 @@ degrades the deployment (the in-house engine stays wired) instead of producing a
 </tr>
 <tr>
 <td>3. Compile with <code>-d</code></td>
-<td><code>./build.sh compile</code> → <code>javac -d out/classes --release 11</code></td>
+<td><code>javac -cp lib/core-3.5.3.jar -d out/classes src/main/java/ke/ku/sco310/qr/*/*.java</code></td>
 </tr>
 <tr>
 <td>4. Create a manifest describing the JAR contents</td>
@@ -560,7 +561,7 @@ degrades the deployment (the in-house engine stays wired) instead of producing a
 </tr>
 <tr>
 <td>5. Create the JAR</td>
-<td><code>./build.sh jar</code> → <code>out/dist/qr-component-suite-1.0.0.jar</code></td>
+<td><code>java -cp out/classes ke.ku.sco310.qr.tools.ProjectBuilder jar</code> → <code>out/dist/qr-component-suite-1.0.0.jar</code></td>
 </tr>
 <tr>
 <td>6. Check the archive</td>
@@ -681,7 +682,7 @@ facade.addQrCodeGenerationListener(listener);   // delegation connection
 <ul>
 <li><code>manifest/MANIFEST.MF</code> — declares <code>Main-Class</code>, <code>Class-Path</code>, specification metadata for the
   JavaBeans component model and a <code>Java-Bean: True</code> block for every bean class file;</li>
-<li><code>out/dist/qr-component-suite-1.0.0.jar</code> — the deployable unit (117 KB, 51 classes) plus <code>lib/</code>
+<li><code>out/dist/qr-component-suite-1.0.0.jar</code> — the deployable unit (122 KB, 52 classes, 53 entries) plus <code>lib/</code>
   for the optional ZXing component;</li>
 <li><code>config/assembly.xml</code> — the deployment descriptor: component selection per role and the
   design-time values of their properties. Deployments change by editing this file, never by
@@ -751,7 +752,8 @@ plays, the interfaces it <strong>provides</strong>, the interfaces it <strong>re
 to builder tools, the events it fires, and the behaviour it hides. Each entry ends with the
 automated checks that hold the component to its contract.</p>
 <p>The introspection data below is not hand-written: it is the output of the project's own tool
-(<code>./run-cli.sh --inspect &lt;class&gt;</code>, see <code>docs/screenshots/10-beaninspector-png-renderer.png</code>,
+(the <code>--inspect</code> option of the CLI assembly or the <code>BeanInspector</code> class directly, see
+<code>docs/screenshots/10-beaninspector-png-renderer.png</code>,
 <code>11-beaninspector-history-facade.png</code> and <code>26-bean-feature-matrix.png</code>), which drives
 <code>java.beans.Introspector</code> on the compiled classes.</p>
 <h3>5.1 Component map</h3>
@@ -1923,7 +1925,7 @@ property in the property sheet is what redraws the artifact.</p>
 <p>This chapter explains the logic that the encoder components hide behind <code>QrCodeEncoder</code>. Everything
 described here lives in the package-private <code>ke.ku.sco310.qr.engine</code> package, and every number
 quoted was produced by running the compiled code (the worked examples come from
-<code>tools/MaskComparison.java</code>-style instrumentation of the real engine, and the tables are
+instrumentation of the real engine (<code>ke.ku.sco310.qr.test.MaskComparisonTool</code>), and the tables are
 cross-checked against ZXing in <code>docs/evidence/table-cross-check.csv</code>).</p>
 <h3>7.1 The five pipeline stages</h3>
 <p><code>QrEngine.encode(...)</code> is organised exactly like clause 8 of ISO/IEC 18004:</p>
@@ -2558,22 +2560,22 @@ GUI screenshot.</p>
 </tr>
 <tr>
 <td><code>06-cli-help.png</code></td>
-<td><code>./run-cli.sh --help</code></td>
+<td><code>java -cp out/classes:lib/* ke.ku.sco310.qr.cli.QrCliAssembly --help</code></td>
 <td>the complete command surface</td>
 </tr>
 <tr>
 <td><code>07-cli-component-catalogue.png</code></td>
-<td><code>./run-cli.sh --list-components</code></td>
+<td><code>java -cp out/classes:lib/* ke.ku.sco310.qr.cli.QrCliAssembly --list-components</code></td>
 <td>roles with provided <strong>and required</strong> interfaces, plus component state</td>
 </tr>
 <tr>
 <td><code>08-cli-png-run.png</code></td>
-<td><code>./run-cli.sh --text … --format png --show-assembly</code></td>
+<td><code>java -cp out/classes:lib/* ke.ku.sco310.qr.cli.QrCliAssembly --text … --format png --show-assembly</code></td>
 <td>a full generation run with the deployment report and the XML bean graph</td>
 </tr>
 <tr>
 <td><code>09-cli-ascii-symbol.png</code></td>
-<td><code>./run-cli.sh --text "SCO310" --ec H --format ascii --ascii</code></td>
+<td><code>java -cp out/classes:lib/* ke.ku.sco310.qr.cli.QrCliAssembly --text "SCO310" --ec H --format ascii --ascii</code></td>
 <td>a decodable symbol printed in a terminal (ASCII renderer component)</td>
 </tr>
 <tr>
@@ -2588,13 +2590,13 @@ GUI screenshot.</p>
 </tr>
 <tr>
 <td><code>12-verification-transcript.png</code></td>
-<td><code>./run-tests.sh</code></td>
+<td><code>java -cp out/classes ke.ku.sco310.qr.tools.ProjectBuilder test</code></td>
 <td>the verification transcript, ending in <code>108 checks, 108 passed, 0 failed</code></td>
 </tr>
 <tr>
 <td><code>13-build-and-package.png</code></td>
-<td><code>./build.sh all</code></td>
-<td>compile → verify → package, with the <code>Java-Bean: True</code> manifest dump</td>
+<td><code>java -cp out/classes ke.ku.sco310.qr.tools.ProjectBuilder all</code></td>
+<td>compile → verify → package, driven entirely by Java</td>
 </tr>
 <tr>
 <td><code>14-jar-manifest.png</code></td>
@@ -2603,7 +2605,7 @@ GUI screenshot.</p>
 </tr>
 <tr>
 <td><code>15-http-service.png</code></td>
-<td><code>./run-web.sh --port 8210</code> + <code>curl</code></td>
+<td><code>java -cp out/classes:lib/* ke.ku.sco310.qr.web.QrHttpServiceComponent --port 8210</code> + <code>curl</code></td>
 <td><code>/qr</code> response headers (<code>X-qr-version</code>, <code>X-qr-mask</code>, <code>X-qr-renderer</code>), <code>/stats</code>, <code>/history</code></td>
 </tr>
 <tr>
@@ -2720,7 +2722,7 @@ places where this implementation legitimately differs from another conforming im
 </table>
 <p>The suite is written as an in-house harness (<code>test/TestHarness.java</code>, 200 lines) rather than JUnit,
 so the project has <strong>no test-framework dependency</strong> and the whole verification runs from
-<code>./run-tests.sh</code>. The harness records, for every check, the group, the name, the outcome, the
+<code>ProjectBuilder test</code>. The harness records, for every check, the group, the name, the outcome, the
 observed value and the elapsed time; the runner writes those records straight into the evidence
 folder:</p>
 <pre><code>[evidence] wrote docs/evidence/test-report.txt (13448 chars)
@@ -3077,11 +3079,13 @@ component-programming story: two interchangeable implementations of one interfac
 identical, only contract-equivalent.</p>
 <h3>9.7 Reproducing the evidence</h3>
 <pre><code>cd qr-component-studio
-./build.sh all          # clean, compile, verify, compare, package
-./run-tests.sh          # verification only, rewrites docs/evidence/
-python3 tools/capture_screenshots.py   # regenerates docs/screenshots/ from the running programs
-python3 tools/make_diagrams.py         # regenerates docs/diagrams/
-python3 tools/make_gallery.py          # regenerates the artifact contact sheet
+java -cp out/classes ke.ku.sco310.qr.tools.ProjectBuilder all     # clean, compile, verify, compare, package
+java -cp out/classes ke.ku.sco310.qr.tools.ProjectBuilder test    # verification only, rewrites docs/evidence/
+
+# the report images are regenerated by the documentation helpers kept in docs/report-tooling/
+python3 docs/report-tooling/capture_screenshots.py    # screenshots of the running programs
+python3 docs/report-tooling/make_diagrams.py          # the six figures
+python3 docs/report-tooling/make_gallery.py           # the artifact contact sheet
 </code></pre>
 <p>Every artefact in this report is regenerated by those commands, so a marker can reproduce the
 evidence from source rather than trusting the submitted images.</p>
@@ -3102,96 +3106,112 @@ evidence from source rather than trusting the submitted images.</p>
 │   ├── web/             1 file  - HTTP service assembly (front end 3)
 │   ├── editor/          1 file  - custom property editor
 │   ├── event/           2 files - event object and listener interface
-│   └── tools/           1 file  - BeanInspector introspection tool
-├── src/test/java/ke/ku/sco310/qr/test/   7 files - in-house harness, oracle, suites, runner
+│   └── tools/           2 files - the Java build tool and the BeanInspector introspection tool
+├── src/test/java/ke/ku/sco310/qr/test/   8 files - harness, oracle, suites, runner, comparison tool
 ├── config/assembly.xml           deployment descriptor
 ├── manifest/MANIFEST.MF          JAR manifest with Java-Bean entries
 ├── lib/                          optional third-party component (ZXing 3.5.3)
-├── tools/                        documentation builders and the mask-comparison instrument
-├── build.sh, run-*.sh, pom.xml   build and run tooling
+├── pom.xml, README.md            optional Maven build, project readme
+├── .gitignore                    keeps out/ and editor noise out of version control
 ├── out/                          classes, verification classes, distribution JAR, generated files
 └── docs/
     ├── Documentation.md          this report
     ├── SCO310-QR-Component-Suite-Report.html / .docx / .pdf
     ├── diagrams/                 6 generated figures
     ├── screenshots/              27 screenshots of code and of running programs
-    └── evidence/                 verification transcript, CSVs, artifact gallery, XML graph
+    ├── evidence/                 verification transcript, CSVs, artifact gallery, XML graph
+    └── report-tooling/           helpers that produced the figures and the screenshots
 </code></pre>
-<h3>10.2 Build</h3>
-<p>The build is deliberately dependency-free: it uses <code>javac</code> directly (step 3 of the eight JavaBean
-steps) and packages with <code>jar</code> (steps 4–6). No Maven, Gradle or Ant is required, although a
-<code>pom.xml</code> is included for environments that prefer it.</p>
+<h3>10.2 Build — pure Java, no scripts</h3>
+<p>The project contains <strong>no shell scripts, batch files or external build tool</strong>. Everything the build
+does is done by Java code:</p>
+<ul>
+<li><code>ke.ku.sco310.qr.tools.ProjectBuilder</code> is the build tool. It drives
+  <code>javax.tools.JavaCompiler</code> (the compiler API that ships with the JDK) to compile the sources,
+  launches the verification suite in a child JVM, and writes the deployable JAR with
+  <code>java.util.jar.JarOutputStream</code>, applying <code>manifest/MANIFEST.MF</code> so that every bean keeps its
+  <code>Java-Bean: True</code> entry.</li>
+<li>the three front ends, the introspection tool and the verification suite are ordinary <code>main</code>
+  classes, run with <code>java -cp …</code>.</li>
+</ul>
+<p><strong>Step 1 — bootstrap compile</strong> (one command; it produces the build tool itself together with the
+components, because all main sources live one directory deep under <code>ke/ku/sco310/qr/</code>):</p>
+<pre><code>javac -cp lib/core-3.5.3.jar -d out/classes src/main/java/ke/ku/sco310/qr/*/*.java
+</code></pre>
+<p><strong>Step 2 — everything else</strong> is a single Java command:</p>
+<pre><code>java -cp out/classes ke.ku.sco310.qr.tools.ProjectBuilder all
+</code></pre>
 <table>
 <thead>
 <tr>
-<th>Command</th>
+<th>Target</th>
 <th>Effect</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>./build.sh clean</code></td>
+<td><code>ProjectBuilder clean</code></td>
 <td>removes <code>out/</code></td>
 </tr>
 <tr>
-<td><code>./build.sh compile</code></td>
-<td>compiles the main sources with <code>javac --release 11 -Xlint:all,-this-escape</code></td>
+<td><code>ProjectBuilder compile</code></td>
+<td>compiles the main sources through the <code>JavaCompiler</code> API</td>
 </tr>
 <tr>
-<td><code>./build.sh test</code></td>
+<td><code>ProjectBuilder test</code></td>
 <td>compiles and runs the verification suite, rewriting <code>docs/evidence/</code></td>
 </tr>
 <tr>
-<td><code>./build.sh compare</code></td>
+<td><code>ProjectBuilder compare</code></td>
 <td>runs the ZXing mask-selection comparison instrument</td>
 </tr>
 <tr>
-<td><code>./build.sh jar</code></td>
+<td><code>ProjectBuilder jar</code></td>
 <td>packages <code>out/dist/qr-component-suite-1.0.0.jar</code> with the manifest</td>
 </tr>
 <tr>
-<td><code>./build.sh docs</code></td>
-<td>regenerates the HTML, DOCX and PDF versions of this report</td>
-</tr>
-<tr>
-<td><code>./build.sh all</code></td>
-<td>clean → compile → verify → compare → package</td>
-</tr>
-<tr>
-<td><code>./run-tests.sh</code>, <code>./run-cli.sh</code>, <code>./run-gui.sh</code>, <code>./run-web.sh</code></td>
-<td>run the verification suite and the three front ends</td>
+<td><code>ProjectBuilder all</code></td>
+<td>clean → compile → verify → compare → package (the default target)</td>
 </tr>
 </tbody>
 </table>
-<p>Expected output of <code>./build.sh all</code> (abridged, with the counts that §9 relies on):</p>
-<pre><code>[build] compiling main sources with javac (--release 11)
-[build] main classes: 51
+<p>Expected output of <code>ProjectBuilder all</code> (abridged, with the counts that §9 relies on):</p>
+<pre><code>[build] compiling the verification suite
+TOTAL 108 checks, 108 passed, 0 failed
 [evidence] wrote docs/evidence/test-report.txt (13448 chars)
 checks: 108, failures: 0
-mask comparison written to docs/evidence/mask-selection-comparison.csv
-[build] jar written: out/dist/qr-component-suite-1.0.0.jar (119980 bytes)
+[build] comparing the mask-selection stage with the independent ZXing encoder
+cases                       : 104
+[build] compiling main sources with the JavaCompiler API (--release 11)
+[build] main classes: 52
+[build] packaging the components into qr-component-suite-1.0.0.jar (manifest: manifest/MANIFEST.MF)
+[build] jar written: out/dist/qr-component-suite-1.0.0.jar (124565 bytes, 53 entries)
 [build] done
 </code></pre>
-<p>The compiler is configured with <code>-Xlint:all</code> and the build produces <strong>no warnings</strong>. The single
-disabled category is <code>this-escape</code>, and the reason is documented in <code>build.sh</code>: the JavaBeans
-bound-property idiom requires <code>new PropertyChangeSupport(this)</code> in a field initialiser, and that
-helper only stores the reference — it never calls back into the bean during construction.</p>
+<p>The compiler is invoked with <code>--release 11</code> and <code>-Xlint:all</code>, and the build produces <strong>no
+warnings</strong>. The single disabled category is <code>this-escape</code>, and the reason is written where the
+option is set: the JavaBeans bound-property idiom requires <code>new PropertyChangeSupport(this)</code> in a
+field initialiser, and that helper only stores the reference — it never calls back into the bean
+during construction.</p>
+<p>A <code>pom.xml</code> is included for teams that prefer a repository-managed build (<code>mvn package</code> produces
+the same JAR with the same manifest); the project does not need it, and no part of the project
+depends on it.</p>
 <h3>10.3 Running the three assemblies</h3>
 <p><strong>Desktop assembly</strong></p>
-<pre><code>./run-gui.sh
+<pre><code>java -cp out/classes:lib/* ke.ku.sco310.qr.ui.QrStudioGuiAssembly
 # or, for an automated capture of the real window:
 xvfb-run -a java -cp out/classes:lib/core-3.5.3.jar:lib/javase-3.5.3.jar \
      ke.ku.sco310.qr.ui.QrStudioGuiAssembly --format PNG --screenshot docs/screenshots/gui.png
 </code></pre>
 <p><strong>Command-line assembly</strong></p>
-<pre><code>./run-cli.sh --text &quot;https://www.ku.ac.ke/sco310&quot; --ec M --format png --show-assembly
-./run-cli.sh --list-components            # the component catalogue with provided/required interfaces
-./run-cli.sh --inspect ke.ku.sco310.qr.store.QrHistoryBean
-./run-cli.sh --text &quot;SCO310&quot; --format svg --save-assembly out/assembly-mine.xml
-./run-cli.sh --load-assembly out/assembly-mine.xml --format ascii --ascii
+<pre><code>java -cp out/classes:lib/* ke.ku.sco310.qr.cli.QrCliAssembly --text &quot;https://www.ku.ac.ke/sco310&quot; --ec M --format png
+java -cp out/classes:lib/* ke.ku.sco310.qr.cli.QrCliAssembly --list-components
+java -cp out/classes:lib/* ke.ku.sco310.qr.cli.QrCliAssembly --inspect ke.ku.sco310.qr.store.QrHistoryBean
+java -cp out/classes:lib/* ke.ku.sco310.qr.cli.QrCliAssembly --text &quot;SCO310&quot; --format svg --save-assembly out/assembly-mine.xml
+java -cp out/classes:lib/* ke.ku.sco310.qr.cli.QrCliAssembly --load-assembly out/assembly-mine.xml --format ascii --ascii
 </code></pre>
 <p><strong>HTTP service assembly</strong></p>
-<pre><code>./run-web.sh --port 8099
+<pre><code>java -cp out/classes:lib/* ke.ku.sco310.qr.web.QrHttpServiceComponent --port 8099
 curl 'http://localhost:8099/qr?text=HELLO%20WORLD&amp;ec=Q&amp;format=png&amp;moduleSize=8' -o hello.png
 curl 'http://localhost:8099/qr?text=SCO310&amp;format=svg'
 curl http://localhost:8099/stats
@@ -3256,12 +3276,12 @@ Content-Type: image/png
 <tr>
 <td>Documentation and presentation</td>
 <td>this report with figures, code screenshots and screenshots of the running programs; every artefact reproducible from source</td>
-<td><code>docs/documentation.md</code>, <code>docs/diagrams/</code>, <code>docs/screenshots/</code></td>
+<td><code>docs/Documentation.md</code>, <code>docs/diagrams/</code>, <code>docs/screenshots/</code></td>
 </tr>
 <tr>
 <td>Independent, well-structured code</td>
 <td>package separation of api / engine / components / front ends, zero-warning build, package-private internals, no dependency for the engine</td>
-<td>§7.1, <code>build.sh</code></td>
+<td>§7.1, <code>ProjectBuilder</code></td>
 </tr>
 </tbody>
 </table>
@@ -3474,7 +3494,7 @@ front ends by editing one XML file.</p>
 <code>add</code>/<code>remove&lt;Listener&gt;</code> methods; (6) optional <code>BeanInfo</code> classes for builder tools; (7) packaging
 with a manifest that marks the classes as beans (<code>Java-Bean: True</code>); (8) testing through
 introspection. §4.1 of this report tabulates each step against the class that implements it, and
-<code>./run-cli.sh --inspect &lt;class&gt;</code> demonstrates steps 3–6 and 8 on the compiled bytecode.</p>
+<code>java -cp out/classes:lib/* ke.ku.sco310.qr.cli.QrCliAssembly --inspect &lt;class&gt;</code> demonstrates steps 3–6 and 8 on the compiled bytecode.</p>
 <hr />
 <hr />
 <h2>Appendix D - Screenshot gallery (embedded)</h2>

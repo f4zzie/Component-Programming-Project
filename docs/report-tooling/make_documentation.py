@@ -10,7 +10,7 @@ Both rendered formats gain an "Appendix D - Screenshot gallery" that embeds ever
 every screenshot, so the submitted document is self-contained: a marker can read the report and
 see the code listings and the running programs without opening a second folder.
 
-Usage: python3 tools/make_documentation.py
+Usage: python3 docs/report-tooling/make_documentation.py
 """
 from __future__ import annotations
 
@@ -22,8 +22,13 @@ import shutil
 import subprocess
 import sys
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# this helper lives in docs/report-tooling/, so the project root is three levels up
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 DOCS = os.path.join(ROOT, "docs")
+if not os.path.exists(os.path.join(DOCS, "Documentation.md")):
+    # fall back to "run from the project root" so the script works from anywhere sensible
+    ROOT = os.getcwd()
+    DOCS = os.path.join(ROOT, "docs")
 MASTER = os.path.join(DOCS, "Documentation.md")
 BASENAME = "SCO310-QR-Component-Suite-Report"
 
