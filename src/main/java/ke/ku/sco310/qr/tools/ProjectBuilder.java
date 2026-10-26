@@ -19,9 +19,13 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
+import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
 import java.util.stream.Stream;
@@ -51,6 +55,7 @@ public final class ProjectBuilder {
     private static final String TEST_CLASSES = "out/test-classes";
     private static final String DIST = "out/dist";
     private static final String JAR_NAME = "qr-component-suite-1.0.0.jar";
+    private static final String APP_JAR_NAME = "QrStudio.jar";
     private static final String RELEASE = "11";
     private static final String ZXING_CORE = "lib/core-3.5.3.jar";
     private static final String ZXING_JAVASE = "lib/javase-3.5.3.jar";
@@ -97,6 +102,7 @@ public final class ProjectBuilder {
     static void clean() throws IOException {
         info("removing build output");
         deleteRecursively(Paths.get(OUT));
+        Files.deleteIfExists(Paths.get(APP_JAR_NAME));
         Files.createDirectories(Paths.get(CLASSES));
         Files.createDirectories(Paths.get(TEST_CLASSES));
         Files.createDirectories(Paths.get(DIST));
@@ -184,6 +190,68 @@ public final class ProjectBuilder {
             Files.copy(Paths.get(library), Paths.get(DIST, "lib", new File(library).getName()),
                     java.nio.file.StandardCopyOption.REPLACE_EXISTING);
         }
+
+        Manifest appManifest;
+        try (InputStream in = new FileInputStream("manifest/MANIFEST.MF")) {
+            appManifest = new Manifest(in);
+        }
+        appManifest.getMainAttributes().remove(Attributes.Name.CLASS_PATH);
+        File appJar = new File(APP_JAR_NAME);
+        Set<String> written = new HashSet<>();
+        int appEntries = 0;
+        try (JarOutputStream jar = new JarOutputStream(new FileOutputStream(appJar), appManifest);
+             Stream<Path> tree = Files.walk(Paths.get(CLASSES))) {
+            List<Path> files = new ArrayList<>();
+            tree.filter(Files::isRegularFile).forEach(files::add);
+            files.sort(Comparator.comparing(Path::toString));
+            for (Path file : files) {
+                String name = Paths.get(CLASSES).relativize(file).toString().replace(File.separatorChar, '/');
+                if (name.equals("META-INF/MANIFEST.MF")) {
+                    continue;
+                }
+                JarEntry entry = new JarEntry(name);
+                entry.setTime(file.toFile().lastModified());
+                jar.putNextEntry(entry);
+                Files.copy(file, jar);
+                jar.closeEntry();
+                written.add(name);
+                appEntries++;
+            }
+            for (String library : new String[]{ZXING_CORE, ZXING_JAVASE}) {
+                try (JarFile source = new JarFile(library)) {
+                    List<JarEntry> dependencies = new ArrayList<>();
+                    source.stream()
+                            .filter(entry -> !entry.isDirectory())
+                            .filter(entry -> !isJarMetadata(entry.getName()))
+                            .forEach(dependencies::add);
+                    dependencies.sort(Comparator.comparing(JarEntry::getName));
+                    for (JarEntry entry : dependencies) {
+                        if (!written.add(entry.getName())) {
+                            continue;
+                        }
+                        JarEntry output = new JarEntry(entry.getName());
+                        output.setTime(entry.getTime());
+                        jar.putNextEntry(output);
+                        try (InputStream input = source.getInputStream(entry)) {
+                            input.transferTo(jar);
+                        }
+                        jar.closeEntry();
+                        appEntries++;
+                    }
+                }
+            }
+        }
+        info("standalone app written: " + appJar.getPath() + " (" + appJar.length() + " bytes, "
+                + appEntries + " entries)");
+    }
+
+    private static boolean isJarMetadata(String name) {
+        String upper = name.toUpperCase(Locale.ROOT);
+        return upper.equals("META-INF/MANIFEST.MF")
+                || upper.equals("META-INF/INDEX.LIST")
+                || upper.endsWith(".SF")
+                || upper.endsWith(".RSA")
+                || upper.endsWith(".DSA");
     }
 
     // ------------------------------------------------------------------ helpers

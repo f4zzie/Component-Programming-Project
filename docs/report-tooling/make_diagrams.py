@@ -148,7 +148,6 @@ def diagram_component_model():
          "observes every generation"], accent=ACCENT_3)
     box(draw, (1120, 580, 1450, 700), "Front-end assemblies",
         ["QrStudioGuiAssembly (Swing)",
-         "QrCliAssembly (console)",
          "QrHttpServiceComponent (HTTP)"], accent=ACCENT_4)
     box(draw, (1120, 120, 1450, 300), "ComponentRegistry + AssemblyProfile",
         ["catalogue: I, D, availability",
@@ -219,14 +218,14 @@ def diagram_deployment_model():
     width, height = 1500, 860
     image = Image.new("RGB", (width, height), BG)
     draw = ImageDraw.Draw(image)
-    draw.text((30, 22), "Figure 3 - Deployment model: one compiled component set, three deployed assemblies",
+    draw.text((30, 22), "Figure 3 - Deployment model: one compiled component set, two deployed assemblies",
               font=font(SANS_BOLD, 19), fill=INK)
 
     box(draw, (60, 100, 700, 330), "Deployable unit: qr-component-suite-1.0.0.jar",
         ["META-INF/MANIFEST.MF",
          "  Java-Bean: True   (per bean class file)",
          "  Main-Class, Class-Path: lib/core-3.5.3.jar",
-         "ke/ku/sco310/qr/**/*.class  (50 classes)",
+         "ke/ku/sco310/qr/**/*.class  (all component classes)",
          "config/assembly.xml  (deployment descriptor: P)"], accent=ACCENT)
 
     box(draw, (60, 400, 700, 620), "Execution environment: Java SE 11+ (javac 21 --release 11)",
@@ -242,19 +241,15 @@ def diagram_deployment_model():
     box(draw, (800, 100, 1440, 240), "Assembly 1 - Desktop (QrStudioGuiAssembly)",
         ["profile: renderer.png.v1, moduleSize=10, GUI wiring",
          "renders the live preview and the history list"], accent=ACCENT_4)
-    box(draw, (800, 290, 1440, 430), "Assembly 2 - Command line (QrCliAssembly)",
-        ["profile overridden by CLI switches",
-         "writes PNG / SVG / ASCII artifacts"],
-        accent=ACCENT_4)
-    box(draw, (800, 480, 1440, 620), "Assembly 3 - Web service (QrHttpServiceComponent)",
+    box(draw, (800, 480, 1440, 620), "Assembly 2 - Web service (QrHttpServiceComponent)",
         ["GET /qr?text=...&format=svg  (renderer per request)",
          "GET /stats, /history, /health"], accent=ACCENT_4)
-    box(draw, (800, 670, 1440, 800), "Optional assembly 4 - any tool that reads the XML bean graph",
+    box(draw, (800, 670, 1440, 800), "Optional assembly 3 - any tool that reads the XML bean graph",
         ["java.beans.XMLDecoder rebuilds the wiring: no recompilation"], accent=ACCENT_2)
 
     arrow(draw, (700, 200), (800, 180), "deploy C")
-    arrow(draw, (700, 240), (800, 380), "deploy C")
-    arrow(draw, (700, 280), (800, 580), "deploy C")
+    arrow(draw, (700, 240), (800, 550), "deploy C")
+    arrow(draw, (700, 280), (800, 730), "deploy C")
     arrow(draw, (380, 330), (380, 400), "E")
     arrow(draw, (380, 620), (380, 690), "L")
     arrow(draw, (1120, 620), (1120, 670), "P changes only", dashed=True, colour=ACCENT_2)

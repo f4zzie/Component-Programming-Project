@@ -20,7 +20,7 @@
   <properties>
     <maven.compiler.release>11</maven.compiler.release>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <main.class>ke.ku.sco310.qr.cli.QrCliAssembly</main.class>
+    <main.class>ke.ku.sco310.qr.ui.QrStudioGuiAssembly</main.class>
   </properties>
 
   <dependencies>

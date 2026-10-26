@@ -3,7 +3,6 @@ package ke.ku.sco310.qr.ui;
 import ke.ku.sco310.qr.api.BoundPropertySource;
 import ke.ku.sco310.qr.api.QrCode;
 import ke.ku.sco310.qr.api.QrCodeRenderer;
-import ke.ku.sco310.qr.api.QrErrorCorrection;
 import ke.ku.sco310.qr.api.QrGenerationResult;
 import ke.ku.sco310.qr.api.RenderedArtifact;
 import ke.ku.sco310.qr.editor.HexColorPropertyEditor;
@@ -22,7 +21,6 @@ import java.awt.Graphics2D;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.RenderingHints;
@@ -45,12 +43,9 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JSpinner;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
-import javax.swing.JTextField;
-import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
@@ -60,8 +55,7 @@ import javax.swing.WindowConstants;
  * <p>The frame owns no domain logic. It holds an {@link QrAssembly}, forwards user gestures to the
  * facade component and reacts to the components' <em>bound properties</em> and <em>events</em>:</p>
  * <ul>
- *   <li>the module-size spinner writes {@code PngRendererBean.moduleSize}; the change fires a
- *       {@code PropertyChangeEvent} that re-renders the preview;</li>
+ *   <li>the output-format combo replaces the renderer component and re-renders the preview;</li>
  *   <li>the history list is refreshed from the {@code QrHistoryBean} indexed property events;</li>
  *   <li>the audit listener prints to the status area through the generation event.</li>
  * </ul>
@@ -75,13 +69,13 @@ public class QrStudioFrame extends JFrame implements PropertyChangeListener {
 
     private final transient QrAssembly assembly;
 
-    private final JTextArea inputArea = new JTextArea("https://www.ku.ac.ke/sco310\nKenyatta University - Component Programming", 4, 34);
-    private final JComboBox<QrErrorCorrection> levelCombo = new JComboBox<>(QrErrorCorrection.values());
+    private final JTextArea inputArea = new JTextArea(4, 34);
+    private static final int DEFAULT_MODULE_SIZE = 10;
+    private static final String DEFAULT_FOREGROUND = "#101820";
+    private static final String DEFAULT_BACKGROUND = "#FFFFFF";
+
     private final JComboBox<String> rendererCombo = new JComboBox<>(
             new DefaultComboBoxModel<>(new String[]{"PNG", "SVG", "ASCII"}));
-    private final JSpinner moduleSizeSpinner = new JSpinner(new SpinnerNumberModel(10, 1, 64, 1));
-    private final JTextField foregroundField = new JTextField("#101820", 8);
-    private final JTextField backgroundField = new JTextField("#FFFFFF", 8);
     private final FitLabel previewLabel = new FitLabel();
     private final JTextArea previewText = new JTextArea(24, 60);
     private final CardLayout previewCards = new CardLayout();
@@ -95,20 +89,18 @@ public class QrStudioFrame extends JFrame implements PropertyChangeListener {
     public QrStudioFrame(QrAssembly assembly) {
         super("SCO310 - QR Code Generator (component assembly)");
         this.assembly = assembly;
-        // The combo box starts on the error-correction level the facade component was configured with.
-        levelCombo.setSelectedItem(assembly.getFacade().getDefaultErrorCorrection());
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         buildLayout();
         wireComponents();
         setSize(1220, 780);
         if (mainSplit != null) {
-            mainSplit.setDividerLocation(590);   // property sheet on the left, artifact on the right
+            mainSplit.setDividerLocation(430);
         }
     }
 
     private void buildLayout() {
         JPanel controls = new JPanel(new GridBagLayout());
-        controls.setBorder(BorderFactory.createTitledBorder("Component properties"));
+        controls.setBorder(BorderFactory.createTitledBorder("QR settings"));
         GridBagConstraints c = new GridBagConstraints();
         c.insets = new Insets(3, 6, 3, 6);
         c.anchor = GridBagConstraints.WEST;
@@ -124,25 +116,12 @@ public class QrStudioFrame extends JFrame implements PropertyChangeListener {
         c.fill = GridBagConstraints.HORIZONTAL;
 
         c.gridwidth = 1; c.weightx = 0; c.gridy = 1; c.gridx = 0;
-        controls.add(new JLabel("Error correction"), c);
-        c.gridx = 1; controls.add(levelCombo, c);
-        c.gridx = 2; controls.add(new JLabel("Renderer component"), c);
-        c.gridx = 3; controls.add(rendererCombo, c);
-
-        c.gridy = 2; c.gridx = 0;
-        controls.add(new JLabel("Module size (px)"), c);
-        c.gridx = 1; controls.add(moduleSizeSpinner, c);
-        c.gridx = 2; controls.add(new JLabel("Foreground / background"), c);
-        JPanel colours = new JPanel(new GridLayout(1, 2, 4, 0));
-        colours.add(foregroundField);
-        colours.add(backgroundField);
-        colours.setPreferredSize(new Dimension(180, 22));
-        colours.setMinimumSize(new Dimension(180, 22));
-        c.gridx = 3; controls.add(colours, c);
+        controls.add(new JLabel("Output format"), c);
+        c.gridx = 1; controls.add(rendererCombo, c);
 
         JButton generate = new JButton("Generate");
         generate.addActionListener(e -> generate());
-        JButton saveAs = new JButton("Save artifact as...");
+        JButton saveAs = new JButton("Save as...");
         saveAs.addActionListener(e -> saveAs());
         JButton clearHistory = new JButton("Clear history");
         clearHistory.addActionListener(e -> assembly.getHistory().clear());
@@ -150,19 +129,19 @@ public class QrStudioFrame extends JFrame implements PropertyChangeListener {
         buttons.add(generate);
         buttons.add(saveAs);
         buttons.add(clearHistory);
-        c.gridy = 3; c.gridx = 0; c.gridwidth = 4;
+        c.gridy = 2; c.gridx = 0; c.gridwidth = 4;
         controls.add(buttons, c);
 
         previewText.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 11));
         previewText.setEditable(false);
         historyArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 11));
         historyArea.setEditable(false);
-        historyArea.setBorder(BorderFactory.createTitledBorder("History component (indexed property)"));
+        historyArea.setBorder(BorderFactory.createTitledBorder("History"));
 
         JPanel preview = new JPanel(new BorderLayout());
         preview.setBorder(BorderFactory.createTitledBorder("Rendered artifact"));
-        // A raster artifact is shown in the image card, a textual artifact (SVG source or ASCII
-        // art) in the text card; exactly one of them is visible at a time.
+        // Raster artifacts and SVG (previewed as a raster) use the image card; ASCII art uses the
+        // text card. Exactly one card is visible at a time.
         previewDeck.add(previewLabel, "raster");
         previewDeck.add(new JScrollPane(previewText), "text");
         preview.add(previewDeck, BorderLayout.CENTER);
@@ -176,19 +155,12 @@ public class QrStudioFrame extends JFrame implements PropertyChangeListener {
         status.add(statusLabel, BorderLayout.CENTER);
 
         JSplitPane vertical = new JSplitPane(JSplitPane.VERTICAL_SPLIT, preview, historyArea);
-        vertical.setResizeWeight(0.72);
-        // GridBagLayout centres its grid when the pane is taller than the content, which would
-        // leave the property sheet floating in the middle of the window; hosting it in the NORTH
-        // slot of a BorderLayout keeps it anchored under the titled border.
-        JPanel controlsHost = new JPanel(new BorderLayout());
-        controlsHost.add(controls, BorderLayout.NORTH);
-
-        JSplitPane horizontal = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, controlsHost, vertical);
-        horizontal.setResizeWeight(0.0);
-        mainSplit = horizontal;
+        vertical.setResizeWeight(0.78);
+        mainSplit = vertical;
 
         setLayout(new BorderLayout());
-        add(horizontal, BorderLayout.CENTER);
+        add(controls, BorderLayout.NORTH);
+        add(vertical, BorderLayout.CENTER);
         add(status, BorderLayout.SOUTH);
     }
 
@@ -198,7 +170,6 @@ public class QrStudioFrame extends JFrame implements PropertyChangeListener {
         subscribe(assembly.getRenderer());
         assembly.getHistory().addPropertyChangeListener(this);
         assembly.getListener().addPropertyChangeListener(this);
-        moduleSizeSpinner.addChangeListener(e -> applyModuleSize());
         rendererCombo.addActionListener(e -> applyRendererSelection());
         inputArea.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
             public void insertUpdate(javax.swing.event.DocumentEvent e) { schedulePreview(); }
@@ -212,17 +183,6 @@ public class QrStudioFrame extends JFrame implements PropertyChangeListener {
         if (renderer instanceof BoundPropertySource) {
             ((BoundPropertySource) renderer).addPropertyChangeListener(this);
         }
-    }
-
-    private void applyModuleSize() {
-        int value = (Integer) moduleSizeSpinner.getValue();
-        QrCodeRenderer renderer = assembly.getRenderer();
-        if (renderer instanceof PngRendererBean) {
-            ((PngRendererBean) renderer).setModuleSize(value);
-        } else if (renderer instanceof SvgRendererBean) {
-            ((SvgRendererBean) renderer).setModuleSize(value);
-        }
-        refreshPreviewFromLastSymbol();
     }
 
     private void applyRendererSelection() {
@@ -243,18 +203,18 @@ public class QrStudioFrame extends JFrame implements PropertyChangeListener {
 
     private QrCodeRenderer pngRendererFor() {
         PngRendererBean bean = (PngRendererBean) rendererFor("PNG");
-        bean.setModuleSize((Integer) moduleSizeSpinner.getValue());
-        bean.setForegroundColor(HexColorPropertyEditor.fromHex(foregroundField.getText()));
-        bean.setBackgroundColor(HexColorPropertyEditor.fromHex(backgroundField.getText()));
+        bean.setModuleSize(DEFAULT_MODULE_SIZE);
+        bean.setForegroundColor(HexColorPropertyEditor.fromHex(DEFAULT_FOREGROUND));
+        bean.setBackgroundColor(HexColorPropertyEditor.fromHex(DEFAULT_BACKGROUND));
         bean.addPropertyChangeListener(this);
         return bean;
     }
 
     private QrCodeRenderer svgRendererFor() {
         SvgRendererBean bean = new SvgRendererBean();
-        bean.setModuleSize((Integer) moduleSizeSpinner.getValue());
-        bean.setForegroundColor(foregroundField.getText());
-        bean.setBackgroundColor(backgroundField.getText());
+        bean.setModuleSize(DEFAULT_MODULE_SIZE);
+        bean.setForegroundColor(DEFAULT_FOREGROUND);
+        bean.setBackgroundColor(DEFAULT_BACKGROUND);
         bean.setPhysicalWidthMillimetres(60);
         bean.addPropertyChangeListener(this);
         return bean;
@@ -284,8 +244,8 @@ public class QrStudioFrame extends JFrame implements PropertyChangeListener {
             return;
         }
         try {
-            QrErrorCorrection level = (QrErrorCorrection) levelCombo.getSelectedItem();
-            QrGenerationResult result = assembly.generate(payload, level);
+            QrGenerationResult result = assembly.generate(payload,
+                    assembly.getFacade().getDefaultErrorCorrection());
             lastSymbol = result.getSymbol();
             showArtifact(result.getArtifact(), result.getSymbol());
             statusLabel.setText("generated in " + result.getDurationMillis() + " ms - stored "
@@ -325,11 +285,21 @@ public class QrStudioFrame extends JFrame implements PropertyChangeListener {
     }
 
     private void showArtifact(RenderedArtifact artifact, QrCode symbol) {
-        if ("PNG".equals(artifact.getFormatName())) {
-            ImageIcon icon = new ImageIcon(artifact.getContent());
+        boolean svg = "SVG".equals(artifact.getFormatName());
+        RenderedArtifact visual = artifact;
+        if (svg) {
+            try {
+                visual = assembly.getFacade().renderWith(symbol, pngRendererFor());
+            } catch (Exception e) {
+                statusLabel.setText("preview failed: " + e.getMessage());
+            }
+        }
+        if ("PNG".equals(visual.getFormatName())) {
+            ImageIcon icon = new ImageIcon(visual.getContent());
             previewLabel.showImage(icon.getImage());
             previewLabel.setToolTipText(artifact.getWidth() + " x " + artifact.getHeight() + " pixels, "
-                    + artifact.getSizeInBytes() + " bytes, " + artifact.getRendererId());
+                    + artifact.getSizeInBytes() + " bytes, " + artifact.getRendererId()
+                    + (svg ? " (SVG preview rendered as PNG; saved artifact is SVG)" : ""));
             previewText.setText("");
             previewCards.show(previewDeck, "raster");
         } else {
@@ -488,18 +458,6 @@ public class QrStudioFrame extends JFrame implements PropertyChangeListener {
     /** Triggers a generation programmatically (screenshot tooling). */
     public void generateNow() {
         generate();
-    }
-
-    /** Applies colours programmatically (screenshot tooling). */
-    public void setColours(String foregroundHex, String backgroundHex) {
-        foregroundField.setText(foregroundHex);
-        backgroundField.setText(backgroundHex);
-        applyRendererSelection();
-    }
-
-    /** @return the colour currently used for the dark modules. */
-    public Color getForegroundColour() {
-        return HexColorPropertyEditor.fromHex(foregroundField.getText());
     }
 
     /** Re-subscribes the given listener to the currently wired renderer component. */

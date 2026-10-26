@@ -81,7 +81,7 @@
 | beans.events | the facade notifies every connected listener | PASS | `listeners notified=1 audit events=1` |
 | beans.events | the event object carries the symbol and the artifact | PASS | `symbol=QrCode{version=2, size=25, ec=M, mode=Byte, mask=6, chars=17, dataCodewords=28, eccCodewords=16, producer='encoder.pure-java.v1'} artifact=RenderedArtifact{format=PNG, 264x264, bytes=5865, by=renderer.png.v1}` |
 | beans.persistence | the assembled bean graph survives an XML round trip | PASS | `facade[encoder=encoder.pure-java.v1, renderer=renderer.png.v1, repository=repository.file-system.v1, history=history.bounded-memory.v1, listeners=1]` |
-| beans.persistence | design-time property values survive the round trip | PASS | `moduleSize=8 xmlBytes=1244` |
+| beans.persistence | design-time property values survive the round trip | PASS | `moduleSize=8 xmlBytes=1246` |
 | beans.persistence | the restored assembly can generate without recompiling | PASS | `artifact written by the restored graph` |
 | beans.persistence | the assembly profile survives an XML round trip | PASS | `Assembly profile 'round-trip':   encoder     -> encoder.pure-java.v1   renderer    -> renderer.svg.v1                  moduleSize = 9   repository  -> repository.file-system.v1   history     -> history.bounded-memory.v1   listener    -> listener.audit-log.v1   facade      -> facade.qr-studio.v1 ` |
 | beans.optional | the assembly detects the optional third-party component | PASS | `com.google.zxing.core present=true` |
@@ -90,7 +90,7 @@
 | assembly.catalogue | the optional component declares its context dependency | PASS | `adapter declared with an explicit required interface` |
 | assembly.wiring | every declared dependency of the assembly is satisfied | PASS | `encoder       -> facade.setEncoder     : OK \| renderer      -> facade.setRenderer    : OK \| repository    -> facade.setRepository  : OK \| history       -> facade.setHistory     : OK \| listener      -> facade event source   : OK \| encoder       -> optional ZXing library : PRESENT` |
 | assembly.wiring | profile properties reached the component instances | PASS | `moduleSize=7` |
-| assembly.end-to-end | generation stores an artifact and returns the path | PASS | `docs/evidence/work/assembly-test-1792089341650/qr-code-v5-q-20261015-213541.png` |
+| assembly.end-to-end | generation stores an artifact and returns the path | PASS | `docs/evidence/work/assembly-test-1792994609042/qr-code-v5-q-20261026-090329.png` |
 | assembly.end-to-end | the stored PNG decodes back to the payload | PASS | `expected=https://www.ku.ac.ke/sco310/component-programming actual=https://www.ku.ac.ke/sco310/component-programming` |
 | assembly.end-to-end | history and audit counters were updated | PASS | `history=1 audit=1 facade=1` |
 | assembly.end-to-end | the repository persisted the history record | PASS | `expected=1 actual=1` |
@@ -105,10 +105,10 @@
 | assembly.negative | a profile property the selected component does not declare is reported, not fatal | PASS | `[not applicable to component renderer.ascii.v1 (property not declared): component renderer.ascii.v1.moduleSize]` |
 | assembly.repository | clearHistory empties the persisted history | PASS | `expected=0 actual=0` |
 | assembly.repository | a new record is persisted immediately | PASS | `expected=1 actual=1` |
-| assembly.repository | reinstantiating the repository component reads the same history file | PASS | `history file /home/lacoste/component-programming/qr-component-studio/docs/evidence/work/assembly-test-1792089341650/history.ser` |
+| assembly.repository | reinstantiating the repository component reads the same history file | PASS | `history file /home/lacoste/component-programming/qr-component-studio/docs/evidence/work/assembly-test-1792994609042/history.ser` |
 | assembly.history | the in-memory history honours its capacity policy | PASS | `entries=2 discarded=5` |
 | gallery | the third-party adapter component produces decodable artifacts | PASS | `v3 mask 4 by encoder.zxing-adapter.v1` |
-| gallery | the assembled application writes gallery artifacts | PASS | `docs/evidence/gallery/evidence-v5-h-20261015-213541.png` |
+| gallery | the assembled application writes gallery artifacts | PASS | `docs/evidence/gallery/assembled-app.png` |
 | gallery | gallery contains PNG, SVG and ASCII artifacts | PASS | `/home/lacoste/component-programming/qr-component-studio/docs/evidence/gallery` |
 
 

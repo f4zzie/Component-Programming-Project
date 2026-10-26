@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<java version="21.0.12.1" class="java.beans.XMLDecoder">
+<java version="21.0.13.0.2" class="java.beans.XMLDecoder">
  <object class="ke.ku.sco310.qr.facade.AssemblyGraphBean">
   <void property="encoder">
    <object class="ke.ku.sco310.qr.components.PureJavaQrEncoderBean" id="PureJavaQrEncoderBean0"/>

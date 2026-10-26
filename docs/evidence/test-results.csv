@@ -13,8 +13,8 @@ engine,encoder publishes its capability metadata,pass,"SCO310 in-house QR engine
 engine,maximum byte capacity reported for level L,pass,expected=2953 actual=2953,0
 engine,empty payload is rejected,pass,rejected as expected: QrEncodingException: The payload is empty; a QR Code must carry at least one byte,0
 engine,null payload is rejected,pass,rejected as expected: QrEncodingException: The payload is empty; a QR Code must carry at least one byte,0
-engine,over-capacity payload is rejected with a clear error,pass,"rejected as expected: QrEncodingException: Payload of 200 characters does not fit version 1 at level H (needs 1113 bits, capacity 72 bits). Shorten the payload or lower the error-correction level.",6
-engine,unknown error-correction label is rejected,pass,"rejected as expected: IllegalArgumentException: Unknown error-correction level 'Z'. Expected one of L, M, Q, H",1
+engine,over-capacity payload is rejected with a clear error,pass,"rejected as expected: QrEncodingException: Payload of 200 characters does not fit version 1 at level H (needs 1113 bits, capacity 72 bits). Shorten the payload or lower the error-correction level.",14
+engine,unknown error-correction label is rejected,pass,"rejected as expected: IllegalArgumentException: Unknown error-correction level 'Z'. Expected one of L, M, Q, H",3
 engine,invalid forced mask is rejected,pass,rejected as expected: IllegalArgumentException: forcedMaskPattern must be -1 or 0..7,0
 engine,constrained minimumVersion vetoes an inconsistent window,pass,rejected as expected: PropertyVetoException: minimumVersion 9 would exceed maximumVersion 5,0
 renderer.png,artifact size follows moduleSize and quietZone,pass,expected=246 actual=246,0
@@ -78,7 +78,7 @@ beans.introspection,BeanInfo publishes a display name for builder tools,pass,exp
 beans.events,the facade notifies every connected listener,pass,listeners notified=1 audit events=1,0
 beans.events,the event object carries the symbol and the artifact,pass,"symbol=QrCode{version=2, size=25, ec=M, mode=Byte, mask=6, chars=17, dataCodewords=28, eccCodewords=16, producer='encoder.pure-java.v1'} artifact=RenderedArtifact{format=PNG, 264x264, bytes=5865, by=renderer.png.v1}",0
 beans.persistence,the assembled bean graph survives an XML round trip,pass,"facade[encoder=encoder.pure-java.v1, renderer=renderer.png.v1, repository=repository.file-system.v1, history=history.bounded-memory.v1, listeners=1]",0
-beans.persistence,design-time property values survive the round trip,pass,moduleSize=8 xmlBytes=1244,0
+beans.persistence,design-time property values survive the round trip,pass,moduleSize=8 xmlBytes=1246,0
 beans.persistence,the restored assembly can generate without recompiling,pass,artifact written by the restored graph,0
 beans.persistence,the assembly profile survives an XML round trip,pass,Assembly profile 'round-trip':   encoder     -> encoder.pure-java.v1   renderer    -> renderer.svg.v1                  moduleSize = 9   repository  -> repository.file-system.v1   history     -> history.bounded-memory.v1   listener    -> listener.audit-log.v1   facade      -> facade.qr-studio.v1 ,0
 beans.optional,the assembly detects the optional third-party component,pass,com.google.zxing.core present=true,0
@@ -87,7 +87,7 @@ assembly.catalogue,every role has at least one implementation,pass,encoders=2 re
 assembly.catalogue,the optional component declares its context dependency,pass,adapter declared with an explicit required interface,0
 assembly.wiring,every declared dependency of the assembly is satisfied,pass,encoder       -> facade.setEncoder     : OK | renderer      -> facade.setRenderer    : OK | repository    -> facade.setRepository  : OK | history       -> facade.setHistory     : OK | listener      -> facade event source   : OK | encoder       -> optional ZXing library : PRESENT,0
 assembly.wiring,profile properties reached the component instances,pass,moduleSize=7,0
-assembly.end-to-end,generation stores an artifact and returns the path,pass,docs/evidence/work/assembly-test-1792089341650/qr-code-v5-q-20261015-213541.png,0
+assembly.end-to-end,generation stores an artifact and returns the path,pass,docs/evidence/work/assembly-test-1792994609042/qr-code-v5-q-20261026-090329.png,0
 assembly.end-to-end,the stored PNG decodes back to the payload,pass,expected=https://www.ku.ac.ke/sco310/component-programming actual=https://www.ku.ac.ke/sco310/component-programming,0
 assembly.end-to-end,history and audit counters were updated,pass,history=1 audit=1 facade=1,0
 assembly.end-to-end,the repository persisted the history record,pass,expected=1 actual=1,0
@@ -102,8 +102,8 @@ assembly.negative,an unknown component id is rejected at assembly time,pass,reje
 assembly.negative,"a profile property the selected component does not declare is reported, not fatal",pass,[not applicable to component renderer.ascii.v1 (property not declared): component renderer.ascii.v1.moduleSize],0
 assembly.repository,clearHistory empties the persisted history,pass,expected=0 actual=0,0
 assembly.repository,a new record is persisted immediately,pass,expected=1 actual=1,0
-assembly.repository,reinstantiating the repository component reads the same history file,pass,history file /home/lacoste/component-programming/qr-component-studio/docs/evidence/work/assembly-test-1792089341650/history.ser,0
+assembly.repository,reinstantiating the repository component reads the same history file,pass,history file /home/lacoste/component-programming/qr-component-studio/docs/evidence/work/assembly-test-1792994609042/history.ser,0
 assembly.history,the in-memory history honours its capacity policy,pass,entries=2 discarded=5,0
 gallery,the third-party adapter component produces decodable artifacts,pass,v3 mask 4 by encoder.zxing-adapter.v1,0
-gallery,the assembled application writes gallery artifacts,pass,docs/evidence/gallery/evidence-v5-h-20261015-213541.png,0
+gallery,the assembled application writes gallery artifacts,pass,docs/evidence/gallery/assembled-app.png,0
 gallery,"gallery contains PNG, SVG and ASCII artifacts",pass,/home/lacoste/component-programming/qr-component-studio/docs/evidence/gallery,0

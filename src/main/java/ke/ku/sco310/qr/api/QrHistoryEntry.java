@@ -119,7 +119,7 @@ public class QrHistoryEntry implements Serializable {
         return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ROOT).format(new Date(timestamp));
     }
 
-    /** @return a short single-line summary used by the CLI and GUI history views. */
+    /** @return a short single-line summary used by the GUI history view. */
     public String getSummary() {
         String text = content.length() > 32 ? content.substring(0, 32) + "..." : content;
         return getFormattedTimestamp() + " | v" + version + "-" + errorCorrectionLabel

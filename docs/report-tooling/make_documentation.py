@@ -51,24 +51,19 @@ CAPTIONS = {
     "20-code-registry": ("Listing 7.", "facade/ComponentRegistry.java - catalogue, select, instantiate, configure, validate."),
     "21-code-beaninfo": ("Listing 8.", "render/PngRendererBeanBeanInfo.java - feature descriptors, expert flag, custom property editor."),
     "22-code-swing-assembly": ("Listing 9.", "ui/QrStudioFrame.java - the desktop front end listening to bound properties."),
-    "23-code-cli-assembly": ("Listing 10.", "cli/QrCliAssembly.java - the command-line front end."),
-    "24-code-zxing-adapter": ("Listing 11.", "components/ZxingQrEncoderAdapterBean.java - third-party composition behind our own interface."),
-    "25-code-verification": ("Listing 12.", "test/EngineReferenceTest.java - the independent-oracle checks."),
-    "03-gui-png-assembly": ("Screenshot 1.", "The desktop assembly, PNG renderer component: property sheet, live preview, indexed history."),
-    "04-gui-svg-assembly": ("Screenshot 2.", "The same running application after the renderer component was replaced by renderer.svg.v1."),
+    "24-code-zxing-adapter": ("Listing 10.", "components/ZxingQrEncoderAdapterBean.java - third-party composition behind our own interface."),
+    "25-code-verification": ("Listing 11.", "test/EngineReferenceTest.java - the independent-oracle checks."),
+    "03-gui-png-assembly": ("Screenshot 1.", "The desktop assembly, PNG renderer component: payload and format controls, live preview, indexed history."),
+    "04-gui-svg-assembly": ("Screenshot 2.", "The same running application after the renderer component was replaced by renderer.svg.v1; the SVG artifact is previewed as a QR image."),
     "05-gui-ascii-assembly": ("Screenshot 3.", "The same running application with renderer.ascii.v1: a textual artifact in the preview panel."),
-    "06-cli-help": ("Screenshot 4.", "The command-line assembly: complete option surface."),
-    "07-cli-component-catalogue": ("Screenshot 5.", "The component catalogue with roles, provided interfaces, required interfaces and state."),
-    "08-cli-png-run": ("Screenshot 6.", "A full generation run: deployment report, result, deployment XML reuse."),
-    "09-cli-ascii-symbol": ("Screenshot 7.", "A decodable symbol printed in a terminal by the ASCII renderer component."),
-    "10-beaninspector-png-renderer": ("Screenshot 8.", "Run-time introspection of the PNG renderer bean."),
-    "11-beaninspector-history-facade": ("Screenshot 9.", "Introspection of the indexed/constrained history bean and the facade event set."),
-    "12-verification-transcript": ("Screenshot 10.", "The verification transcript: 108 checks, 108 passed, 0 failed."),
-    "13-build-and-package": ("Screenshot 11.", "Build, verify and package in one command."),
-    "14-jar-manifest": ("Screenshot 12.", "The deployment interface: Java-Bean: True entries for all nine beans."),
-    "15-http-service": ("Screenshot 13.", "The HTTP assembly answering /qr, /stats and /history."),
-    "26-bean-feature-matrix": ("Screenshot 14.", "The bean feature matrix across four components in one view."),
-    "http-service-symbol": ("Screenshot 15.", "The artifact returned by the HTTP service for a PNG request."),
+    "10-beaninspector-png-renderer": ("Screenshot 4.", "Run-time introspection of the PNG renderer bean."),
+    "11-beaninspector-history-facade": ("Screenshot 5.", "Introspection of the indexed/constrained history bean and the facade event set."),
+    "12-verification-transcript": ("Screenshot 6.", "The verification transcript: 108 checks, 108 passed, 0 failed."),
+    "13-build-and-package": ("Screenshot 7.", "Build, verify and package in one command."),
+    "14-jar-manifest": ("Screenshot 8.", "The deployment interface: Java-Bean: True entries for all nine beans."),
+    "15-http-service": ("Screenshot 9.", "The HTTP assembly answering /qr, /stats and /history."),
+    "26-bean-feature-matrix": ("Screenshot 10.", "The bean feature matrix across four components in one view."),
+    "http-service-symbol": ("Screenshot 11.", "The artifact returned by the HTTP service for a PNG request."),
 }
 
 
@@ -95,7 +90,7 @@ def appendix_markdown() -> str:
     lines = [f"\n---\n\n## {GALLERY_TITLE}\n",
              "The images below are the figures and the screenshots referenced throughout this "
              "report. All of them were generated from the running code by the project's own "
-             "tooling (`tools/make_diagrams.py`, `tools/capture_screenshots.py`).\n"]
+             "tooling (`docs/report-tooling/make_diagrams.py`, `docs/report-tooling/capture_screenshots.py`).\n"]
     for path, label, caption in gallery_items():
         rel = os.path.relpath(path, DOCS)
         lines.append(f"**{label}** {caption}\n")

@@ -45,14 +45,17 @@ public final class QrStudioGuiAssembly {
         String target = screenshot;
         String chosenFormat = format;
         final QrStudioFrame[] holder = new QrStudioFrame[1];
-        // Phase 1: build the frame and generate, on the event dispatch thread.
+        // Phase 1: build the frame on the event dispatch thread. The demonstration payload is
+        // filled in only for the documentation capture; a normal launch starts with an empty form.
         SwingUtilities.invokeAndWait(() -> {
             QrStudioFrame frame = new QrStudioFrame(assembly);
             frame.setVisible(true);
-            frame.selectRenderer(chosenFormat);
-            frame.setPayload("https://www.ku.ac.ke/sco310  Kenyatta University\n"
-                    + "SCO310 Component Programming - QR generator component suite");
-            frame.generateNow();
+            if (target != null) {
+                frame.selectRenderer(chosenFormat);
+                frame.setPayload("https://www.ku.ac.ke/sco310  Kenyatta University\n"
+                        + "SCO310 Component Programming - QR generator component suite");
+                frame.generateNow();
+            }
             holder[0] = frame;
             System.out.println("[gui] wired: " + frame.describeWiring());
         });

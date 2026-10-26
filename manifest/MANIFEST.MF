@@ -7,7 +7,7 @@ Specification-Version: 1.01
 Specification-Vendor: Oracle / Sun Microsystems
 Created-By: javac (JDK 21, --release 11)
 Class-Path: lib/core-3.5.3.jar lib/javase-3.5.3.jar
-Main-Class: ke.ku.sco310.qr.cli.QrCliAssembly
+Main-Class: ke.ku.sco310.qr.ui.QrStudioGuiAssembly
 
 Name: ke/ku/sco310/qr/components/PureJavaQrEncoderBean.class
 Java-Bean: True

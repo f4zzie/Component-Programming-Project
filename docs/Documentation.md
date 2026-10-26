@@ -11,7 +11,7 @@
 | **Course lecturer** | Dr. Bernard Ondara, Ph.D. |
 | **Institution** | Kenyatta University — Department of Computing |
 | **Submission date** | `[DATE]` |
-| **Source tree** | `qr-component-suite/` (49 Java source files, 6 844 lines; 52 compiled classes) |
+| **Source tree** | `qr-component-suite/` (48 Java source files, 6 581 lines; 51 compiled classes) |
 | **Automated verification** | 108 checks — **108 passed, 0 failed** (transcript: `docs/evidence/test-report.txt`) |
 
 ---
@@ -25,7 +25,7 @@
 | **3. Component-oriented analysis** | the COP requirements, the decomposition, the five component characteristics, COP versus OOP, and the three kinds of interface incompatibility |
 | **4. The JavaBeans component model** | the eight bean steps, the four property kinds, the connection and deployment models, persistence, introspection |
 | **5. The component catalogue, component by component** | provided/required interfaces, hidden behaviour, properties, events and contract checks for all eleven entries |
-| **6. Assembling the components** | the composition pipeline, three front ends from one component set, replaceability, persistence of the assembly |
+| **6. Assembling the components** | the composition pipeline, two front ends from one component set, replaceability, persistence of the assembly |
 | **7. The encoding logic, in detail** | ISO/IEC 18004 stage by stage, with worked examples whose codewords match the standard |
 | **8. Guide to the screenshots, listings and figures** | which screenshot proves what |
 | **9. Verification** | strategy, results, the seven defects the evidence caught, negative controls, known divergences |
@@ -41,9 +41,9 @@ rather than written as one monolithic program.
 The suite contains **nine components plus two infrastructure classes**, every one of them a
 JavaBean that satisfies the mandatory bean characteristics (public class, no-argument constructor,
 `Serializable`, `get`/`set` design patterns, delegation events). The components are wired by a
-component registry, configured by a deployment descriptor, and consumed by **three different
-front-end assemblies** — a Swing desktop application, a command-line tool and an HTTP web
-service — all built from the *same* compiled component set.
+component registry, configured by a deployment descriptor, and consumed by **two different
+front-end assemblies** — a Swing desktop application and an HTTP web service — both built from
+the *same* compiled component set.
 
 The QR encoding itself (numeric, alphanumeric and byte modes, Reed–Solomon error correction over
 GF(2⁸), all eight mask patterns, versions 1–40) is implemented from **ISO/IEC 18004 without any
@@ -67,7 +67,7 @@ was designed to catch.
 | Capacity sweep | 160/160 version/level pairs decoded at exact byte capacity | `docs/evidence/capacity-matrix.csv` |
 | Renderer reconstruction | PNG pixels, SVG rectangles and ASCII glyphs rebuild the matrix exactly | `docs/evidence/renderer-matrix.csv` |
 | Artifact gallery | 28 artifacts (20 raster, 4 SVG, 4 ASCII) with SHA-256 digests and recovered payloads | `docs/evidence/artifact-gallery.csv` |
-| Code size | 6 844 lines of Java across 49 files, 0 external dependency for the engine | `ProjectBuilder` output |
+| Code size | 6 581 lines of Java across 48 files, 0 external dependency for the engine | `ProjectBuilder` output |
 
 ---
 
@@ -82,7 +82,7 @@ A QR Code generator that
    level L/M/Q/H;
 3. renders the symbol as a PNG raster image, a vector SVG document or console text art;
 4. persists both the artifacts and a generation history;
-5. is usable from a desktop GUI, a command line and an HTTP endpoint;
+5. is usable from a desktop GUI and an HTTP endpoint;
 6. is decomposed into components with explicit provided/required interfaces and can be
    reconfigured *without recompiling*.
 
@@ -92,7 +92,7 @@ A QR Code generator that
 |---|---|---|
 | Apply component-oriented design, not just object-oriented code | component identification, roles, provided/required interfaces, black-box internals | §4, `docs/diagrams/figure-1-component-model.png` |
 | Implement a real JavaBeans component model | four property kinds, delegation events, introspection, BeanInfo, persistence | §5, `ke.ku.sco310.qr.tools.BeanInspector` |
-| Demonstrate reusability and replaceability | two encoder components, three renderer components, three assemblies | §6, `docs/screenshots/07-cli-component-catalogue.png` |
+| Demonstrate reusability and replaceability | two encoder components, three renderer components, two assemblies | §6, `docs/screenshots/03-gui-png-assembly.png` |
 | Demonstrate the deployment model | JAR with `Java-Bean: True` manifest entries, XML assembly persistence | §5.4, `docs/screenshots/14-jar-manifest.png` |
 | Produce correct, verified logic | 108 automated checks against an independent oracle | §9, `docs/evidence/` |
 | Produce complete documentation | this report, screenshots of code and of the running programs | §8, `docs/screenshots/` |
@@ -101,18 +101,19 @@ A QR Code generator that
 
 ```
 qr-component-studio/
-├── src/main/java/ke/ku/sco310/qr/     49 Java sources: components, engine, front ends, build tool
+├── src/main/java/ke/ku/sco310/qr/     48 Java sources: components, engine, front ends, build tool
 ├── src/test/java/ke/ku/sco310/qr/test/ verification suite (8 files)
 ├── config/assembly.xml                 deployment descriptor (component selection + properties)
 ├── manifest/MANIFEST.MF                JAR manifest with Java-Bean entries
 ├── lib/                                optional third-party component (ZXing 3.5.3)
 ├── pom.xml, README.md                  optional Maven build, project readme
+├── QrStudio.jar                        standalone desktop application (double-click / java -jar)
 ├── out/                                compiled classes, distribution JAR, generated artifacts
 └── docs/
     ├── Documentation.md                this report (master document)
     ├── SCO310-QR-Component-Suite-Report.html / .docx / .pdf
     ├── diagrams/                       six generated figures
-    ├── screenshots/                    27 screenshots (code, GUI, console, introspection)
+    ├── screenshots/                    22 screenshots (code, GUI, web service, introspection)
     ├── evidence/                       verification transcript, CSVs, artifact gallery
     └── report-tooling/                 helpers that produced the figures and screenshots
 ```
@@ -158,15 +159,15 @@ and at different rates.
 | 10 | infrastructure | `ComponentRegistry` | catalogue, selection, configuration, validation | the nine components | reflection-based property application, dependency validation |
 | 11 | infrastructure | `AssemblyProfile` | component selection, property values, XML load/save | — | descriptor parsing and writing |
 
-`ComponentRegistry.listComponents()` prints exactly this table at run time — see
-`docs/screenshots/07-cli-component-catalogue.png`.
+The same catalogue is held by `ComponentRegistry` and is visible in the registry source listing,
+`docs/screenshots/20-code-registry.png`.
 
 ### 3.3 The five characteristics of software components, applied
 
 | Characteristic | How this project satisfies it | Evidence |
 |---|---|---|
 | **Encapsulation / black-box abstraction** | The engine package is package-private; callers see only `QrCodeEncoder`. No public method exposes a Reed–Solomon or masking detail. | `src/main/java/ke/ku/sco310/qr/engine/*` (no `public class` except `QrEngine`/`QrTables`, which are consumed only by the in-house bean) |
-| **Reusability** | The same nine components are used by three assemblies with three different user interfaces, and the renderers are reused inside the HTTP service per request. | §6.2, `docs/screenshots/03/04/05-gui-*.png`, `15-http-service.png` |
+| **Reusability** | The same nine components are used by two assemblies with two different user interfaces, and the renderers are reused inside the HTTP service per request. | §6.2, `docs/screenshots/03/04/05-gui-*.png`, `15-http-service.png` |
 | **Replaceability** | Two encoders and three renderers implement identical interfaces; the assembly swaps them at run time (`replaceRenderer`, `replaceEncoder`) without recompiling any caller. | `AssemblyTest` checks `assembly.replace` |
 | **Interoperability / standardisation** | The contract is the standard JavaBeans model (`java.beans.*`); the third-party ZXing component interoperates through an adapter; artifacts interoperate through PNG, SVG and MIME types. | `docs/screenshots/24-code-zxing-adapter.png` |
 | **Composability / independence** | Components never reference each other's classes, only interfaces; the facade composes four of them and a listener set. Independent deployment is shown by the JAR + descriptor. | `docs/diagrams/figure-1-component-model.png` |
@@ -175,7 +176,7 @@ and at different rates.
 
 | Aspect | Object-oriented view | How this project is *component*-oriented |
 |---|---|---|
-| Basic unit | `QrCode`, `BitBuffer`, `GaloisField` are objects/classes | the unit of *deployment and reuse* is the bean; `PureJavaQrEncoderBean` is dropped into three assemblies untouched |
+| Basic unit | `QrCode`, `BitBuffer`, `GaloisField` are objects/classes | the unit of *deployment and reuse* is the bean; `PureJavaQrEncoderBean` is dropped into two assemblies untouched |
 | Granularity | fine-grained classes | coarse-grained components behind roles (`encoder`, `renderer`, …) |
 | Reuse | inheritance and library calls | third-party composition: ZXing plugged in behind our interface; artifacts reused by external systems |
 | Interaction | method calls on concrete types | event delegation (`QrCodeGenerationListener`) and bound-property notification (`PropertyChangeEvent`) |
@@ -187,7 +188,7 @@ and at different rates.
 1. **Faster development** — the HTTP front end needed 260 lines of HTTP plumbing and *no* domain
    logic because encoding, rendering and storage already existed as components.
 2. **Reliability through reuse of verified parts** — the composed checks confirm that the same
-   renderer component behaves identically in the GUI, the CLI and the web service.
+   renderer component behaves identically in the GUI and the web service.
 3. **Standardisation** — the JavaBeans conventions are what allow the `BeanInspector` tool (225
    lines) to describe *any* component without knowing it in advance.
 4. **Maintainability** — defects are localised: the interleaving defect described in §9.4 was
@@ -324,8 +325,10 @@ Packaging follows steps 4–6 of the bean recipe:
 
 * `manifest/MANIFEST.MF` — declares `Main-Class`, `Class-Path`, specification metadata for the
   JavaBeans component model and a `Java-Bean: True` block for every bean class file;
-* `out/dist/qr-component-suite-1.0.0.jar` — the deployable unit (122 KB, 52 classes, 53 entries) plus `lib/`
-  for the optional ZXing component;
+* `QrStudio.jar` — the standalone desktop application (component classes plus the optional ZXing
+  classes, so it runs without a `lib/` folder);
+* `out/dist/qr-component-suite-1.0.0.jar` — the thin deployable unit (118 KB, 51 component
+  classes, 52 entries) plus `lib/` for the optional ZXing component;
 * `config/assembly.xml` — the deployment descriptor: component selection per role and the
   design-time values of their properties. Deployments change by editing this file, never by
   recompiling, which is exactly the parameter set *P* of the deployment quadruple
@@ -374,7 +377,7 @@ to builder tools, the events it fires, and the behaviour it hides. Each entry en
 automated checks that hold the component to its contract.
 
 The introspection data below is not hand-written: it is the output of the project's own tool
-(the `--inspect` option of the CLI assembly or the `BeanInspector` class directly, see
+(the `BeanInspector` class directly, see
 `docs/screenshots/10-beaninspector-png-renderer.png`,
 `11-beaninspector-history-facade.png` and `26-bean-feature-matrix.png`), which drives
 `java.beans.Introspector` on the compiled classes.
@@ -395,9 +398,9 @@ The introspection data below is not hand-written: it is the output of the projec
 | 10 | infrastructure | `ComponentRegistry` | `facade/ComponentRegistry.java` | 336 |
 | 11 | infrastructure | `AssemblyProfile` (+ `AssemblyGraphBean`) | `facade/AssemblyProfile.java` | 180 |
 
-`ComponentRegistry.listComponents()` prints this catalogue at run time together with the state of
+`ComponentRegistry.listComponents()` builds this catalogue at run time together with the state of
 each component, which is how the suite shows that a component may be **declared but unavailable**
-(`docs/screenshots/07-cli-component-catalogue.png`).
+(see the registry source listing, `docs/screenshots/20-code-registry.png`).
 
 ---
 
@@ -808,7 +811,7 @@ same compiled classes.
 </qr-assembly>
 ```
 
-The same file generates the deployment report printed at start-up by all three front ends:
+The same file generates the deployment report printed at start-up by both front ends:
 
 ```
 facade[encoder=encoder.pure-java.v1, renderer=renderer.png.v1,
@@ -816,20 +819,18 @@ facade[encoder=encoder.pure-java.v1, renderer=renderer.png.v1,
 renderer=PNG: moduleSize=10px, quietZone=4 modules, fg=#101820, bg=#FFFFFF
 ```
 
-### 6.2 Three front ends, one component set
+### 6.2 Two front ends, one component set
 
 | Assembly | Class | What it adds | Evidence |
 |---|---|---|---|
-| **Desktop (Swing)** | `ui/QrStudioGuiAssembly` + `ui/QrStudioFrame` | a property sheet that edits the live components, a preview that follows bound-property changes, an indexed history view | `docs/screenshots/03/04/05-gui-*-assembly.png` |
-| **Command line** | `cli/QrCliAssembly` | batch generation, catalogue listing, introspection, XML graph save/load, ASCII preview | `docs/screenshots/06-cli-help.png`, `07`, `08`, `09` |
+| **Desktop (Swing)** | `ui/QrStudioGuiAssembly` + `ui/QrStudioFrame` | a compact form for the payload and output format, a preview that follows renderer replacement, an indexed history view | `docs/screenshots/03/04/05-gui-*-assembly.png` |
 | **HTTP service** | `web/QrHttpServiceComponent` | one URL per symbol with the renderer chosen per request, plus statistics, history and health endpoints | `docs/screenshots/15-http-service.png` |
 
-The three front ends contain **no encoding, rendering or storage logic at all**. They only
+The two front ends contain **no encoding, rendering or storage logic at all**. They only
 configure and call components:
 
 * the GUI calls `assembly.generate(...)` and subscribes to `BoundPropertySource` of the renderer
-  (`frame.propertyChange(...)` refreshes the preview when `moduleSize` changes);
-* the CLI parses arguments and calls the same facade;
+  (`frame.propertyChange(...)` refreshes the preview when the renderer reports a property change);
 * the HTTP service resolves the `format` query parameter to a renderer component per request:
 
 ```java
@@ -856,7 +857,7 @@ The last check is the strongest single piece of evidence in the project: **three
 renderer components and two different encoder components produce mutually consistent symbols**,
 because they communicate only through the shared value objects `QrCode` and `RenderedArtifact`.
 
-The GUI shows the same replacement interactively: choosing "SVG" in the *Renderer component* combo
+The GUI shows the same replacement interactively: choosing "SVG" in the *Output format* combo
 box calls `assembly.replaceRenderer(...)` on the running application, and the status bar reports
 the new component id and its configuration — the running application changes component without
 restarting (`docs/screenshots/04-gui-svg-assembly.png`).
@@ -891,19 +892,17 @@ the demonstration payload and painting itself into an image.
 
 | Region of the window | Component behind it |
 |---|---|
-| *Payload*, *Error correction* | inputs to `facade.generate(text, level)` |
-| *Renderer component* combo box | `AssemblyProfile` role `renderer`; changing it calls `assembly.replaceRenderer(...)` |
-| *Module size (px)* spinner | the bound `moduleSize` property of the active renderer; the preview updates through `PropertyChangeEvent` |
-| *Foreground / background* fields | `foregroundColor` / `backgroundColor`, parsed by `HexColorPropertyEditor.fromHex` |
-| *Generate* / *Save artifact as…* | `facade.generate(...)` / `facade.renderWith(...)` |
-| *Rendered artifact* panel | the `RenderedArtifact` returned by the renderer component; the image is scaled to fit with nearest-neighbour interpolation so the module edges stay crisp |
-| *History component (indexed property)* panel | `historyArea.setText(history.describeEntries())`, refreshed by the indexed property event |
+| *Payload* | input to `facade.generate(...)`; the error-correction level is the one configured in `assembly.xml` |
+| *Output format* combo box | `AssemblyProfile` role `renderer`; changing it calls `assembly.replaceRenderer(...)` |
+| *Generate* / *Save as…* | `facade.generate(...)` / `facade.renderWith(...)` |
+| *Rendered artifact* panel | the `RenderedArtifact` returned by the renderer component; PNG and SVG are previewed as images (the SVG preview is rasterised through the PNG renderer, while *Save as…* writes the SVG source), and the image is scaled to fit with nearest-neighbour interpolation so the module edges stay crisp |
+| *History* panel | `historyArea.setText(history.describeEntries())`, refreshed by the indexed property event |
 | Status bar (left) | the symbol's own metadata: version, level, mask, mode, module count |
 | Status bar (centre) | generation duration and the file written by the repository component |
 
 Because the preview panel listens to the renderer's bound properties and the history panel
-listens to the indexed property, the window is a *live view of the component graph*: editing a
-property in the property sheet is what redraws the artifact.
+listens to the indexed property, the window is a *live view of the component graph*: replacing
+the renderer component redraws the artifact, and every generation updates the history.
 
 ---
 
@@ -1267,8 +1266,7 @@ Every listing is generated from the real files in `src/` with syntax highlightin
 | `19-code-facade.png` | `facade/QrStudioFacadeBean.java` | composition, event firing, timing |
 | `20-code-registry.png` | `facade/ComponentRegistry.java` | catalogue → select → instantiate → configure → validate |
 | `21-code-beaninfo.png` | `render/PngRendererBeanBeanInfo.java` | feature descriptors, expert flag, custom property editor |
-| `22-code-swing-assembly.png` | `ui/QrStudioFrame.java` | the front end: bound-property listeners, live preview |
-| `23-code-cli-assembly.png` | `cli/QrCliAssembly.java` | the batch front end and its option handling |
+| `22-code-swing-assembly.png` | `ui/QrStudioFrame.java` | the desktop front end: bound-property listeners, live preview |
 | `24-code-zxing-adapter.png` | `components/ZxingQrEncoderAdapterBean.java` | third-party composition behind our own interface |
 | `25-code-verification.png` | `test/EngineReferenceTest.java` | how the independent-oracle checks are written |
 
@@ -1276,13 +1274,9 @@ Every listing is generated from the real files in `src/` with syntax highlightin
 
 | Screenshot | Command that produced it | What to look for |
 |---|---|---|
-| `03-gui-png-assembly.png` | `java … QrStudioGuiAssembly --format PNG --screenshot …` | property sheet, live PNG preview, indexed history, symbol identity in the status bar |
+| `03-gui-png-assembly.png` | `java … QrStudioGuiAssembly --format PNG --screenshot …` | payload and format controls, live PNG preview, indexed history, symbol identity in the status bar |
 | `04-gui-svg-assembly.png` | same, `--format SVG` | the renderer component replaced on the running application |
 | `05-gui-ascii-assembly.png` | same, `--format ASCII` | a textual artifact rendered into the same preview panel (card switch) |
-| `06-cli-help.png` | `java -cp out/classes:lib/* ke.ku.sco310.qr.cli.QrCliAssembly --help` | the complete command surface |
-| `07-cli-component-catalogue.png` | `java -cp out/classes:lib/* ke.ku.sco310.qr.cli.QrCliAssembly --list-components` | roles with provided **and required** interfaces, plus component state |
-| `08-cli-png-run.png` | `java -cp out/classes:lib/* ke.ku.sco310.qr.cli.QrCliAssembly --text … --format png --show-assembly` | a full generation run with the deployment report and the XML bean graph |
-| `09-cli-ascii-symbol.png` | `java -cp out/classes:lib/* ke.ku.sco310.qr.cli.QrCliAssembly --text "SCO310" --ec H --format ascii --ascii` | a decodable symbol printed in a terminal (ASCII renderer component) |
 | `10-beaninspector-png-renderer.png` | `… BeanInspector … PngRendererBean` | introspection: bean characteristics, properties, editors, event sets, methods |
 | `11-beaninspector-history-facade.png` | `… BeanInspector … QrHistoryBean QrStudioFacadeBean` | `INDEXED yes` on `entries`, the `vetoableChange` event set, the `qrCodeGeneration` delegation event set |
 | `12-verification-transcript.png` | `java -cp out/classes ke.ku.sco310.qr.tools.ProjectBuilder test` | the verification transcript, ending in `108 checks, 108 passed, 0 failed` |
@@ -1447,16 +1441,16 @@ the placeholder text `-` and was therefore rendered as `...`.
 *Effect* the symbol metadata now appears correctly in the status bar of
 `docs/screenshots/03-gui-png-assembly.png` (`v7-M mask 2 Byte 45x45`).
 
-**Defect 5 — property sheet collapsed and preview cropped (medium, presentation).**
+**Defect 5 — settings panel collapsed and preview cropped (medium, presentation).**
 Two layout defects in the desktop assembly: `GridBagLayout` centres its grid when the container is
-taller than its content, so the property sheet floated in the middle of the window; and the
+taller than its content, so the settings panel floated in the middle of the window; and the
 artifact preview was placed in a scroll pane that clipped large symbols (a version-7 symbol at
 10 px per module is 450 px wide).
-*Fix* the property sheet is hosted in the `NORTH` slot of a `BorderLayout` so it stays anchored;
-the payload and colour rows received explicit **minimum** sizes as well as preferred sizes
-(`GridBagLayout` honours the minimum when it arranges a grid that would otherwise overflow); and
-the preview is now a card-switching panel whose raster card paints the artifact scaled to fit with
-nearest-neighbour interpolation, never enlarged above 1:1 so that module edges stay exact.
+*Fix* the settings panel is hosted in the `NORTH` slot of a `BorderLayout` so it stays anchored;
+the payload row received explicit **minimum** sizes as well as preferred sizes (`GridBagLayout`
+honours the minimum when it arranges a grid that would otherwise overflow); and the preview is now
+a card-switching panel whose raster card paints the artifact scaled to fit with nearest-neighbour
+interpolation, never enlarged above 1:1 so that module edges stay exact.
 
 **Defect 6 — the indexed property was invisible to introspection (high, course requirement).**
 `QrHistoryBeanBeanInfo` declared `entries` with a plain `PropertyDescriptor` so that the property
@@ -1558,8 +1552,7 @@ qr-component-studio/
 │   ├── log/             1 file  - audit listener component
 │   ├── facade/          8 files - facade, registry, profile, persistence, coercion
 │   ├── ui/              2 files - desktop assembly (front end 1)
-│   ├── cli/             1 file  - command-line assembly (front end 2)
-│   ├── web/             1 file  - HTTP service assembly (front end 3)
+│   ├── web/             1 file  - HTTP service assembly (front end 2)
 │   ├── editor/          1 file  - custom property editor
 │   ├── event/           2 files - event object and listener interface
 │   └── tools/           2 files - the Java build tool and the BeanInspector introspection tool
@@ -1574,7 +1567,7 @@ qr-component-studio/
     ├── Documentation.md          this report
     ├── SCO310-QR-Component-Suite-Report.html / .docx / .pdf
     ├── diagrams/                 6 generated figures
-    ├── screenshots/              27 screenshots of code and of running programs
+    ├── screenshots/              22 screenshots of code and of running programs
     ├── evidence/                 verification transcript, CSVs, artifact gallery, XML graph
     └── report-tooling/           helpers that produced the figures and the screenshots
 ```
@@ -1589,7 +1582,7 @@ does is done by Java code:
   launches the verification suite in a child JVM, and writes the deployable JAR with
   `java.util.jar.JarOutputStream`, applying `manifest/MANIFEST.MF` so that every bean keeps its
   `Java-Bean: True` entry.
-* the three front ends, the introspection tool and the verification suite are ordinary `main`
+* the two front ends, the introspection tool and the verification suite are ordinary `main`
   classes, run with `java -cp …`.
 
 **Step 1 — bootstrap compile** (one command; it produces the build tool itself together with the
@@ -1611,7 +1604,7 @@ java -cp out/classes ke.ku.sco310.qr.tools.ProjectBuilder all
 | `ProjectBuilder compile` | compiles the main sources through the `JavaCompiler` API |
 | `ProjectBuilder test` | compiles and runs the verification suite, rewriting `docs/evidence/` |
 | `ProjectBuilder compare` | runs the ZXing mask-selection comparison instrument |
-| `ProjectBuilder jar` | packages `out/dist/qr-component-suite-1.0.0.jar` with the manifest |
+| `ProjectBuilder jar` | packages `out/dist/qr-component-suite-1.0.0.jar` and the standalone `QrStudio.jar` |
 | `ProjectBuilder all` | clean → compile → verify → compare → package (the default target) |
 
 Expected output of `ProjectBuilder all` (abridged, with the counts that §9 relies on):
@@ -1624,9 +1617,10 @@ checks: 108, failures: 0
 [build] comparing the mask-selection stage with the independent ZXing encoder
 cases                       : 104
 [build] compiling main sources with the JavaCompiler API (--release 11)
-[build] main classes: 52
+[build] main classes: 51
 [build] packaging the components into qr-component-suite-1.0.0.jar (manifest: manifest/MANIFEST.MF)
-[build] jar written: out/dist/qr-component-suite-1.0.0.jar (124565 bytes, 53 entries)
+[build] jar written: out/dist/qr-component-suite-1.0.0.jar (118882 bytes, 52 entries)
+[build] standalone app written: QrStudio.jar (762259 bytes, 360 entries)
 [build] done
 ```
 
@@ -1640,26 +1634,19 @@ A `pom.xml` is included for teams that prefer a repository-managed build (`mvn p
 the same JAR with the same manifest); the project does not need it, and no part of the project
 depends on it.
 
-### 10.3 Running the three assemblies
+### 10.3 Running the two assemblies
 
 **Desktop assembly**
 
 ```
-java -cp out/classes:lib/* ke.ku.sco310.qr.ui.QrStudioGuiAssembly
+java -jar QrStudio.jar
 # or, for an automated capture of the real window:
-xvfb-run -a java -cp out/classes:lib/core-3.5.3.jar:lib/javase-3.5.3.jar \
-     ke.ku.sco310.qr.ui.QrStudioGuiAssembly --format PNG --screenshot docs/screenshots/gui.png
+java -jar QrStudio.jar --format PNG --screenshot docs/screenshots/gui.png
 ```
 
-**Command-line assembly**
-
-```
-java -cp out/classes:lib/* ke.ku.sco310.qr.cli.QrCliAssembly --text "https://www.ku.ac.ke/sco310" --ec M --format png
-java -cp out/classes:lib/* ke.ku.sco310.qr.cli.QrCliAssembly --list-components
-java -cp out/classes:lib/* ke.ku.sco310.qr.cli.QrCliAssembly --inspect ke.ku.sco310.qr.store.QrHistoryBean
-java -cp out/classes:lib/* ke.ku.sco310.qr.cli.QrCliAssembly --text "SCO310" --format svg --save-assembly out/assembly-mine.xml
-java -cp out/classes:lib/* ke.ku.sco310.qr.cli.QrCliAssembly --load-assembly out/assembly-mine.xml --format ascii --ascii
-```
+`QrStudio.jar` is self-contained (the component classes and the optional ZXing classes are inside
+the archive), so it can be copied to any machine with Java 11+ and double-clicked. No scripts or
+class-path setup are needed.
 
 **HTTP service assembly**
 
@@ -1690,7 +1677,7 @@ Content-Type: image/png
 | Criterion (as stated for the unit) | Where it is demonstrated | Evidence |
 |---|---|---|
 | Understanding of component-oriented programming | component identification with roles, provided/required interfaces and hidden behaviour for 11 entries; COP-vs-OOP comparison; CBSE context | §3, `figure-1`, `figure-3` |
-| Correct use of the JavaBeans component model | all four property kinds, delegation events, introspection, `BeanInfo`, custom property editor, customiser (the GUI property sheet), two persistence mechanisms | §4, §5, screenshots `10`, `11`, `18`, `21`, `26` |
+| Correct use of the JavaBeans component model | all four property kinds, delegation events, introspection, `BeanInfo`, custom property editor, two persistence mechanisms | §4, §5, screenshots `10`, `11`, `18`, `21`, `26` |
 | Component design: interfaces and contracts | five provided interfaces with documented pre/post-conditions; required interfaces injected only through setters; typed exception hierarchy | §3.2, `01-code-provided-interface.png` |
 | Reuse, replaceability and third-party composition | 2 encoders, 3 renderers, 2 repositories; assembly-level replacement tests; ZXing wrapped behind our own interface | §6.3, `07`, `24` |
 | Deployment and configuration without recompilation | XML deployment descriptor, profiles, `Java-Bean: True` manifest entries, XML bean-graph persistence | §4.4, §6.4, `14`, `08` |
@@ -1709,10 +1696,10 @@ a published interface, a declared set of dependencies, and behaviour that no con
 into. The only place where QR-specific complexity lives is a package-private engine package, which
 is exactly what the component triple **C = (I, D, B)** asks for.
 
-*Practically*, the same compiled components serve a desktop GUI, a command-line tool and an HTTP
-service, and the renderer or the entire encoder can be replaced at run time by editing an XML
-descriptor or by calling one setter — with the assembly tests proving that a swapped component
-still produces the same symbol.
+*Practically*, the same compiled components serve a desktop GUI and an HTTP service, and the
+renderer or the entire encoder can be replaced at run time by editing an XML descriptor or by
+calling one setter — with the assembly tests proving that a swapped component still produces the
+same symbol.
 
 *Technically*, the encoder is a complete, dependency-free implementation of ISO/IEC 18004, and it
 is verifiable rather than merely plausible: the data and error-correction codewords reproduce the
@@ -1761,7 +1748,6 @@ legitimately differs from ZXing are measured, explained and recorded instead of 
 | `docs/evidence/gallery/` | the artifacts themselves, the version ladder and the level set |
 | `docs/evidence/work/bean-graph.xml` | the assembled bean graph persisted with `XMLEncoder` |
 | `docs/evidence/work/assembly-roundtrip.xml` | an assembly profile written and re-read |
-| `docs/evidence/work/assembly-test-*/history.ser` | history files written by the repository component |
 
 ## Appendix B — Glossary of the terms used in this report
 
@@ -1827,7 +1813,7 @@ decomposes a solution into deployable components with contractually specified in
 of reuse is the binary component, the dependencies are declared rather than implicit, and the
 decision is made at deployment or run time by an assembler. In this project the same code base
 demonstrates both: `QrCode`, `BitBuffer` and `GaloisField` are ordinary OOP objects inside the
-component, while the *reused* artefact is `PureJavaQrEncoderBean`, deployed into three different
+component, while the *reused* artefact is `PureJavaQrEncoderBean`, deployed into two different
 front ends by editing one XML file.
 
 **Q4. "Outline the steps to create a JavaBean."**
@@ -1836,7 +1822,7 @@ front ends by editing one XML file.
 `add`/`remove<Listener>` methods; (6) optional `BeanInfo` classes for builder tools; (7) packaging
 with a manifest that marks the classes as beans (`Java-Bean: True`); (8) testing through
 introspection. §4.1 of this report tabulates each step against the class that implements it, and
-`java -cp out/classes:lib/* ke.ku.sco310.qr.cli.QrCliAssembly --inspect <class>` demonstrates steps 3–6 and 8 on the compiled bytecode.
+`java -cp out/classes ke.ku.sco310.qr.tools.BeanInspector <class>` demonstrates steps 3–6 and 8 on the compiled bytecode.
 
 ---
 

@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Captures the screenshots used by the report: the running application, the console assemblies,
+"""Captures the screenshots used by the report: the running application, the web service,
 the introspection tool, the verification transcript and the source code listings.
 
-Everything is captured from the real programs (Xvfb + Swing for the GUI, the actual command line
-output for the terminal shots, Pygments for the source listings); no screenshot is a mock-up.
+Everything is captured from the real programs (Xvfb + Swing for the GUI, the actual terminal
+output for the console shots, Pygments for the source listings); no screenshot is a mock-up.
 
     python3 docs/report-tooling/capture_screenshots.py
 """
@@ -21,7 +21,6 @@ SANS_BOLD = "/usr/share/fonts/liberation/LiberationSans-Bold.ttf"
 SHOTS = "docs/screenshots"
 CP = "out/classes:out/test-classes:lib/*"
 CP_MAIN = "out/classes:lib/*"
-CLI = "ke.ku.sco310.qr.cli.QrCliAssembly"
 BUILDER = "ke.ku.sco310.qr.tools.ProjectBuilder"
 JAVA = "java -cp out/classes:lib/*"
 
@@ -75,7 +74,7 @@ def terminal_image(lines, path, title, width_chars=118, font_size=15, prompt=Non
             colour = TERM_GREEN
         elif stripped.startswith("FAIL") or "FAILED" in stripped or "error" in stripped.lower():
             colour = TERM_RED
-        elif stripped.startswith("[registry]") or stripped.startswith("[audit]") or stripped.startswith("[cli]"):
+        elif stripped.startswith("[registry]") or stripped.startswith("[audit]"):
             colour = TERM_BLUE
         elif stripped.startswith("===") or stripped.startswith("---") or stripped.startswith("TOTAL"):
             colour = TERM_YELLOW
@@ -125,32 +124,7 @@ def main():
                  f'--screenshot {SHOTS}/{name}')
         print(f"[gui {fmt}] " + " | ".join(line for line in out.splitlines()[-3:]))
 
-    # ------------------------------------------------------------------ 2. console assemblies
-    cli_help = sh(f'java -cp "{CP}" {CLI} --help')
-    terminal_image(cli_help.splitlines(), f"{SHOTS}/06-cli-help.png",
-                   "the command-line assembly: every option is parsed by QrCliAssembly",
-                   prompt="student@ku:~/qr-component-studio$ ")
-
-    catalog = sh(f'java -cp "{CP}" {CLI} --list-components')
-    terminal_image(catalog.splitlines(), f"{SHOTS}/07-cli-component-catalogue.png",
-                   "component catalogue: roles, provided and required interfaces",
-                   prompt="student@ku:~/qr-component-studio$ java -cp out/classes:lib/* ke.ku.sco310.qr.cli.QrCliAssembly --list-components")
-
-    run_png = sh(f'java -cp "{CP}" {CLI} --text '
-                 f'"https://www.ku.ac.ke/sco310" --ec M --format png --show-assembly')
-    terminal_image(run_png.splitlines(), f"{SHOTS}/08-cli-png-run.png",
-                   "PNG generation through the assembled facade component",
-                   prompt='student@ku:~/qr-component-studio$ java -cp out/classes:lib/* ke.ku.sco310.qr.cli.QrCliAssembly --text "https://www.ku.ac.ke/sco310" --ec M')
-
-    run_ascii = sh(f'java -cp "{CP}" {CLI} --text "SCO310" --ec H '
-                   f'--format ascii --ascii')
-    lines = [line for line in run_ascii.splitlines() if "│" not in line]
-    terminal_image(lines, f"{SHOTS}/09-cli-ascii-symbol.png",
-                   "ASCII renderer component: the symbol printed from the terminal",
-                   prompt='student@ku:~/qr-component-studio$ java -cp out/classes:lib/* ke.ku.sco310.qr.cli.QrCliAssembly --text "SCO310" --ec H --format ascii --ascii',
-                   width_chars=100)
-
-    # ------------------------------------------------------------------ 3. introspection tool
+    # ------------------------------------------------------------------ 2. introspection tool
     inspection = sh(f'java -cp "{CP}" ke.ku.sco310.qr.tools.BeanInspector '
                     f'ke.ku.sco310.qr.render.PngRendererBean')
     terminal_image(inspection.splitlines(), f"{SHOTS}/10-beaninspector-png-renderer.png",
@@ -232,8 +206,6 @@ def main():
          "BeanInfo: explicit introspection metadata and the custom property editor", 60),
         ("src/main/java/ke/ku/sco310/qr/ui/QrStudioFrame.java", "22-code-swing-assembly.png",
          "Swing assembly: reacts to bound properties and generation events", 70),
-        ("src/main/java/ke/ku/sco310/qr/cli/QrCliAssembly.java", "23-code-cli-assembly.png",
-         "Command line assembly over the same components", 60),
         ("src/main/java/ke/ku/sco310/qr/components/ZxingQrEncoderAdapterBean.java",
          "24-code-zxing-adapter.png",
          "Adapter component: a third-party engine behind the same provided interface", 60),

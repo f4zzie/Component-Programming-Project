@@ -31,9 +31,9 @@ import java.util.concurrent.atomic.AtomicLong;
  * Web service assembly of the component suite (front end number five in the course material: a
  * component published over HTTP).
  *
- * <p>The service exposes the <em>same</em> facade component that the GUI and the CLI use; the only
- * new code is HTTP plumbing. Per request the assembly instantiates the renderer component that the
- * query string asks for and hands it to the facade, which proves in one deployment that renderer
+ * <p>The service exposes the <em>same</em> facade component that the GUI uses; the only new code
+ * is HTTP plumbing. Per request the assembly instantiates the renderer component that the query
+ * string asks for and hands it to the facade, which proves in one deployment that renderer
  * components are interchangeable at run time.</p>
  *
  * <pre>

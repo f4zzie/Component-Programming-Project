@@ -6,8 +6,8 @@ import java.io.Serializable;
 /**
  * Immutable outcome of one end-to-end generation performed by the facade component.
  *
- * <p>The facade returns this single object so that callers (CLI, GUI, HTTP service) never have
- * to assemble the pieces themselves; the symbol, the artifact, the stored file and the timing all
+ * <p>The facade returns this single object so that callers (GUI, HTTP service) never have to
+ * assemble the pieces themselves; the symbol, the artifact, the stored file and the timing all
  * travel together.</p>
  */
 public final class QrGenerationResult implements Serializable {
