@@ -120,6 +120,7 @@ public final class ProjectBuilder {
 
     /** Compiles the verification suite and runs it, rewriting the evidence folder. */
     static void runVerification() throws IOException, InterruptedException {
+        File evidence = evidenceDirectory();
         info("compiling the verification suite");
         List<File> sources = javaSourcesUnder("src/main/java");
         sources.addAll(javaSourcesUnder("src/test/java"));
@@ -129,7 +130,7 @@ public final class ProjectBuilder {
         info("running the automated verification suite");
         String classPath = TEST_CLASSES + File.pathSeparator + CLASSES + File.pathSeparator
                 + ZXING_CORE + File.pathSeparator + ZXING_JAVASE;
-        int status = launch("ke.ku.sco310.qr.test.VerificationRunner", classPath, "docs/evidence");
+        int status = launch("ke.ku.sco310.qr.test.VerificationRunner", classPath, evidence.getAbsolutePath());
         if (status != 0) {
             System.out.println("verification failed with exit status " + status);
             System.exit(status);
@@ -138,6 +139,7 @@ public final class ProjectBuilder {
 
     /** Runs the mask-selection comparison against the independent ZXing encoder. */
     static void runMaskComparison() throws IOException, InterruptedException {
+        File evidence = evidenceDirectory();
         info("comparing the mask-selection stage with the independent ZXing encoder");
         List<File> sources = javaSourcesUnder("src/main/java");
         sources.addAll(javaSourcesUnder("src/test/java"));
@@ -146,7 +148,7 @@ public final class ProjectBuilder {
         }
         String classPath = TEST_CLASSES + File.pathSeparator + CLASSES + File.pathSeparator + ZXING_CORE;
         launch("ke.ku.sco310.qr.test.MaskComparisonTool", classPath,
-                "docs/evidence/mask-selection-comparison.csv");
+                new File(evidence, "mask-selection-comparison.csv").getAbsolutePath());
     }
 
     /** Builds the deployable JAR: compiled components plus the manifest that marks them as beans. */
@@ -255,6 +257,18 @@ public final class ProjectBuilder {
     }
 
     // ------------------------------------------------------------------ helpers
+
+    private static File evidenceDirectory() {
+        String env = System.getenv("QR_EVIDENCE_DIR");
+        if (env != null && !env.trim().isEmpty()) {
+            return new File(env.trim());
+        }
+        String property = System.getProperty("qr.evidence.dir");
+        if (property != null && !property.trim().isEmpty()) {
+            return new File(property.trim());
+        }
+        return new File("docs/evidence");
+    }
 
     private static boolean compile(List<File> sources, String outputDirectory, String classPath) {
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
