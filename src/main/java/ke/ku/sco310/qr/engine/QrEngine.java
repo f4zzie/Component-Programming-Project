@@ -73,12 +73,13 @@ public final class QrEngine {
             throw new QrEncodingException(producerId, "Mask pattern must be 0..7 or -1 for automatic selection");
         }
 
-        List<QrSegment> segments = QrSegment.makeSegments(content);
-
         int version = minimumVersion;
         QrErrorCorrection level = requestedLevel;
-        int usedBits;
+        List<QrSegment> segments = new java.util.ArrayList<>();
+        int usedBits = 0;
         while (true) {
+            segments = QrSegment.makeSegments(content, version);
+            segments = QrSegment.withEciIfNeeded(segments, content);
             usedBits = totalBits(segments, version);
             int capacityBits = QrTables.numDataCodewords(version, level) * 8;
             if (usedBits <= capacityBits) {
@@ -110,7 +111,9 @@ public final class QrEngine {
         BitBuffer dataBits = new BitBuffer();
         for (QrSegment segment : segments) {
             dataBits.appendBits(segment.getMode().getModeIndicator(), 4);
-            dataBits.appendBits(segment.getCharacterCount(), segment.getMode().getCharacterCountBits(version));
+            if (!segment.isEci()) {
+                dataBits.appendBits(segment.getCharacterCount(), segment.getMode().getCharacterCountBits(version));
+            }
             dataBits.append(segment.getData());
         }
 
@@ -147,9 +150,15 @@ public final class QrEngine {
         engine.applyMask(mask);
         engine.drawFormatBits(mask, level);
 
-        QrEncodingMode mode = segments.isEmpty() ? QrEncodingMode.BYTE : segments.get(0).getMode();
+        QrEncodingMode mode = QrEncodingMode.BYTE;
         int characterCount = 0;
         for (QrSegment segment : segments) {
+            if (segment.isEci()) {
+                continue;
+            }
+            if (characterCount == 0) {
+                mode = segment.getMode();
+            }
             characterCount += segment.getCharacterCount();
         }
         int eccCodewords = QrTables.eccCodewordsPerBlock(level, version)

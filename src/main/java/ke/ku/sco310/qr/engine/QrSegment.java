@@ -2,22 +2,28 @@ package ke.ku.sco310.qr.engine;
 
 import ke.ku.sco310.qr.api.QrEncodingMode;
 
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
  * One data segment of a QR Code symbol: a mode, a character count and the encoded bit stream.
  *
- * <p>The segment decides which of the three encoding modes is the most compact for the
- * supplied text - numeric (10 bits per 3 digits), alphanumeric (11 bits per 2 characters) or
- * byte (8 bits per byte). Choosing the smallest fitting mode is what keeps the symbol at the
- * lowest possible version, i.e. at the highest module size for a fixed print size.</p>
+ * <p>The segment factory chooses the most compact combination of numeric, alphanumeric, byte
+ * and kanji modes with a dynamic-programming pass over the payload. This is what keeps a mixed
+ * payload at the lowest possible version, i.e. at the highest module size for a fixed print
+ * size.</p>
  */
 final class QrSegment {
 
     /** The 45 characters of the alphanumeric mode, indexed by their 6-bit value. */
     static final String ALPHANUMERIC_CHARSET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./:";
+
+    private static final Charset SHIFT_JIS = Charset.forName("Shift_JIS");
+    /** ECI assignment number for UTF-8 (ISO/IEC 18004, Table 2). */
+    static final int ECI_UTF8 = 26;
 
     private final QrEncodingMode mode;
     private final int characterCount;
@@ -65,22 +71,178 @@ final class QrSegment {
     }
 
     /**
+     * Builds one Kanji-mode segment from a string whose characters are all encodable in the
+     * Kanji Shift_JIS range (ISO/IEC 18004, 8.4.5).
+     *
+     * @param text payload restricted to Kanji-capable characters
+     * @return a segment whose 13-bit values are the standard Kanji transformation
+     */
+    static QrSegment makeKanji(String text) {
+        BitBuffer buffer = new BitBuffer();
+        for (int i = 0; i < text.length(); i++) {
+            buffer.appendBits(toKanjiValue(text.charAt(i)), 13);
+        }
+        return new QrSegment(QrEncodingMode.KANJI, text.length(), buffer);
+    }
+
+    /**
+     * Builds an ECI designator segment for an assignment number below 128 (the range that
+     * includes UTF-8, assignment 26). The segment carries the 8-bit assignment value only; the
+     * 4-bit mode indicator is emitted by the bit-stream assembler, so no character-count field
+     * is ever written for this segment type.
+     *
+     * @param assignmentNumber ECI assignment number (0..127)
+     * @return an ECI segment whose payload is the assignment number
+     */
+    static QrSegment makeEci(int assignmentNumber) {
+        if (assignmentNumber < 0 || assignmentNumber > 127) {
+            throw new IllegalArgumentException("Only 8-bit ECI assignments are supported: " + assignmentNumber);
+        }
+        BitBuffer buffer = new BitBuffer();
+        buffer.appendBits(assignmentNumber, 8);
+        return new QrSegment(QrEncodingMode.ECI, 0, buffer);
+    }
+
+    /**
      * @param text payload
-     * @return a single element list with the most compact segment for this payload
+     * @return the most compact segmentation for this payload (computed for version 40)
      */
     static List<QrSegment> makeSegments(String text) {
-        List<QrSegment> result = new ArrayList<>(1);
+        return makeSegments(text, 40);
+    }
+
+    /**
+     * Chooses the optimal segmentation of {@code text} for a target version.
+     *
+     * <p>A forward-looking dynamic program minimizes the total number of bits: for every suffix
+     * starting at position {@code i} it tries every valid leading segment and adds the optimal
+     * cost of the remainder. The mode/end pair that realizes the minimum for the whole payload is
+     * then walked forward to build the segment list.</p>
+     *
+     * @param text    payload to encode
+     * @param version target symbol version, used for the character-count field widths
+     * @return the segment list (empty when the payload is empty)
+     */
+    static List<QrSegment> makeSegments(String text, int version) {
+        List<QrSegment> result = new ArrayList<>();
         if (text.isEmpty()) {
             return result;
         }
-        if (isNumeric(text)) {
-            result.add(makeNumeric(text));
-        } else if (isAlphanumeric(text)) {
-            result.add(makeAlphanumeric(text));
-        } else {
-            result.add(makeBytes(text.getBytes(StandardCharsets.UTF_8)));
+        int n = text.length();
+        int[] utf8Prefix = new int[n + 1];
+        int[] kanjiValue = new int[n];
+        boolean[] boundary = new boolean[n + 1];
+        Arrays.fill(kanjiValue, -1);
+        boundary[0] = true;
+        boundary[n] = true;
+        for (int k = 0; k < n; ) {
+            int codePoint = text.codePointAt(k);
+            int charCount = Character.charCount(codePoint);
+            int bytes = utf8ByteCount(codePoint);
+            kanjiValue[k] = toKanjiValueOrMinusOne(text.charAt(k));
+            for (int t = 0; t < charCount; t++) {
+                utf8Prefix[k + 1 + t] = utf8Prefix[k] + bytes;
+            }
+            k += charCount;
+            boundary[k] = true;
+        }
+
+        long[] cost = new long[n + 1];
+        QrEncodingMode[] modeAt = new QrEncodingMode[n];
+        int[] endAt = new int[n];
+        Arrays.fill(cost, Long.MAX_VALUE);
+        cost[n] = 0L;
+
+        for (int i = n - 1; i >= 0; i--) {
+            if (i > 0 && !boundary[i]) {
+                continue;
+            }
+            int numEnd = i;
+            while (numEnd < n && isDigit(text.charAt(numEnd))) {
+                numEnd++;
+            }
+            for (int j = i + 1; j <= numEnd; j++) {
+                consider(text, i, j, QrEncodingMode.NUMERIC, version, cost, modeAt, endAt, utf8Prefix);
+            }
+
+            int alphaEnd = i;
+            while (alphaEnd < n && ALPHANUMERIC_CHARSET.indexOf(text.charAt(alphaEnd)) >= 0) {
+                alphaEnd++;
+            }
+            for (int j = i + 1; j <= alphaEnd; j++) {
+                consider(text, i, j, QrEncodingMode.ALPHANUMERIC, version, cost, modeAt, endAt, utf8Prefix);
+            }
+
+            int kanjiEnd = i;
+            while (kanjiEnd < n && kanjiValue[kanjiEnd] >= 0) {
+                kanjiEnd++;
+            }
+            for (int j = i + 1; j <= kanjiEnd; j++) {
+                consider(text, i, j, QrEncodingMode.KANJI, version, cost, modeAt, endAt, utf8Prefix);
+            }
+
+            // Byte mode can always encode the remainder, so one pass over every possible end is enough.
+            for (int j = i + 1; j <= n; j++) {
+                if (!boundary[j]) {
+                    continue;
+                }
+                consider(text, i, j, QrEncodingMode.BYTE, version, cost, modeAt, endAt, utf8Prefix);
+            }
+        }
+
+        int i = 0;
+        while (i < n) {
+            int end = endAt[i];
+            String part = text.substring(i, end);
+            switch (modeAt[i]) {
+                case NUMERIC:
+                    result.add(makeNumeric(part));
+                    break;
+                case ALPHANUMERIC:
+                    result.add(makeAlphanumeric(part));
+                    break;
+                case BYTE:
+                    result.add(makeBytes(part.getBytes(StandardCharsets.UTF_8)));
+                    break;
+                case KANJI:
+                    result.add(makeKanji(part));
+                    break;
+                default:
+                    throw new IllegalStateException("Unreachable segmentation state");
+            }
+            i = end;
         }
         return result;
+    }
+
+    private static void consider(String text, int i, int j, QrEncodingMode mode, int version,
+                                 long[] cost, QrEncodingMode[] modeAt, int[] endAt,
+                                 int[] utf8Prefix) {
+        long bits = segmentBitLength(text, i, j, mode, version, utf8Prefix);
+        long candidate = bits + cost[j];
+        if (candidate < cost[i]) {
+            cost[i] = candidate;
+            modeAt[i] = mode;
+            endAt[i] = j;
+        }
+    }
+
+    private static long segmentBitLength(String text, int i, int j, QrEncodingMode mode, int version,
+                                         int[] utf8Prefix) {
+        int length = j - i;
+        switch (mode) {
+            case NUMERIC:
+                return 4 + mode.getCharacterCountBits(version) + 10L * (length / 3)
+                        + (length % 3 == 2 ? 7L : length % 3 == 1 ? 4L : 0L);
+            case ALPHANUMERIC:
+                return 4 + mode.getCharacterCountBits(version) + 11L * (length / 2) + 6L * (length % 2);
+            case BYTE:
+                return 4 + mode.getCharacterCountBits(version) + 8L * (utf8Prefix[j] - utf8Prefix[i]);
+            case KANJI:
+                return 4 + mode.getCharacterCountBits(version) + 13L * length;
+            default:
+                throw new IllegalArgumentException("Unsupported DP mode: " + mode);
+        }
     }
 
     static boolean isNumeric(String text) {
@@ -102,6 +264,44 @@ final class QrSegment {
         return !text.isEmpty();
     }
 
+    /** @return {@code true} when the payload contains any byte that is not plain ASCII. */
+    static boolean needsEci(String text) {
+        for (int i = 0; i < text.length(); i++) {
+            if (text.charAt(i) > 0x7F) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** @return {@code true} when the payload contains at least one byte-mode segment. */
+    static boolean usesByteMode(List<QrSegment> segments) {
+        for (QrSegment segment : segments) {
+            if (segment.mode == QrEncodingMode.BYTE) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Prepends a UTF-8 ECI designator when the payload is not plain ASCII and the segmentation
+     * uses byte mode; plain-ASCII, numeric, alphanumeric and all-Kanji payloads need no ECI.
+     *
+     * @param segments segmentation produced by {@link #makeSegments(String, int)}
+     * @param text     original payload
+     * @return the same list, or a new list with the ECI segment in front
+     */
+    static List<QrSegment> withEciIfNeeded(List<QrSegment> segments, String text) {
+        if (needsEci(text) && usesByteMode(segments)) {
+            List<QrSegment> prefixed = new ArrayList<>(segments.size() + 1);
+            prefixed.add(makeEci(ECI_UTF8));
+            prefixed.addAll(segments);
+            return prefixed;
+        }
+        return segments;
+    }
+
     QrEncodingMode getMode() {
         return mode;
     }
@@ -114,13 +314,68 @@ final class QrSegment {
         return data;
     }
 
+    /** @return {@code true} for an ECI designator segment (it has no character-count field). */
+    boolean isEci() {
+        return mode == QrEncodingMode.ECI;
+    }
+
     /** @param version target symbol version @return bits this segment occupies at that version. */
     int getTotalBits(int version) {
+        if (isEci()) {
+            return 4 + data.size();
+        }
         return 4 + mode.getCharacterCountBits(version) + data.size();
     }
 
     @Override
     public String toString() {
         return mode + " segment (" + characterCount + " chars, " + data.size() + " bits)";
+    }
+
+    private static boolean isDigit(char c) {
+        return c >= '0' && c <= '9';
+    }
+
+    private static int utf8ByteCount(int codePoint) {
+        if (codePoint <= 0x7F) {
+            return 1;
+        }
+        if (codePoint <= 0x7FF) {
+            return 2;
+        }
+        if (codePoint <= 0xFFFF) {
+            return 3;
+        }
+        return 4;
+    }
+
+
+    /**
+     * @param c Unicode character to encode
+     * @return the 13-bit Kanji-mode value, or -1 when the character has no Kanji Shift_JIS form
+     */
+    private static int toKanjiValueOrMinusOne(char c) {
+        byte[] bytes = String.valueOf(c).getBytes(SHIFT_JIS);
+        if (bytes.length != 2) {
+            return -1;
+        }
+        int b0 = bytes[0] & 0xFF;
+        int b1 = bytes[1] & 0xFF;
+        if (b0 >= 0x81 && b0 <= 0x9F && b1 >= 0x40 && b1 <= 0xFC && b1 != 0x7F) {
+            return (b0 - 0x81) * 0xC0 + (b1 - 0x40);
+        }
+        if (b0 >= 0xE0 && b0 <= 0xEB && b1 >= 0x40 && b1 <= 0xFC && b1 != 0x7F) {
+            return (b0 - 0xC1) * 0xC0 + (b1 - 0x40);
+        }
+        return -1;
+    }
+
+    private static int toKanjiValue(char c) {
+        int value = toKanjiValueOrMinusOne(c);
+        if (value < 0) {
+            throw new IllegalArgumentException("Character cannot be encoded in Kanji mode: "
+                    + String.format("U+%04X", (int) c));
+        }
+        return value;
     }
 }
