@@ -46,6 +46,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
+        <version>3.4.2</version>
         <configuration>
           <archive>
             <manifestFile>manifest/MANIFEST.MF</manifestFile>
@@ -58,11 +59,15 @@
         <version>3.11.0</version>
         <configuration>
           <release>11</release>
+          <compilerArgs>
+            <arg>-Xlint:all</arg>
+          </compilerArgs>
         </configuration>
       </plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
+        <version>3.5.0</version>
         <configuration>
           <mainClass>${main.class}</mainClass>
         </configuration>
@@ -75,6 +80,7 @@
             </goals>
             <configuration>
               <mainClass>ke.ku.sco310.qr.test.VerificationRunner</mainClass>
+              <classpathScope>test</classpathScope>
               <arguments>
                 <argument>${project.build.directory}/qr-evidence</argument>
               </arguments>

@@ -280,11 +280,7 @@ public final class ProjectBuilder {
         try (StandardJavaFileManager files = compiler.getStandardFileManager(diagnostics, null,
                 StandardCharsets.UTF_8)) {
             Iterable<? extends JavaFileObject> units = files.getJavaFileObjectsFromFiles(sources);
-            List<String> options = Arrays.asList(
-                    "--release", RELEASE,
-                    "-Xlint:all,-this-escape",
-                    "-d", outputDirectory,
-                    "-cp", classPath);
+            List<String> options = compilerOptions(outputDirectory, classPath);
             boolean success = compiler.getTask(null, files, diagnostics, options, null, units).call();
             for (Diagnostic<? extends JavaFileObject> diagnostic : diagnostics.getDiagnostics()) {
                 String where = diagnostic.getSource() == null ? ""
@@ -302,14 +298,24 @@ public final class ProjectBuilder {
 
     private static int launch(String mainClass, String classPath, String... args) throws IOException,
             InterruptedException {
+        Process process = new ProcessBuilder(launchCommand(mainClass, classPath, args)).inheritIO().start();
+        return process.waitFor();
+    }
+
+    static List<String> compilerOptions(String outputDirectory, String classPath) {
+        return Arrays.asList("--release", RELEASE, "-Xlint:all", "-d", outputDirectory,
+                "-cp", classPath);
+    }
+
+    static List<String> launchCommand(String mainClass, String classPath, String... args) {
         List<String> command = new ArrayList<>();
         command.add(Paths.get(System.getProperty("java.home"), "bin", "java").toString());
+        command.add("-Djava.awt.headless=" + System.getProperty("java.awt.headless", "true"));
         command.add("-cp");
         command.add(classPath);
         command.add(mainClass);
         command.addAll(Arrays.asList(args));
-        Process process = new ProcessBuilder(command).inheritIO().start();
-        return process.waitFor();
+        return command;
     }
 
     private static List<File> javaSourcesUnder(String root) throws IOException {
