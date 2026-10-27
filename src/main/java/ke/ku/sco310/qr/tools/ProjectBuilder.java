@@ -115,6 +115,7 @@ public final class ProjectBuilder {
         if (!compile(sources, CLASSES, ZXING_CORE)) {
             System.exit(1);
         }
+        copyResources(CLASSES);
         info("main classes: " + countFiles(Paths.get(CLASSES), ".class"));
     }
 
@@ -127,6 +128,7 @@ public final class ProjectBuilder {
         if (!compile(sources, TEST_CLASSES, ZXING_CORE + File.pathSeparator + ZXING_JAVASE)) {
             System.exit(1);
         }
+        copyResources(TEST_CLASSES);
         info("running the automated verification suite");
         String classPath = TEST_CLASSES + File.pathSeparator + CLASSES + File.pathSeparator
                 + ZXING_CORE + File.pathSeparator + ZXING_JAVASE;
@@ -329,6 +331,27 @@ public final class ProjectBuilder {
         return sources;
     }
 
+    /** Copies classpath service descriptors and other resources into a compiler output tree. */
+    private static void copyResources(String outputDirectory) throws IOException {
+        Path root = Paths.get("src/main/resources");
+        if (!Files.isDirectory(root)) {
+            return;
+        }
+        try (Stream<Path> tree = Files.walk(root)) {
+            tree.filter(Files::isRegularFile).forEach(source -> {
+                try {
+                    Path target = Paths.get(outputDirectory).resolve(root.relativize(source));
+                    Files.createDirectories(target.getParent());
+                    Files.copy(source, target, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                } catch (IOException e) {
+                    throw new ResourceCopyException(e);
+                }
+            });
+        } catch (ResourceCopyException e) {
+            throw e.cause;
+        }
+    }
+
     private static long countFiles(Path root, String suffix) throws IOException {
         try (Stream<Path> tree = Files.walk(root)) {
             return tree.filter(path -> path.toString().endsWith(suffix)).count();
@@ -351,6 +374,15 @@ public final class ProjectBuilder {
 
     private static void info(String message) {
         System.out.println("[build] " + message);
+    }
+
+    private static final class ResourceCopyException extends RuntimeException {
+        private static final long serialVersionUID = 1L;
+        private final IOException cause;
+
+        ResourceCopyException(IOException cause) {
+            this.cause = cause;
+        }
     }
 
     /** Keeps the unused-import warning away while documenting the stream-based traversal above. */
