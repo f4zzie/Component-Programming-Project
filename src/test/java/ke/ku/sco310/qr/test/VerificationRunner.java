@@ -55,6 +55,7 @@ public final class VerificationRunner {
         System.out.println("evidence directory: " + evidence.getAbsolutePath());
 
         EngineReferenceTest.run(harness, tableCsv, capacityCsv);
+        MicroQrReferenceTest.run(harness);
         ProjectBuilderTest.run(harness);
         RendererTest.run(harness, rendererCsv);
         BeanContractTest.run(harness, work);

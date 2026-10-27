@@ -42,6 +42,9 @@ final class QrSegment {
     }
 
     static QrSegment makeNumeric(String digits) {
+        if (!isNumeric(digits)) {
+            throw new IllegalArgumentException("Numeric segments require at least one digit and no other characters");
+        }
         BitBuffer buffer = new BitBuffer();
         for (int i = 0; i < digits.length(); ) {
             int take = Math.min(3, digits.length() - i);
@@ -53,6 +56,9 @@ final class QrSegment {
     }
 
     static QrSegment makeAlphanumeric(String text) {
+        if (!isAlphanumeric(text)) {
+            throw new IllegalArgumentException("Payload is outside the QR alphanumeric alphabet");
+        }
         BitBuffer buffer = new BitBuffer();
         int i = 0;
         for (; i + 2 <= text.length(); i += 2) {
@@ -86,20 +92,26 @@ final class QrSegment {
     }
 
     /**
-     * Builds an ECI designator segment for an assignment number below 128 (the range that
-     * includes UTF-8, assignment 26). The segment carries the 8-bit assignment value only; the
+     * Builds an ECI designator segment for an assignment number in the ISO range 0..999999.
+     * The segment carries the variable-length assignment value only; the
      * 4-bit mode indicator is emitted by the bit-stream assembler, so no character-count field
      * is ever written for this segment type.
      *
-     * @param assignmentNumber ECI assignment number (0..127)
+     * @param assignmentNumber ECI assignment number (0..999999)
      * @return an ECI segment whose payload is the assignment number
      */
     static QrSegment makeEci(int assignmentNumber) {
-        if (assignmentNumber < 0 || assignmentNumber > 127) {
-            throw new IllegalArgumentException("Only 8-bit ECI assignments are supported: " + assignmentNumber);
+        if (assignmentNumber < 0 || assignmentNumber > 999999) {
+            throw new IllegalArgumentException("ECI assignment must be 0..999999: " + assignmentNumber);
         }
         BitBuffer buffer = new BitBuffer();
-        buffer.appendBits(assignmentNumber, 8);
+        if (assignmentNumber < 128) {
+            buffer.appendBits(assignmentNumber, 8);
+        } else if (assignmentNumber < 16384) {
+            buffer.appendBits(0x8000 | assignmentNumber, 16);
+        } else {
+            buffer.appendBits(0xC00000 | assignmentNumber, 24);
+        }
         return new QrSegment(QrEncodingMode.ECI, 0, buffer);
     }
 
@@ -124,77 +136,109 @@ final class QrSegment {
      * @return the segment list (empty when the payload is empty)
      */
     static List<QrSegment> makeSegments(String text, int version) {
+        return optimise(text, version, false);
+    }
+
+    static List<QrSegment> makeMicroSegments(String text, int version) {
+        return optimise(text, version, true);
+    }
+
+    private static List<QrSegment> optimise(String text, int version, boolean micro) {
+        validateText(text);
         List<QrSegment> result = new ArrayList<>();
         if (text.isEmpty()) {
             return result;
         }
         int n = text.length();
         int[] utf8Prefix = new int[n + 1];
-        int[] kanjiValue = new int[n];
+        int[] numericInvalid = new int[n + 1];
+        int[] alphaInvalid = new int[n + 1];
+        int[] kanjiInvalid = new int[n + 1];
+        int[] latinInvalid = new int[n + 1];
+        int[] nonAscii = new int[n + 1];
         boolean[] boundary = new boolean[n + 1];
-        Arrays.fill(kanjiValue, -1);
         boundary[0] = true;
         boundary[n] = true;
         for (int k = 0; k < n; ) {
             int codePoint = text.codePointAt(k);
             int charCount = Character.charCount(codePoint);
             int bytes = utf8ByteCount(codePoint);
-            kanjiValue[k] = toKanjiValueOrMinusOne(text.charAt(k));
             for (int t = 0; t < charCount; t++) {
-                utf8Prefix[k + 1 + t] = utf8Prefix[k] + bytes;
+                int position = k + t;
+                char c = text.charAt(position);
+                utf8Prefix[position + 1] = utf8Prefix[k] + bytes;
+                numericInvalid[position + 1] = numericInvalid[position] + (isDigit(c) ? 0 : 1);
+                alphaInvalid[position + 1] = alphaInvalid[position]
+                        + (ALPHANUMERIC_CHARSET.indexOf(c) >= 0 ? 0 : 1);
+                kanjiInvalid[position + 1] = kanjiInvalid[position]
+                        + (charCount == 1 && toKanjiValueOrMinusOne(c) >= 0 ? 0 : 1);
+                latinInvalid[position + 1] = latinInvalid[position] + (c <= 255 ? 0 : 1);
+                nonAscii[position + 1] = nonAscii[position] + (c > 127 ? 1 : 0);
             }
             k += charCount;
             boundary[k] = true;
         }
 
-        long[] cost = new long[n + 1];
-        QrEncodingMode[] modeAt = new QrEncodingMode[n];
-        int[] endAt = new int[n];
-        Arrays.fill(cost, Long.MAX_VALUE);
-        cost[n] = 0L;
+        long[][] cost = new long[n + 1][2];
+        QrEncodingMode[][] modeAt = new QrEncodingMode[n][2];
+        int[][] endAt = new int[n][2];
+        for (long[] row : cost) {
+            Arrays.fill(row, Long.MAX_VALUE / 4);
+        }
+        cost[n][0] = 0;
+        cost[n][1] = 0;
+        QrEncodingMode[] modes = {QrEncodingMode.NUMERIC, QrEncodingMode.ALPHANUMERIC,
+                QrEncodingMode.KANJI, QrEncodingMode.BYTE};
 
         for (int i = n - 1; i >= 0; i--) {
             if (i > 0 && !boundary[i]) {
                 continue;
             }
-            int numEnd = i;
-            while (numEnd < n && isDigit(text.charAt(numEnd))) {
-                numEnd++;
-            }
-            for (int j = i + 1; j <= numEnd; j++) {
-                consider(text, i, j, QrEncodingMode.NUMERIC, version, cost, modeAt, endAt, utf8Prefix);
-            }
-
-            int alphaEnd = i;
-            while (alphaEnd < n && ALPHANUMERIC_CHARSET.indexOf(text.charAt(alphaEnd)) >= 0) {
-                alphaEnd++;
-            }
-            for (int j = i + 1; j <= alphaEnd; j++) {
-                consider(text, i, j, QrEncodingMode.ALPHANUMERIC, version, cost, modeAt, endAt, utf8Prefix);
-            }
-
-            int kanjiEnd = i;
-            while (kanjiEnd < n && kanjiValue[kanjiEnd] >= 0) {
-                kanjiEnd++;
-            }
-            for (int j = i + 1; j <= kanjiEnd; j++) {
-                consider(text, i, j, QrEncodingMode.KANJI, version, cost, modeAt, endAt, utf8Prefix);
-            }
-
-            // Byte mode can always encode the remainder, so one pass over every possible end is enough.
             for (int j = i + 1; j <= n; j++) {
                 if (!boundary[j]) {
                     continue;
                 }
-                consider(text, i, j, QrEncodingMode.BYTE, version, cost, modeAt, endAt, utf8Prefix);
+                for (QrEncodingMode mode : modes) {
+                    int countBits = micro ? MicroQrTables.characterCountBits(version, mode)
+                            : mode.getCharacterCountBits(version);
+                    if (countBits < 0) {
+                        continue;
+                    }
+                    int count = mode == QrEncodingMode.BYTE && !micro
+                            ? utf8Prefix[j] - utf8Prefix[i] : j - i;
+                    if (count >= (1 << countBits)) {
+                        continue;
+                    }
+                    int[] invalid = mode == QrEncodingMode.NUMERIC ? numericInvalid
+                            : mode == QrEncodingMode.ALPHANUMERIC ? alphaInvalid
+                            : mode == QrEncodingMode.KANJI ? kanjiInvalid : latinInvalid;
+                    if ((mode != QrEncodingMode.BYTE || micro) && invalid[j] != invalid[i]) {
+                        continue;
+                    }
+                    long bits = (micro ? version - 1 : 4) + countBits + dataBitLength(mode, count);
+                    boolean needsEci = !micro && mode == QrEncodingMode.BYTE && nonAscii[j] != nonAscii[i];
+                    for (int state = 0; state < 2; state++) {
+                        int nextState = needsEci ? 1 : state;
+                        long candidate = bits + cost[j][nextState] + (needsEci && state == 0 ? 12 : 0);
+                        if (candidate < cost[i][state]) {
+                            cost[i][state] = candidate;
+                            modeAt[i][state] = mode;
+                            endAt[i][state] = j;
+                        }
+                    }
+                }
             }
         }
 
         int i = 0;
+        int state = 0;
         while (i < n) {
-            int end = endAt[i];
+            if (modeAt[i][state] == null) {
+                throw new IllegalArgumentException("Payload uses a mode or character unavailable in M" + version);
+            }
+            int end = endAt[i][state];
             String part = text.substring(i, end);
-            switch (modeAt[i]) {
+            switch (modeAt[i][state]) {
                 case NUMERIC:
                     result.add(makeNumeric(part));
                     break;
@@ -202,7 +246,11 @@ final class QrSegment {
                     result.add(makeAlphanumeric(part));
                     break;
                 case BYTE:
-                    result.add(makeBytes(part.getBytes(StandardCharsets.UTF_8)));
+                    result.add(makeBytes(part.getBytes(micro ? StandardCharsets.ISO_8859_1
+                            : StandardCharsets.UTF_8)));
+                    if (!micro && nonAscii[end] != nonAscii[i]) {
+                        state = 1;
+                    }
                     break;
                 case KANJI:
                     result.add(makeKanji(part));
@@ -212,34 +260,23 @@ final class QrSegment {
             }
             i = end;
         }
+        if (state == 1) {
+            result.add(0, makeEci(ECI_UTF8));
+        }
         return result;
     }
 
-    private static void consider(String text, int i, int j, QrEncodingMode mode, int version,
-                                 long[] cost, QrEncodingMode[] modeAt, int[] endAt,
-                                 int[] utf8Prefix) {
-        long bits = segmentBitLength(text, i, j, mode, version, utf8Prefix);
-        long candidate = bits + cost[j];
-        if (candidate < cost[i]) {
-            cost[i] = candidate;
-            modeAt[i] = mode;
-            endAt[i] = j;
-        }
-    }
-
-    private static long segmentBitLength(String text, int i, int j, QrEncodingMode mode, int version,
-                                         int[] utf8Prefix) {
-        int length = j - i;
+    private static long dataBitLength(QrEncodingMode mode, int length) {
         switch (mode) {
             case NUMERIC:
-                return 4 + mode.getCharacterCountBits(version) + 10L * (length / 3)
+                return 10L * (length / 3)
                         + (length % 3 == 2 ? 7L : length % 3 == 1 ? 4L : 0L);
             case ALPHANUMERIC:
-                return 4 + mode.getCharacterCountBits(version) + 11L * (length / 2) + 6L * (length % 2);
+                return 11L * (length / 2) + 6L * (length % 2);
             case BYTE:
-                return 4 + mode.getCharacterCountBits(version) + 8L * (utf8Prefix[j] - utf8Prefix[i]);
+                return 8L * length;
             case KANJI:
-                return 4 + mode.getCharacterCountBits(version) + 13L * length;
+                return 13L * length;
             default:
                 throw new IllegalArgumentException("Unsupported DP mode: " + mode);
         }
@@ -293,6 +330,9 @@ final class QrSegment {
      * @return the same list, or a new list with the ECI segment in front
      */
     static List<QrSegment> withEciIfNeeded(List<QrSegment> segments, String text) {
+        if (!segments.isEmpty() && segments.get(0).isEci()) {
+            return segments;
+        }
         if (needsEci(text) && usesByteMode(segments)) {
             List<QrSegment> prefixed = new ArrayList<>(segments.size() + 1);
             prefixed.add(makeEci(ECI_UTF8));
@@ -355,6 +395,9 @@ final class QrSegment {
      * @return the 13-bit Kanji-mode value, or -1 when the character has no Kanji Shift_JIS form
      */
     private static int toKanjiValueOrMinusOne(char c) {
+        if (!SHIFT_JIS.newEncoder().canEncode(c)) {
+            return -1;
+        }
         byte[] bytes = String.valueOf(c).getBytes(SHIFT_JIS);
         if (bytes.length != 2) {
             return -1;
@@ -368,6 +411,22 @@ final class QrSegment {
             return (b0 - 0xC1) * 0xC0 + (b1 - 0x40);
         }
         return -1;
+    }
+
+    static void validateText(String text) {
+        if (text == null) {
+            throw new IllegalArgumentException("Payload must not be null");
+        }
+        for (int i = 0; i < text.length(); i++) {
+            char c = text.charAt(i);
+            if (Character.isHighSurrogate(c)) {
+                if (i + 1 == text.length() || !Character.isLowSurrogate(text.charAt(++i))) {
+                    throw new IllegalArgumentException("Payload contains an unpaired high surrogate");
+                }
+            } else if (Character.isLowSurrogate(c)) {
+                throw new IllegalArgumentException("Payload contains an unpaired low surrogate");
+            }
+        }
     }
 
     private static int toKanjiValue(char c) {

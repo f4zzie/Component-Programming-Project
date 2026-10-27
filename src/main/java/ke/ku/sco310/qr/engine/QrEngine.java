@@ -65,6 +65,17 @@ public final class QrEngine {
         if (content == null || content.isEmpty()) {
             throw new QrEncodingException(producerId, "The payload is empty; a QR Code must carry at least one byte");
         }
+        if (requestedLevel == null) {
+            throw new QrEncodingException(producerId, "An error-correction level is required");
+        }
+        try {
+            QrSegment.validateText(content);
+        } catch (IllegalArgumentException e) {
+            throw new QrEncodingException(producerId, e.getMessage(), e);
+        }
+        if (content.codePointCount(0, content.length()) > 7089) {
+            throw new QrEncodingException(producerId, "Payload exceeds the maximum QR numeric capacity of 7089 characters");
+        }
         if (minimumVersion < 1 || maximumVersion > 40 || minimumVersion > maximumVersion) {
             throw new QrEncodingException(producerId, "Invalid version window "
                     + minimumVersion + ".." + maximumVersion);
@@ -77,9 +88,13 @@ public final class QrEngine {
         QrErrorCorrection level = requestedLevel;
         List<QrSegment> segments = new java.util.ArrayList<>();
         int usedBits = 0;
+        int previousRange = -1;
         while (true) {
-            segments = QrSegment.makeSegments(content, version);
-            segments = QrSegment.withEciIfNeeded(segments, content);
+            int range = version <= 9 ? 0 : version <= 26 ? 1 : 2;
+            if (range != previousRange) {
+                segments = QrSegment.makeSegments(content, version);
+                previousRange = range;
+            }
             usedBits = totalBits(segments, version);
             int capacityBits = QrTables.numDataCodewords(version, level) * 8;
             if (usedBits <= capacityBits) {
