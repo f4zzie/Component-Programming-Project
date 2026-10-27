@@ -30,6 +30,7 @@ java -jar QrStudio.jar
 
 - [Background](#background)
 - [Features](#features)
+- [Screenshots](#screenshots)
 - [Component catalogue](#component-catalogue)
 - [Getting started](#getting-started)
 - [CLI](#cli)
@@ -76,6 +77,24 @@ source tree.
 - CLI commands for generation, decoding, CSV batch processing and component listing.
 - HTTP endpoints for QR generation, health, history, statistics and catalogue discovery.
 - HTTP payload limits, request logging, renderer reuse, JSON escaping and optional CORS.
+
+## Screenshots
+
+The existing coursework evidence includes the running desktop assembly, renderer replacement, HTTP
+service and component architecture:
+
+| Desktop PNG assembly | Desktop SVG assembly |
+|---|---|
+| [![PNG renderer](docs/screenshots/03-gui-png-assembly.png)](docs/screenshots/03-gui-png-assembly.png) | [![SVG renderer](docs/screenshots/04-gui-svg-assembly.png)](docs/screenshots/04-gui-svg-assembly.png) |
+| **ASCII renderer** | **HTTP service** |
+| [![ASCII renderer](docs/screenshots/05-gui-ascii-assembly.png)](docs/screenshots/05-gui-ascii-assembly.png) | [![HTTP service](docs/screenshots/15-http-service.png)](docs/screenshots/15-http-service.png) |
+
+The architecture and verification evidence are also available as full-size images:
+
+- [Component model](docs/diagrams/figure-1-component-model.png)
+- [Verification transcript](docs/screenshots/12-verification-transcript.png)
+- [Build and JAR packaging](docs/screenshots/13-build-and-package.png)
+- [Component registry source](docs/screenshots/20-code-registry.png)
 
 ## Component catalogue
 
