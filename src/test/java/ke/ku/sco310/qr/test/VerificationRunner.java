@@ -57,6 +57,7 @@ public final class VerificationRunner {
         EngineReferenceTest.run(harness, tableCsv, capacityCsv);
         MicroQrReferenceTest.run(harness);
         ExtensionComponentTest.run(harness);
+        FrontEndTest.run(harness, new File(evidence, "work/frontends"));
         ProjectBuilderTest.run(harness);
         RendererTest.run(harness, rendererCsv);
         BeanContractTest.run(harness, work);
