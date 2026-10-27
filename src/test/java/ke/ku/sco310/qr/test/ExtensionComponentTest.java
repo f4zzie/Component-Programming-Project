@@ -43,6 +43,9 @@ final class ExtensionComponentTest {
         PureJavaQrDecoderBean pure = new PureJavaQrDecoderBean();
         harness.checkEquals("extensions.decoder", "pure decoder reads a symbol matrix", payload,
                 pure.decode(symbol));
+        QrCode versionOne = new PureJavaQrEncoderBean().encode("A", QrErrorCorrection.MEDIUM);
+        harness.checkEquals("extensions.decoder", "pure decoder reads version-one format bits", "A",
+                pure.decode(versionOne));
 
         RenderedArtifact png = new PngRendererBean().render(symbol);
         RenderedArtifact svg = new SvgRendererBean().render(symbol);

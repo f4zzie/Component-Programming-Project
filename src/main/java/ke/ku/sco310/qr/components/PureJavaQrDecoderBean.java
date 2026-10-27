@@ -306,7 +306,7 @@ public class PureJavaQrDecoderBean implements QrCodeDecoder, Serializable, Bound
         bits |= bool(modules[8][8]) << 7;
         bits |= bool(modules[8][7]) << 8;
         for (int i = 9; i < 15; i++) {
-            bits |= bool(modules[14 - i][8]) << i;
+            bits |= bool(modules[8][14 - i]) << i;
         }
         int bestDistance = Integer.MAX_VALUE;
         QrErrorCorrection bestLevel = null;
